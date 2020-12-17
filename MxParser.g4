@@ -120,11 +120,12 @@ expressionList: expression (Comma expression)*;
 
 statement
     : expressionStatement
-	| compoundStatement
-	| selectionStatement
-	| iterationStatement
-	| jumpStatement
-	| declarationStatement;
+    | compoundStatement
+    | selectionStatement
+    | iterationStatement
+    | jumpStatement
+    | declarationStatement
+    ;
 
 expressionStatement: expression? Semi;
 
@@ -138,31 +139,34 @@ condition: expression;
 
 iterationStatement
     : While LeftParen condition RightParen statement
-	| For LeftParen forInitStatement condition? Semi expression? RightParen statement
+    | For LeftParen forInitStatement condition? Semi expression? RightParen statement
     ;
 
 forInitStatement: expressionStatement | simpleDeclaration;
 
 jumpStatement
     : ( Break
-		| Continue
-		| Return expression?
-	) Semi
+	| Continue
+	| Return expression?
+    ) Semi
     ;
 
 declarationStatement: simpleDeclaration;
 
-simpleDeclaration: typeSpecifier declaratorList Semi;
+simpleDeclaration
+    : simpleTypeSpecifier declaratorList Semi
+    | classSpecifier declaratorList? Semi
+    ;
 
 typeSpecifier
     : simpleTypeSpecifier
-	| classSpecifier
-	;
+    | classSpecifier
+    ;
 
 simpleTypeSpecifier
-    : className
-	| builtinType
-	;
+    : (className | builtinType) (LeftBracket RightBracket)*
+    | Void
+    ;
 
 declaratorList: declarator (Comma declarator)*;
 
@@ -170,11 +174,11 @@ declarator: idExpression;
 
 /* function */
 
-functionDefinition: typeSpecifier? declarator LeftParen parameterDeclarationList RightParen functionBody;
+functionDefinition: simpleTypeSpecifier? declarator LeftParen parameterDeclarationList RightParen functionBody;
 
 parameterDeclarationList: parameterDeclaration (Comma parameterDeclaration)*;
 
-parameterDeclaration: typeSpecifier declarator;
+parameterDeclaration: simpleTypeSpecifier declarator;
 
 functionBody: compoundStatement;
 
@@ -199,7 +203,6 @@ builtinType
     : Int
     | Bool
     | String
-    | Void
     ;
 
 literal
