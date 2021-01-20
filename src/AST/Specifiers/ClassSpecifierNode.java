@@ -59,6 +59,21 @@ public class ClassSpecifierNode extends DeclSpecifierNode {
     public ArrayList<FuncNode> getConstructors() {
         return constructors;
     }
+    public ClassType generateClassType() {
+        ArrayList<VarEntity> memberList = new ArrayList<>();
+        ArrayList<FunctionEntity> constructorList = new ArrayList<>();
+        ArrayList<FunctionEntity> methodList = new ArrayList<>();
+        for (var varNode: members) {
+            memberList.add(varNode.generateEntity(VarEntity.VarEntityType.member));
+        }
+        for (var funcNode: constructors) {
+            constructorList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.constructor));
+        }
+        for (var funcNode: methods) {
+            methodList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.method));
+        }
+        return new ClassType(className, memberList, constructorList, methodList);
+    }
 
     @Override
     public String toString() {
