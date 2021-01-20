@@ -19,6 +19,7 @@ public class ClassSpecifierNode extends DeclSpecifierNode {
                               MemberSpecificationNode MS) {
         super(loc);
         this.className = className;
+        this.setTypeName(className);
         if (MS!=null) {
             this.members = MS.getMembers();
             this.constructors = MS.getConstructors();
