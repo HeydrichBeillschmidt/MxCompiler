@@ -129,30 +129,40 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitNewExpression(MxParser.NewExpressionContext ctx) {
-        DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.newTypeId());
-        if (ctx.newInitializer()!=null) {
-            if (ctx.newInitializer().expressionList()!=null) {
-                ArrayList<InitializerClauseNode> temp
-                        = ((InitializerListNode)visit(ctx.newInitializer().expressionList())).getInitClauses();
-                ArrayList<ExprNode> indexes = new ArrayList<>(temp);
-                return new NewExprNode(new Location(ctx.getStart()), ctx.getText(),
-                        specifier, indexes);
-            }
-            else return new NewExprNode(new Location(ctx.getStart()), ctx.getText(),
-                    specifier, null);
-        }
-        else return new NewExprNode(new Location(ctx.getStart()), ctx.getText(),
-                specifier, null);
+        return visit(ctx.newTypeId());
     }
 
     @Override
     public ASTNode visitNewTypeId(MxParser.NewTypeIdContext ctx) {
-        return visit(ctx.typeSpecifierSeq());
+        DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.typeSpecifierSeq());
+        if (ctx.newDeclarator()!=null) {
+            ArrayList<ExprNode> indexes
+                    = ((ExprSeqNode) visit(ctx.newDeclarator())).getSubExpressions();
+            return new NewExprNode(new Location(ctx.getStart()), ctx.getText(),
+                    specifier, indexes);
+        }
+        return new NewExprNode(new Location(ctx.getStart()), ctx.getText(),
+                specifier, null);
     }
 
     @Override
     public ASTNode visitNewDeclarator(MxParser.NewDeclaratorContext ctx) {
-        return null;
+        ArrayList<ExprNode> indexes = new ArrayList<>();
+        if (ctx.expression()!=null) {
+            ExprNode first = ((ExprSeqNode) visit(ctx.expression())).getSubExpressions().get(0);
+            indexes.add(first);
+        }
+        else {
+            indexes = ((ExprSeqNode) visit(ctx.newDeclarator())).getSubExpressions();
+            if (ctx.constantExpression()!=null) {
+                indexes.add((ConditionalExprNode) visit(ctx.constantExpression()));
+            }
+            else {
+                indexes.add(new ConditionalExprNode(new Location(ctx.getStart()),
+                        ctx.getText(), null));
+            }
+        }
+        return new ExprSeqNode(new Location(ctx.getStart()), ctx.getText(), indexes);
     }
 
     @Override
@@ -353,9 +363,9 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitExpression(MxParser.ExpressionContext ctx) {
-        ArrayList<AssignmentExprNode> tests = new ArrayList<>();
+        ArrayList<ExprNode> tests = new ArrayList<>();
         for (var test: ctx.assignmentExpression())
-            tests.add((AssignmentExprNode) visit(test));
+            tests.add((ExprNode) visit(test));
         return new ExprSeqNode(new Location(ctx.getStart()), ctx.getText(), tests);
     }
 
