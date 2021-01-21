@@ -6,15 +6,15 @@ import Mx.Utils.Location;
 import java.util.ArrayList;
 
 public class ExprSeqNode extends ExprNode {
-    private final ArrayList<AssignmentExprNode> tests;
+    private final ArrayList<ExprNode> tests;
 
     public ExprSeqNode(Location loc, String text,
-                       ArrayList<AssignmentExprNode> tests) {
+                       ArrayList<ExprNode> tests) {
         super(loc, text);
         this.tests = tests;
     }
 
-    public ArrayList<AssignmentExprNode> getSubExpressions() {
+    public ArrayList<ExprNode> getSubExpressions() {
         return tests;
     }
 
