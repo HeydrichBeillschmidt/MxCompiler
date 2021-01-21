@@ -2,8 +2,11 @@ package Mx;
 
 import Mx.AST.ASTRoot;
 import Mx.Frontend.ASTBuilder;
+import Mx.Frontend.SemanticChecker;
+import Mx.Frontend.TypeChecker;
 import Mx.Generated.MxLexer;
 import Mx.Generated.MxParser;
+import Mx.Utils.Errors.SemanticError;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -49,5 +52,17 @@ public class Main {
 
         ASTBuilder astBuilder = new ASTBuilder(exceptionHandler);
         ASTRoot AST = (ASTRoot) astBuilder.visit(parseTreeRoot);
+
+        try {
+            TypeChecker typeChecker = new TypeChecker(exceptionHandler);
+            AST.accept(typeChecker);
+            SemanticChecker semanticChecker = new SemanticChecker(typeChecker.getTypeTable(),
+                    exceptionHandler);
+            AST.accept(semanticChecker);
+        }
+        catch (SemanticError err) {
+            exceptionHandler.print();
+            throw new RuntimeException();
+        }
     }
 }
