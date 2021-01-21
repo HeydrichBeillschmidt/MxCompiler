@@ -27,11 +27,9 @@ public class NewExprNode extends ExprNode {
         return indexes;
     }
     public int getDimension() {
-        DeclSpecifierNode tmp = specifier.getTypeSpecifier();
-        if (tmp instanceof ArrayTypeSpecifierNode)
-            return ((ArrayTypeSpecifierNode)tmp).getDimension();
-        else
-            return 0;
+        if (indexes!=null)
+            return indexes.size();
+        return 0;
     }
 
     @Override
