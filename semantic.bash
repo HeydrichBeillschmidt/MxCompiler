@@ -1,3 +1,6 @@
 set ff=UNIX
 set -e
-cat | java -cp /ulib/java/antlr-4.9.1-complete.jar:./bin Main -semantic
+cd "$(dirname "$0")"
+export CCHK="java -classpath ./lib/antlr-4.9.1-complete.jar:./bin Main"
+cat > test.mx   # save everything in stdin to test.Mx
+$CCHK
