@@ -1,8 +1,6 @@
 package Mx.AST.Expressions;
 
 import Mx.AST.ASTVisitor;
-import Mx.AST.Specifiers.ArrayTypeSpecifierNode;
-import Mx.AST.Specifiers.DeclSpecifierNode;
 import Mx.AST.Specifiers.DeclSpecifierSeqNode;
 import Mx.Utils.Location;
 
