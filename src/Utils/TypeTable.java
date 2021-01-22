@@ -50,7 +50,7 @@ public class TypeTable {
                     + specifier.getTypename() + "\".");
             throw new SemanticError();
         }
-        DeclSpecifierNode typeSpecifier = specifier.getTypeSpecifier();
+        TypeSpecifierNode typeSpecifier = specifier.getTypeSpecifier();
         if (typeSpecifier instanceof ArrayTypeSpecifierNode) {
             String baseTypeName
                     = ((ArrayTypeSpecifierNode) typeSpecifier).getBaseTypeSpecifier().getTypename();
@@ -61,7 +61,7 @@ public class TypeTable {
             return typeTable.get(specifier.getTypename());
     }
     public Type getType(DeclSpecifierSeqNode specifier) {
-        DeclSpecifierNode typeSpecifier = specifier.getTypeSpecifier();
+        TypeSpecifierNode typeSpecifier = specifier.getTypeSpecifier();
         if (typeSpecifier instanceof ArrayTypeSpecifierNode) {
             String baseTypeName
                     = ((ArrayTypeSpecifierNode) typeSpecifier).getBaseTypeSpecifier().getTypename();
