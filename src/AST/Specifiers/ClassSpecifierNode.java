@@ -65,14 +65,20 @@ public class ClassSpecifierNode extends TypeSpecifierNode {
         ArrayList<VarEntity> memberList = new ArrayList<>();
         ArrayList<FunctionEntity> constructorList = new ArrayList<>();
         ArrayList<FunctionEntity> methodList = new ArrayList<>();
-        for (var varNode: members) {
-            memberList.add(varNode.generateEntity(VarEntity.VarEntityType.member));
+        if (members!=null) {
+            for (var varNode: members) {
+                memberList.add(varNode.generateEntity(VarEntity.VarEntityType.member));
+            }
         }
-        for (var funcNode: constructors) {
-            constructorList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.constructor));
+        if (constructors!=null) {
+            for (var funcNode: constructors) {
+                constructorList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.constructor));
+            }
         }
-        for (var funcNode: methods) {
-            methodList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.method));
+        if (methods!=null) {
+            for (var funcNode: methods) {
+                methodList.add(funcNode.generateEntity(FunctionEntity.FuncEntityType.method));
+            }
         }
         return new ClassType(className, memberList, constructorList, methodList);
     }
@@ -82,16 +88,20 @@ public class ClassSpecifierNode extends TypeSpecifierNode {
         StringBuilder string = new StringBuilder("<ClassSpecifierNode>\n");
         string.append("class name = ").append(className);
         string.append("\nmembers:\n");
-        for (var mem: members)
-            string.append(mem.toString());
+        if (members!=null) {
+            for (var mem: members)
+                string.append(mem.toString());
+        }
         if (hasConstructor()) {
             string.append("constructors:\n");
             for (var cstr : constructors)
                 string.append(cstr.toString());
         }
         string.append("methods:\n");
-        for (var method: methods)
-            string.append(method.toString());
+        if (methods!=null) {
+            for (var method: methods)
+                string.append(method.toString());
+        }
         return string.toString();
     }
     @Override
