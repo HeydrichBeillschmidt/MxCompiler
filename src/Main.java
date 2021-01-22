@@ -24,7 +24,8 @@ public class Main {
         InputStream inputStream;
         CharStream input;
         try {
-            inputStream = new FileInputStream(filename);
+//            inputStream = new FileInputStream(filename);
+            inputStream = System.in;
             input = CharStreams.fromStream(inputStream);
         }
         catch (Exception e) {
