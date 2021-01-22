@@ -848,6 +848,8 @@ public class SemanticChecker implements ASTVisitor {
                     node.getLocation());
             throw new SemanticError();
         }
+        node.assureLvalue(false);
+        node.setType(lExpr.getType());
     }
 
     @Override
@@ -1237,10 +1239,36 @@ public class SemanticChecker implements ASTVisitor {
             varNode.accept(this);
     }
 
-    @Override public void visit(ParenedInitializerNode node) {}
-    @Override public void visit(InitializerClauseNode node) {}
-    @Override public void visit(InitializerListNode node) {}
-    @Override public void visit(BracedInitListNode node) {}
+    @Override
+    public void visit(ParenedInitializerNode node) {
+        node.setScope(currentScope());
+        node.getInitList().accept(this);
+    }
+
+    @Override
+    public void visit(InitializerClauseNode node) {
+        if (node.isAtomic()) {
+            node.getAssignmentExpr().accept(this);
+            node.setType(node.getAssignmentExpr().getType());
+        }
+        else {
+            node.getBraced().accept(this);
+        }
+        node.assureLvalue(false);
+    }
+
+    @Override
+    public void visit(InitializerListNode node) {
+        node.setScope(currentScope());
+        for (var init: node.getInitClauses())
+            init.accept(this);
+    }
+
+    @Override
+    public void visit(BracedInitListNode node) {
+        node.setScope(currentScope());
+        node.getInitList().accept(this);
+    }
 
     /* function */
 
