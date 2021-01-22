@@ -11,7 +11,7 @@ import Mx.Utils.Location;
 
 import java.util.ArrayList;
 
-public class ClassSpecifierNode extends DeclSpecifierNode {
+public class ClassSpecifierNode extends TypeSpecifierNode {
     private final String className;
     private final ArrayList<VarNode> members;
     private final ArrayList<FuncNode> constructors;

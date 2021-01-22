@@ -4,53 +4,30 @@ import Mx.AST.ASTNode;
 import Mx.AST.ASTVisitor;
 import Mx.Utils.Location;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DeclSpecifierSeqNode extends ASTNode {
-    private String typename;
-    private DeclSpecifierNode typeSpecifier;
-    private boolean restrictedSpecifierSeq;
-    public ArrayList<DeclSpecifierNode> declSpecifiers;
+    private final TypeSpecifierNode typeSpecifier;
+    public Set<NonTypeSpecifierNode> declSpecifiers;
 
-    public DeclSpecifierSeqNode(Location loc, ArrayList<DeclSpecifierNode> declSpecifiers) {
+    public DeclSpecifierSeqNode(Location loc, TypeSpecifierNode typeSpecifier,
+                                Set<NonTypeSpecifierNode> declSpecifiers) {
         super(loc);
-        restrictedSpecifierSeq = true;
+        this.typeSpecifier = typeSpecifier;
         this.declSpecifiers = declSpecifiers;
-
-        boolean typed = false;
-        for (var decl: this.declSpecifiers) {
-            if (decl.isTypeSpecifier()) {
-                if (!typed) {
-                    typeSpecifier = decl;
-                    typename = decl.getTypename();
-                    typed = true;
-                }
-            }
-            else if (restrictedSpecifierSeq)
-                restrictedSpecifierSeq = false;
-        }
     }
-    public DeclSpecifierSeqNode(Location loc, DeclSpecifierNode declSpecifier) {
+    public DeclSpecifierSeqNode(Location loc, TypeSpecifierNode typeSpecifier) {
         super(loc);
-        restrictedSpecifierSeq = true;
-        declSpecifiers = new ArrayList<>();
-        declSpecifiers.add(declSpecifier);
-
-        if (declSpecifier.isTypeSpecifier())
-            typename = declSpecifier.getTypename();
-        else {
-            restrictedSpecifierSeq = false;
-        }
+        this.typeSpecifier = typeSpecifier;
+        declSpecifiers = new HashSet<>();
     }
 
     public String getTypename() {
-        return typename;
+        return typeSpecifier.getTypename();
     }
-    public DeclSpecifierNode getTypeSpecifier() {
+    public TypeSpecifierNode getTypeSpecifier() {
         return typeSpecifier;
-    }
-    public boolean isTypeSpecifierSeq() {
-        return restrictedSpecifierSeq;
     }
 
     @Override
@@ -60,6 +37,7 @@ public class DeclSpecifierSeqNode extends ASTNode {
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder("<DeclSpecifierSeq>\n");
+        string.append("TypeSpecifier:\n").append(typeSpecifier.toString());
         string.append("DeclSpecifiers:\n");
         for (var unit: declSpecifiers)
             string.append(unit.toString());
