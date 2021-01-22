@@ -15,7 +15,6 @@ False_:     'false';
 For:        'for';
 If:         'if';
 Int:        'int';
-Main:       'main';
 New:        'new';
 Null:       'null';
 Return:     'return';
