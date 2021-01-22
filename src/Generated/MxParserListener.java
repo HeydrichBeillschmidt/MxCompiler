@@ -488,6 +488,26 @@ public interface MxParserListener extends ParseTreeListener {
 	 */
 	void exitDeclSpecifierSeq(MxParser.DeclSpecifierSeqContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MxParser#storageClassSpecifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#storageClassSpecifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MxParser#functionSpecifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionSpecifier(MxParser.FunctionSpecifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#functionSpecifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionSpecifier(MxParser.FunctionSpecifierContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MxParser#typeSpecifier}.
 	 * @param ctx the parse tree
 	 */
@@ -618,6 +638,16 @@ public interface MxParserListener extends ParseTreeListener {
 	 */
 	void exitBracedInitList(MxParser.BracedInitListContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MxParser#cvQualifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterCvQualifier(MxParser.CvQualifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#cvQualifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitCvQualifier(MxParser.CvQualifierContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MxParser#parametersAndQualifiers}.
 	 * @param ctx the parse tree
 	 */
@@ -687,6 +717,16 @@ public interface MxParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitClassHead(MxParser.ClassHeadContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MxParser#classKey}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassKey(MxParser.ClassKeyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#classKey}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassKey(MxParser.ClassKeyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#className}.
 	 * @param ctx the parse tree
