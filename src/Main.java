@@ -1,12 +1,10 @@
 package Mx;
 
 import Mx.AST.ASTRoot;
-import Mx.Frontend.ASTBuilder;
-import Mx.Frontend.SemanticChecker;
-import Mx.Frontend.TypeChecker;
+import Mx.Frontend.*;
 import Mx.Generated.MxLexer;
 import Mx.Generated.MxParser;
-import Mx.Utils.Errors.SemanticError;
+import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -25,7 +23,6 @@ public class Main {
         CharStream input;
         try {
             inputStream = new FileInputStream(filename);
-//            inputStream = System.in;
             input = CharStreams.fromStream(inputStream);
         }
         catch (Exception e) {
@@ -61,7 +58,11 @@ public class Main {
                     exceptionHandler);
             AST.accept(semanticChecker);
         }
-        catch (SemanticError err) {
+        catch (error err) {
+            exceptionHandler.print();
+            throw new RuntimeException();
+        }
+        if (exceptionHandler.hasError()) {
             exceptionHandler.print();
             throw new RuntimeException();
         }
