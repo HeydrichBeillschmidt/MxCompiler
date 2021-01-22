@@ -46,6 +46,7 @@ public interface ASTVisitor {
     void visit(DeclarationStmtNode node);
     /* specifiers */
     void visit(DeclSpecifierSeqNode node);
+    void visit(NonTypeSpecifierNode node);
     void visit(ClassSpecifierNode node);
     void visit(ArrayTypeSpecifierNode node);
     void visit(BuiltInTypeSpecifierNode node);
