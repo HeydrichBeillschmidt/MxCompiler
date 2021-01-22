@@ -4,6 +4,8 @@ import Mx.AST.ASTVisitor;
 import Mx.AST.FuncNode;
 import Mx.AST.MemberSpecificationNode;
 import Mx.AST.VarNode;
+import Mx.Entities.FunctionEntity;
+import Mx.Entities.VarEntity;
 import Mx.Types.ClassType;
 import Mx.Utils.Location;
 
