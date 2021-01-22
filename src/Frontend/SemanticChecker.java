@@ -46,56 +46,61 @@ public class SemanticChecker implements ASTVisitor {
 
         boolean errored = false;
 
-        for (var decl: node.getDeclarations()) {
-            if (decl instanceof FuncNode) {
+        if (node.getDeclarations()!=null) {
+            for (var decl: node.getDeclarations()) {
+                if (decl instanceof FuncNode) {
+                    try {
+                        globalScope.declareFunction(decl,
+                                FunctionEntity.FuncEntityType.function,
+                                exceptionHandler);
+                    }
+                    catch (SemanticError err) {
+                        errored = true;
+                    }
+                }
+            }
+            for (var decl: node.getDeclarations()) {
                 try {
-                    globalScope.declareFunction(decl,
-                            FunctionEntity.FuncEntityType.function,
-                            exceptionHandler);
+                    if (decl instanceof VarNode) {
+                        decl.accept(this);
+                        if (((VarNode) decl).getName()!=null) {
+                            globalScope.declareVariable(decl,
+                                    VarEntity.VarEntityType.global,
+                                    exceptionHandler);
+                        }
+                    }
+                    else if (decl instanceof FuncNode) {
+                        decl.accept(this);
+                    }
                 }
                 catch (SemanticError err) {
                     errored = true;
                 }
             }
-        }
-        for (var decl: node.getDeclarations()) {
-            try {
-                if (decl instanceof VarNode) {
-                    decl.accept(this);
-                    globalScope.declareVariable(decl,
-                            VarEntity.VarEntityType.global,
-                            exceptionHandler);
+
+            FunctionEntity mainFunc = currentScope().getFuncEntity("main");
+            if (mainFunc==null) {
+                exceptionHandler.error("Main function not found.");
+                errored = true;
+            }
+            else try {
+                if (!(typeTable.getType(mainFunc.getReturnType(),exceptionHandler).equals(new IntType()))) {
+                    exceptionHandler.error("Return type of main function is not int.",
+                            mainFunc.getLocation());
+                    errored = true;
                 }
-                else if (decl instanceof FuncNode) {
-                    decl.accept(this);
+                if (mainFunc.getParameters().size()!=0) {
+                    exceptionHandler.error("Main function should have no parameter.",
+                            mainFunc.getLocation());
+                    errored = true;
                 }
             }
             catch (SemanticError err) {
                 errored = true;
             }
         }
-        node.setScope(globalScope);
 
-        FunctionEntity mainFunc = currentScope().getFuncEntity("main");
-        if (mainFunc==null) {
-            exceptionHandler.error("Main function not found.");
-            errored = true;
-        }
-        else try {
-            if (!(typeTable.getType(mainFunc.getReturnType(),exceptionHandler).equals(new IntType()))) {
-                exceptionHandler.error("Return type of main function is not int.",
-                        mainFunc.getLocation());
-                errored = true;
-            }
-            if (mainFunc.getParameters().size()!=0) {
-                exceptionHandler.error("Main function should have no parameter.",
-                        mainFunc.getLocation());
-                errored = true;
-            }
-        }
-        catch (SemanticError err) {
-            errored = true;
-        }
+        node.setScope(globalScope);
 
         scopeStack.pop();
 
@@ -171,9 +176,13 @@ public class SemanticChecker implements ASTVisitor {
         ExprNode name = node.getName();
         ExprNode index = node.getIndex();
 
-        Type baseType = name.getType() instanceof ArrayType
-                ? ((ArrayType) name.getType()).getBaseType()
-                : name.getType();
+        Type nameType = name.getType();
+        if (!(nameType instanceof ArrayType)) {
+            exceptionHandler.error("\""
+                            + name.getText() + "\" is not of array type.",
+                    name.getLocation());
+            throw new SemanticError();
+        }
         Type indexType = index.getType();
         if (!(indexType instanceof IntType)) {
             exceptionHandler.error("\""
@@ -181,9 +190,13 @@ public class SemanticChecker implements ASTVisitor {
                     index.getLocation());
             throw new SemanticError();
         }
-        int dimension = node.getDimension();
+        Type baseType = ((ArrayType) nameType).getBaseType();
+        int dimension = ((ArrayType) nameType).getDimension();
         node.assureLvalue(true);
-        node.setType(new ArrayType(baseType, dimension));
+        if (dimension==1)
+            node.setType(baseType);
+        else
+            node.setType(new ArrayType(baseType, dimension-1));
     }
 
     @Override
@@ -218,8 +231,10 @@ public class SemanticChecker implements ASTVisitor {
         }
 
         ArrayList<ExprNode> parameters = node.getParameters();
-        for (var par: parameters)
-            par.accept(this);
+        if (parameters!=null) {
+            for (var par: parameters)
+                par.accept(this);
+        }
 
         FunctionEntity func;
         if (funcName instanceof MemberExprNode) {
@@ -240,21 +255,33 @@ public class SemanticChecker implements ASTVisitor {
         }
 
         ArrayList<VarEntity> funcParameters = func.getParameters();
-        if (parameters.size()!=funcParameters.size()) {
-            exceptionHandler.error("Inconsistent parameter num.",
+        if (((parameters==null||parameters.size()==0)
+                &&(funcParameters!=null&&funcParameters.size()!=0))
+                || ((parameters!=null&&parameters.size()!=0)
+                    &&(funcParameters==null||funcParameters.size()==0))) {
+            exceptionHandler.error("Inconsistent parameter list.",
                     node.getLocation());
             throw new SemanticError();
         }
-        for (int i = 0, it = parameters.size(); i < it; ++i) {
-            ExprNode rhs = parameters.get(i);
-            VarEntity lhs = funcParameters.get(i);
-            Type lType = typeTable.getType(lhs.getSpecifier());
-            Type rType = rhs.getType();
-            if (!Type.canAssign(lType, rType)) {
-                exceptionHandler.error("Type match failed: \""
-                        + lType.toString() + "\" required while rhs \""
-                        + rhs.getText() + "\" provided.", rhs.getLocation());
-                throw new SemanticError();
+        if (funcParameters!=null) {
+            if (!(parameters == null || parameters.size() == 0)) {
+                if (parameters.size()!=funcParameters.size()) {
+                    exceptionHandler.error("Inconsistent parameter num.",
+                            node.getLocation());
+                    throw new SemanticError();
+                }
+                for (int i = 0, it = parameters.size(); i < it; ++i) {
+                    ExprNode rhs = parameters.get(i);
+                    VarEntity lhs = funcParameters.get(i);
+                    Type lType = typeTable.getType(lhs.getSpecifier());
+                    Type rType = rhs.getType();
+                    if (!Type.canAssign(lType, rType)) {
+                        exceptionHandler.error("Type match failed: \""
+                                + lType.toString() + "\" required while rhs \""
+                                + rhs.getText() + "\" provided.", rhs.getLocation());
+                        throw new SemanticError();
+                    }
+                }
             }
         }
 
@@ -412,7 +439,7 @@ public class SemanticChecker implements ASTVisitor {
                     || type.getName().equals("bool")
                     || type.getName().equals("string")) {
                 exceptionHandler.error("Invalid to create builtin type "
-                                + type.toString() + " .", node.getLocation());
+                                + type.toString() + ".", node.getLocation());
                 throw new SemanticError();
             }
             node.assureLvalue(true);
@@ -422,11 +449,6 @@ public class SemanticChecker implements ASTVisitor {
             ArrayList<ExprNode> indexes = node.getIndexes();
             indexes.get(0).accept(this);
             ExprNode firstIndex = indexes.get(0);
-            if (!(firstIndex instanceof AssignmentExprNode)) {
-                exceptionHandler.error("Wrong creator syntax.",
-                        node.getLocation());
-                throw new SemanticError();
-            }
             if (!(firstIndex.getType() instanceof IntType)) {
                 exceptionHandler.error("Expression \""
                                 + firstIndex.getText()
@@ -442,8 +464,8 @@ public class SemanticChecker implements ASTVisitor {
                     hasSlot = true;
                 }
                 else if (hasSlot) {
-                    exceptionHandler.error("Wrong creator syntax.",
-                            node.getLocation());
+                    exceptionHandler.error("Wrong creator syntax:\n"
+                                    + node.toString(), node.getLocation());
                     throw new SemanticError();
                 }
                 else {
@@ -874,12 +896,14 @@ public class SemanticChecker implements ASTVisitor {
         scopeStack.push(scope);
 
         boolean errored = false;
-        for (var stmt: node.getStatements()) {
-            try {
-                stmt.accept(this);
-            }
-            catch (SemanticError err) {
-                errored = true;
+        if (node.getStatements()!=null) {
+            for (var stmt: node.getStatements()) {
+                try {
+                    stmt.accept(this);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
             }
         }
         node.setScope(scope);
@@ -1069,7 +1093,8 @@ public class SemanticChecker implements ASTVisitor {
             Type stmtRetType = retValue.getType();
             if (!Type.canAssign(retType, stmtRetType)) {
                 exceptionHandler.error("The returned expression \""
-                        + retValue.getText() + "\" is not of type \""
+                        + retValue.getText() + "\" of type \""
+                        + retValue.getType().toString() +"\" is not of type \""
                         + retType.toString() + "\".", node.getLocation());
                 throw new SemanticError();
             }
@@ -1088,12 +1113,17 @@ public class SemanticChecker implements ASTVisitor {
         node.setScope(currentScope());
 
         boolean errored = false;
-        for (var varNode: node.getVarNodes()) {
-            try {
-                varNode.accept(this);
-            }
-            catch (SemanticError err) {
-                errored = true;
+        if (node.getVarNodes()!=null) {
+            for (var varNode: node.getVarNodes()) {
+                try {
+                    varNode.accept(this);
+                    globalScope.declareVariable(varNode,
+                            VarEntity.VarEntityType.local,
+                            exceptionHandler);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
             }
         }
 
@@ -1115,6 +1145,11 @@ public class SemanticChecker implements ASTVisitor {
     }
 
     @Override
+    public void visit(NonTypeSpecifierNode node) {
+        node.setScope(currentScope());
+    }
+
+    @Override
     public void visit(ClassSpecifierNode node) {
         Scope scope = new Scope(currentScope(), Scope.ScopeType.classScope,
                 null, typeTable.getType(node.getClassName()));
@@ -1123,14 +1158,16 @@ public class SemanticChecker implements ASTVisitor {
 
         boolean errored = false;
         ArrayList<VarNode> members = node.getMembers();
-        for (var mem: members) {
-            try {
-                mem.accept(this);
-                scope.declareVariable(mem, VarEntity.VarEntityType.member,
-                        exceptionHandler);
-            }
-            catch (SemanticError err) {
-                errored = true;
+        if (members!=null) {
+            for (var mem: members) {
+                try {
+                    mem.accept(this);
+                    scope.declareVariable(mem, VarEntity.VarEntityType.member,
+                            exceptionHandler);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
             }
         }
         if (node.hasConstructor()) {
@@ -1153,20 +1190,22 @@ public class SemanticChecker implements ASTVisitor {
             }
         }
         ArrayList<FuncNode> methods = node.getMethods();
-        for (var method: methods) {
-            if (method.getName().equals(node.getClassName())) {
-                exceptionHandler.error("Mis-declared constructor with return type",
-                        method.getLocation());
-                errored = true;
-                continue;
-            }
-            try {
-                method.accept(this);
-                scope.declareFunction(method, FunctionEntity.FuncEntityType.method,
-                        exceptionHandler);
-            }
-            catch (SemanticError err) {
-                errored = true;
+        if (methods!=null) {
+            for (var method: methods) {
+                if (method.getName().equals(node.getClassName())) {
+                    exceptionHandler.error("Mis-declared constructor with return type",
+                            method.getLocation());
+                    errored = true;
+                    continue;
+                }
+                try {
+                    method.accept(this);
+                    scope.declareFunction(method, FunctionEntity.FuncEntityType.method,
+                            exceptionHandler);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
             }
         }
         node.setScope(scope);
@@ -1181,7 +1220,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(ArrayTypeSpecifierNode node) {
         node.setScope(currentScope());
         if (!typeTable.hasType(node.getBaseTypeSpecifier().getTypename())) {
-            exceptionHandler.error("Undefined type \""
+            exceptionHandler.error("Undefined base type \""
                     + node.getTypename() + "\".",node.getLocation());
             throw new SemanticError();
         }
@@ -1191,7 +1230,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(BuiltInTypeSpecifierNode node) {
         node.setScope(currentScope());
         if (!typeTable.hasType(node.getTypename())) { // condition never satisfies
-            exceptionHandler.error("Undefined type \""
+            exceptionHandler.error("Undefined builtin type \""
                     + node.getTypename() + "\".",node.getLocation());
             throw new SemanticError();
         }
@@ -1201,7 +1240,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(ClassTypeSpecifierNode node) {
         node.setScope(currentScope());
         if (!typeTable.hasType(node.getTypename())) { // condition never satisfies
-            exceptionHandler.error("Undefined type \""
+            exceptionHandler.error("Undefined class type \""
                     + node.getTypename() + "\".",node.getLocation());
             throw new SemanticError();
         }
@@ -1231,12 +1270,13 @@ public class SemanticChecker implements ASTVisitor {
         }
     }
 
-        // VarSeqNode will not be reached by visitor
     @Override
     public void visit(VarSeqNode node) {
         node.setScope(currentScope());
-        for (var varNode: node.getVarNodes())
-            varNode.accept(this);
+        if (node.getVarNodes()!=null) {
+            for (var varNode: node.getVarNodes())
+                varNode.accept(this);
+        }
     }
 
     @Override
@@ -1298,32 +1338,12 @@ public class SemanticChecker implements ASTVisitor {
         if (func!=null) {
             ArrayList<VarEntity> parameterEntities = func.getParameters();
             ArrayList<VarNode> parameters = node.getParameters();
-            assert parameterEntities.size()==parameters.size();
-            for (int i = 0, it = parameters.size(); i < it; ++i) {
-                VarNode par = parameters.get(i);
-                try {
-                    par.accept(this);
-                    scope.declareVariable(parameterEntities.get(i),
-                            par.getLocation(), exceptionHandler);
-                }
-                catch (SemanticError err) {
+            if (!(parameterEntities==null&&parameters==null)) {
+                if ((parameterEntities==null||parameters==null)
+                        || (parameterEntities.size()!=parameters.size())) {
                     errored = true;
                 }
-            }
-            try {
-                node.getFuncBody().accept(this);
-            }
-            catch (SemanticError err) {
-                errored = true;
-            }
-        }
-        else {
-            if (scope.getClassType()!=null
-                    && scope.getClassType().getName().equals(node.getName())) {
-                ArrayList<VarNode> parameters = node.getParameters();
-                func = scope.getConstructorEntity(parameters);
-                if (func!=null) {
-                    ArrayList<VarEntity> parameterEntities = func.getParameters();
+                else {
                     for (int i = 0, it = parameters.size(); i < it; ++i) {
                         VarNode par = parameters.get(i);
                         try {
@@ -1333,6 +1353,35 @@ public class SemanticChecker implements ASTVisitor {
                         }
                         catch (SemanticError err) {
                             errored = true;
+                        }
+                    }
+                    try {
+                        node.getFuncBody().accept(this);
+                    }
+                    catch (SemanticError err) {
+                        errored = true;
+                    }
+                }
+            }
+        }
+        else {
+            if (scope.getClassType()!=null
+                    && scope.getClassType().getName().equals(node.getName())) {
+                ArrayList<VarNode> parameters = node.getParameters();
+                func = scope.getConstructorEntity(parameters);
+                if (func!=null) {
+                    ArrayList<VarEntity> parameterEntities = func.getParameters();
+                    if (parameterEntities!=null) {
+                        for (int i = 0, it = parameters.size(); i < it; ++i) {
+                            VarNode par = parameters.get(i);
+                            try {
+                                par.accept(this);
+                                scope.declareVariable(parameterEntities.get(i),
+                                        par.getLocation(), exceptionHandler);
+                            }
+                            catch (SemanticError err) {
+                                errored = true;
+                            }
                         }
                     }
                     try {

@@ -12,6 +12,8 @@ import Mx.Utils.ExceptionHandler;
 import Mx.Utils.Location;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     ExceptionHandler exceptionHandler;
@@ -469,9 +471,16 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         else if (ctx.Continue()!=null)
             return new ContinueStmtNode(new Location(ctx.getStart()));
         else if (ctx.Return()!=null) {
+            ExprSeqNode retTmp;
             ExprNode retExpr = null;
-            if (ctx.expression()!=null)
-                retExpr = (ExprNode) visit(ctx.expression());
+            if (ctx.expression()!=null) {
+                retTmp = (ExprSeqNode) visit(ctx.expression());
+                if (retTmp.getSubExpressions().size()>1) {
+                    exceptionHandler.error("Cannot return multiple expressions: "
+                            + retTmp.toString(), new Location(ctx.getStart()));
+                }
+                retExpr = retTmp.getSubExpressions().get(0);
+            }
             return new ReturnStmtNode(new Location(ctx.getStart()), retExpr);
         }
         return null;
@@ -508,9 +517,18 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     @Override
     public ASTNode visitSimpleDeclaration(MxParser.SimpleDeclarationContext ctx) {
         DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.declSpecifierSeq());
-        ArrayList<VarNode> varNodes = ((VarSeqNode) visit(ctx.initDeclaratorList())).getVarNodes();
-        for (var node: varNodes)
-            node.setSpecifier(specifier);
+        ArrayList<VarNode> varNodes = new ArrayList<>();
+        if (ctx.initDeclaratorList()!=null) {
+            varNodes = ((VarSeqNode) visit(ctx.initDeclaratorList())).getVarNodes();
+            for (var node: varNodes)
+                node.setSpecifier(specifier);
+        }
+        else {
+            VarNode classSpecifierNode = new VarNode(new Location(ctx.getStart()),
+                    specifier, null, null);
+            varNodes.add(classSpecifierNode);
+        }
+
         return new VarSeqNode(new Location(ctx.getStart()), varNodes);
     }
 
@@ -523,40 +541,81 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitDeclSpecifier(MxParser.DeclSpecifierContext ctx) {
-        if (ctx.typeSpecifier() != null)
-            return visit(ctx.typeSpecifier());
-        return null;
+        if (ctx.storageClassSpecifier() != null)
+            return visit(ctx.storageClassSpecifier());
+        else if (ctx.functionSpecifier()!=null)
+            return visit(ctx.functionSpecifier());
+        else if (ctx.Friend()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "friend");
+        else if (ctx.Typedef()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "typedef");
+        else if (ctx.Constexpr()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "constexpr");
+        else return visit(ctx.trailingTypeSpecifier());
     }
 
     @Override
     public ASTNode visitDeclSpecifierSeq(MxParser.DeclSpecifierSeqContext ctx) {
-        ArrayList<DeclSpecifierNode> declSpecifiers = new ArrayList<>();
-        for (var declSpec: ctx.declSpecifier())
-            declSpecifiers.add((DeclSpecifierNode) visit(declSpec));
-        return new DeclSpecifierSeqNode(new Location(ctx.getStart()), declSpecifiers);
+        TypeSpecifierNode typeSpecifier = (TypeSpecifierNode) visit(ctx.typeSpecifier());
+        if (ctx.declSpecifier()!=null) {
+            Set<NonTypeSpecifierNode> declSpecifiers = new HashSet<>();
+            for (var declSpec: ctx.declSpecifier())
+                declSpecifiers.add((NonTypeSpecifierNode) visit(declSpec));
+            return new DeclSpecifierSeqNode(new Location(ctx.getStart()),
+                    typeSpecifier, declSpecifiers);
+        }
+        return new DeclSpecifierSeqNode(new Location(ctx.getStart()), typeSpecifier);
+    }
+
+    @Override
+    public ASTNode visitStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx) {
+        if (ctx.Register()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "register");
+        else if (ctx.Static()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "static");
+        else if (ctx.Thread_local()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "thread_local");
+        else if (ctx.Extern()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "extern");
+        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "mutable");
+    }
+
+    @Override
+    public ASTNode visitFunctionSpecifier(MxParser.FunctionSpecifierContext ctx) {
+        if (ctx.Inline()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "inline");
+        else if (ctx.Virtual()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "virtual");
+        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "explicit");
     }
 
     @Override
     public ASTNode visitTypeSpecifier(MxParser.TypeSpecifierContext ctx) {
-        if (ctx.trailingTypeSpecifier()!=null)
-            return visit(ctx.trailingTypeSpecifier());
+        if (ctx.simpleTypeSpecifier()!=null)
+            return visit(ctx.simpleTypeSpecifier());
         else
             return visit(ctx.classSpecifier());
     }
 
     @Override
     public ASTNode visitTrailingTypeSpecifier(MxParser.TrailingTypeSpecifierContext ctx) {
-        if (ctx.simpleTypeSpecifier()!=null)
-            return visit(ctx.simpleTypeSpecifier());
+        if (ctx.cvQualifier()!=null) {
+            return visit(ctx.cvQualifier());
+        }
         return null;
     }
 
     @Override
     public ASTNode visitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx) {
-        ArrayList<DeclSpecifierNode> typeSpecifiers = new ArrayList<>();
-        for (var typeSpec: ctx.typeSpecifier())
-            typeSpecifiers.add((DeclSpecifierNode) visit(typeSpec));
-        return new DeclSpecifierSeqNode(new Location(ctx.getStart()), typeSpecifiers);
+        TypeSpecifierNode typeSpecifier = (TypeSpecifierNode) visit(ctx.typeSpecifier());
+        if (ctx.trailingTypeSpecifier()!=null) {
+            Set<NonTypeSpecifierNode> declSpecifiers = new HashSet<>();
+            for (var declSpec: ctx.trailingTypeSpecifier())
+                declSpecifiers.add((NonTypeSpecifierNode) visit(declSpec));
+            return new DeclSpecifierSeqNode(new Location(ctx.getStart()),
+                    typeSpecifier, declSpecifiers);
+        }
+        return new DeclSpecifierSeqNode(new Location(ctx.getStart()), typeSpecifier);
     }
 
     @Override
@@ -646,6 +705,13 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         return node;
     }
 
+    @Override
+    public ASTNode visitCvQualifier(MxParser.CvQualifierContext ctx) {
+        if (ctx.Const()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "const");
+        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "volatile");
+    }
+
     /* function */
 
     @Override
@@ -704,6 +770,11 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitClassHead(MxParser.ClassHeadContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ASTNode visitClassKey(MxParser.ClassKeyContext ctx) {
         return null;
     }
 

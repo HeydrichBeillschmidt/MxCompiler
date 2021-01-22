@@ -85,12 +85,15 @@ public class TypeChecker implements ASTVisitor {
     @Override public void visit(DeclSpecifierSeqNode node) {
         node.getTypeSpecifier().accept(this);
     }
+    @Override public void visit(NonTypeSpecifierNode node) {}
     @Override public void visit(ClassSpecifierNode node) {
         ClassType classType = node.generateClassType();
         typeTable.defType(new DeclSpecifierSeqNode(node.getLocation(), node),
                 classType, exceptionHandler);
-        for (var varNode: node.getMembers())
-            varNode.accept(this);
+        if (node.getMembers()!=null) {
+            for (var varNode: node.getMembers())
+                varNode.accept(this);
+        }
     }
     @Override public void visit(ArrayTypeSpecifierNode node) {}
     @Override public void visit(BuiltInTypeSpecifierNode node) {}
@@ -99,7 +102,6 @@ public class TypeChecker implements ASTVisitor {
     @Override public void visit(VarNode node) {
         node.getSpecifier().accept(this);
     }
-        // VarSeqNode will not be reached by visitor
     @Override public void visit(VarSeqNode node) {
         for (var varNode: node.getVarNodes())
             varNode.accept(this);
