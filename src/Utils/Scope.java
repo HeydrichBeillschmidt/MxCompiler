@@ -244,10 +244,12 @@ public class Scope {
     public FunctionEntity getConstructorEntity(ArrayList<VarNode> parameters) {
         if (constructorEntities!=null) {
             for (var ce: constructorEntities) {
-                if (parameters==null && ce.getParameters()==null) {
+                if ((parameters==null||parameters.size()==0)
+                        && (ce.getParameters()==null||ce.getParameters().size()==0)) {
                     return ce;
                 }
-                else if (parameters!=null && ce.getParameters()!=null) {
+                else if ((parameters!=null&&parameters.size()!=0)
+                        && (ce.getParameters()!=null&&ce.getParameters().size()!=0)) {
                     if (parameters.size()==ce.getParameters().size()) {
                         boolean fit = true;
                         for (int i = 0, it = parameters.size(); i < it; ++i) {
