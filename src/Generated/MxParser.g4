@@ -189,18 +189,39 @@ emptyDeclaration: Semi;
 
 /* specifiers */
 
-declSpecifier: typeSpecifier;
+declSpecifier
+    : storageClassSpecifier
+    | functionSpecifier
+    | Friend
+    | Typedef
+    | Constexpr
+    | trailingTypeSpecifier
+    ;
 
-declSpecifierSeq: declSpecifier+;
+declSpecifierSeq: declSpecifier* typeSpecifier;
+
+storageClassSpecifier
+    : Register
+    | Static
+    | Thread_local
+    | Extern
+    | Mutable
+    ;
+
+functionSpecifier
+    : Inline
+    | Virtual
+    | Explicit
+    ;
 
 typeSpecifier
-    : trailingTypeSpecifier
+    : simpleTypeSpecifier
 	| classSpecifier
 	;
 
-trailingTypeSpecifier: simpleTypeSpecifier;
+trailingTypeSpecifier: cvQualifier;
 
-typeSpecifierSeq: typeSpecifier+;
+typeSpecifierSeq: trailingTypeSpecifier* typeSpecifier;
 
 simpleTypeSpecifier
     : simpleTypeSpecifier LeftBracket RightBracket
@@ -243,6 +264,8 @@ initializerList
 
 bracedInitList: LeftBrace initializerList? RightBrace;
 
+cvQualifier: Const | Volatile;
+
 /* function */
 
 parametersAndQualifiers: LeftParen parameterDeclarationList? RightParen;
@@ -259,7 +282,9 @@ functionBody: compoundStatement;
 
 classSpecifier: classHead LeftBrace memberSpecification? RightBrace;
 
-classHead: Class className;
+classHead: classKey className;
+
+classKey: Class | Struct;
 
 className: Identifier;
 
