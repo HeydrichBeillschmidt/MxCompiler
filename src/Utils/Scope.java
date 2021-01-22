@@ -242,19 +242,26 @@ public class Scope {
         else return null;
     }
     public FunctionEntity getConstructorEntity(ArrayList<VarNode> parameters) {
-        for (var ce: constructorEntities) {
-            if (parameters.size()==ce.getParameters().size()) {
-                boolean fit = true;
-                for (int i = 0, it = parameters.size(); i < it; ++i) {
-                    VarNode par = parameters.get(i);
-                    VarEntity parEntity = ce.getParameters().get(i);
-                    if (!(par.getSpecifier().equals(parEntity.getSpecifier())) ||
-                            !(par.getName().equals(parEntity.getName()))) {
-                        fit = false;
-                        break;
+        if (constructorEntities!=null) {
+            for (var ce: constructorEntities) {
+                if (parameters==null && ce.getParameters()==null) {
+                    return ce;
+                }
+                else if (parameters!=null && ce.getParameters()!=null) {
+                    if (parameters.size()==ce.getParameters().size()) {
+                        boolean fit = true;
+                        for (int i = 0, it = parameters.size(); i < it; ++i) {
+                            VarNode par = parameters.get(i);
+                            VarEntity parEntity = ce.getParameters().get(i);
+                            if (!(par.getSpecifier().equals(parEntity.getSpecifier())) ||
+                                    !(par.getName().equals(parEntity.getName()))) {
+                                fit = false;
+                                break;
+                            }
+                        }
+                        if (fit) return ce;
                     }
                 }
-                if (fit) return ce;
             }
         }
         return null;
