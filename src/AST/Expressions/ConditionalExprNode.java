@@ -18,8 +18,10 @@ public class ConditionalExprNode extends ExprNode {
 
     @Override
     public String toString() {
-        return "<ConditionalExprNode>\n"
-                + "condition = " + logic.toString();
+        if (logic!=null)
+            return "<ConditionalExprNode>\n"
+                + "condition:\n" + logic.toString();
+        return "<ConditionalExprNode>\n";
     }
     @Override
     public void accept(ASTVisitor visitor) {
