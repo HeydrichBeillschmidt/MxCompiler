@@ -264,7 +264,8 @@ initializerList
 
 bracedInitList: LeftBrace initializerList? RightBrace;
 
-cvQualifier: Const | Volatile;
+//cvQualifier: Const | Volatile;
+cvQualifier: Volatile;
 
 /* function */
 
