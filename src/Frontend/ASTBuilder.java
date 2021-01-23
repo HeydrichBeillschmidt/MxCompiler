@@ -785,7 +785,7 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         MemberSpecificationNode tmp = null;
         if (ctx.memberSpecification()!=null) {
             tmp = (MemberSpecificationNode) visit(ctx.memberSpecification());
-            tmp.correctConstructors(className); // remember to handle wrong constructors!
+            tmp.correctConstructors(className, exceptionHandler);
         }
         return new ClassSpecifierNode(new Location(ctx.getStart()), className, tmp);
     }
