@@ -40,8 +40,14 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     public ASTNode visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx) {
         if (ctx.literal()!=null)
             return visit(ctx.literal());
-        else if (ctx.expression()!=null)
-            return visit(ctx.expression());
+        else if (ctx.expression()!=null) {
+            ExprSeqNode subExprTmp = (ExprSeqNode) visit(ctx.expression());
+            if (subExprTmp.getSubExpressions().size() > 1) {
+                exceptionHandler.error("Expression paren of multiple expressions.",
+                        subExprTmp.getLocation());
+            }
+            return subExprTmp.getSubExpressions().get(0);
+        }
         else if (ctx.This()!=null)
             return new ThisExprNode(new Location(ctx.getStart()), ctx.getText());
         else // idExpression
@@ -743,9 +749,8 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         Location loc = new Location(ctx.getStart());
         DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.declSpecifierSeq());
         String name = ((IdExprNode) visit(ctx.declarator())).getIdentifier();
-        InitializerNode initializer = null;
-        if (ctx.initializerClause()!=null)
-            initializer = (InitializerNode) visit(ctx.initializerClause());
+        InitializerNode initializer = ctx.initializerClause()!=null ?
+                (InitializerNode) visit(ctx.initializerClause()) : null;
         return new VarNode(loc, specifier, name, initializer);
     }
 
