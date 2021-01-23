@@ -60,7 +60,12 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
             return visit(ctx.primaryExpression());
         else if (ctx.LeftBracket()!=null) { // Subscript
             ExprNode name = (ExprNode) visit(ctx.postfixExpression());
-            ExprNode index = (ExprNode) visit(ctx.expression());
+            ExprSeqNode indexTmp = (ExprSeqNode) visit(ctx.expression());
+            if (indexTmp.getSubExpressions().size() > 1) {
+                exceptionHandler.error("Subscript of multiple expressions.",
+                        indexTmp.getLocation());
+            }
+            ExprNode index = indexTmp.getSubExpressions().get(0);
             return new SubscriptExprNode(new Location(ctx.getStart()), ctx.getText(), name, index);
         }
         else if (ctx.LeftParen()!=null) { // FuncCall
@@ -76,7 +81,7 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
                     name, null);
         }
         else if (ctx.Dot()!=null) { // Member
-            ExprNode name = (ExprNode) visit(ctx.expression());
+            ExprNode name = (ExprNode) visit(ctx.postfixExpression());
             String member = ((IdExprNode) visit(ctx.idExpression())).getIdentifier();
             return new MemberExprNode(new Location(ctx.getStart()), ctx.getText(), name, member);
         }
@@ -433,7 +438,12 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitCondition(MxParser.ConditionContext ctx) {
-        return visit(ctx.expression());
+        ExprSeqNode conditionTmp = (ExprSeqNode) visit(ctx.expression());
+        if (conditionTmp.getSubExpressions().size() > 1) {
+            exceptionHandler.error("Condition of multiple expressions.",
+                    conditionTmp.getLocation());
+        }
+        return conditionTmp.getSubExpressions().get(0);
     }
 
     @Override
@@ -733,7 +743,9 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         Location loc = new Location(ctx.getStart());
         DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.declSpecifierSeq());
         String name = ((IdExprNode) visit(ctx.declarator())).getIdentifier();
-        InitializerNode initializer = (InitializerNode) visit(ctx.initializerClause());
+        InitializerNode initializer = null;
+        if (ctx.initializerClause()!=null)
+            initializer = (InitializerNode) visit(ctx.initializerClause());
         return new VarNode(loc, specifier, name, initializer);
     }
 

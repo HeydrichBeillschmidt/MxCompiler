@@ -984,15 +984,11 @@ public class SemanticChecker implements ASTVisitor {
             errored = true;
         }
         try {
-            if (node.getLoopBody() instanceof CompoundStmtNode)
-                node.getLoopBody().accept(this);
-            else {
-                Scope scope = new Scope(currentScope(), Scope.ScopeType.loopScope,
-                        currentScope().getFuncRetType(), currentScope().getClassType());
-                scopeStack.push(scope);
-                node.getLoopBody().accept(this);
-                scopeStack.pop();
-            }
+            Scope scope = new Scope(currentScope(), Scope.ScopeType.loopScope,
+                    currentScope().getFuncRetType(), currentScope().getClassType());
+            scopeStack.push(scope);
+            node.getLoopBody().accept(this);
+            scopeStack.pop();
         }
         catch (SemanticError err) {
             errored = true;
@@ -1035,15 +1031,11 @@ public class SemanticChecker implements ASTVisitor {
             }
         }
         try {
-            if (node.getLoopBody() instanceof CompoundStmtNode)
-                node.getLoopBody().accept(this);
-            else {
-                Scope scope = new Scope(currentScope(), Scope.ScopeType.loopScope,
-                        currentScope().getFuncRetType(), currentScope().getClassType());
-                scopeStack.push(scope);
-                node.getLoopBody().accept(this);
-                scopeStack.pop();
-            }
+            Scope scope = new Scope(currentScope(), Scope.ScopeType.loopScope,
+                    currentScope().getFuncRetType(), currentScope().getClassType());
+            scopeStack.push(scope);
+            node.getLoopBody().accept(this);
+            scopeStack.pop();
         }
         catch (SemanticError err) {
             errored = true;
