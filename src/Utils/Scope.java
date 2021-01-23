@@ -81,7 +81,7 @@ public class Scope {
         funcEntities.put("print", builtinFunc);
 
         // void println(string str);
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("str", "string"));
         builtinFunc = new FunctionEntity("println", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
@@ -89,7 +89,7 @@ public class Scope {
         funcEntities.put("println", builtinFunc);
 
         // void printInt(int n);
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("n", "int"));
         builtinFunc = new FunctionEntity("printInt", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
@@ -97,7 +97,7 @@ public class Scope {
         funcEntities.put("printInt", builtinFunc);
 
         // void printlnInt(int n);
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("n", "int"));
         builtinFunc = new FunctionEntity("printlnInt", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
@@ -105,21 +105,21 @@ public class Scope {
         funcEntities.put("printlnInt", builtinFunc);
 
         // string getString();
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFunc = new FunctionEntity("getString", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "string")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         funcEntities.put("getString", builtinFunc);
 
         // int getInt();
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFunc = new FunctionEntity("getInt", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "int")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         funcEntities.put("getInt", builtinFunc);
 
         // string toString(int i);
-        builtinFuncParameters.clear();
+        builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("i", "int"));
         builtinFunc = new FunctionEntity("toString", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "string")),
