@@ -59,8 +59,10 @@ public class Main {
             AST.accept(semanticChecker);
         }
         catch (error err) {
-            exceptionHandler.print();
-            throw new RuntimeException();
+            if (exceptionHandler.hasError()) {
+                exceptionHandler.print();
+                throw new RuntimeException();
+            }
         }
         if (exceptionHandler.hasError()) {
             exceptionHandler.print();
