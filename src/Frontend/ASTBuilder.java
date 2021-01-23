@@ -467,7 +467,7 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         else if (ctx.For()!=null) {
             StmtNode initStmt = (StmtNode) visit(ctx.forInitStatement());
             ExprNode condition = null;
-            if (ctx.expression()!=null) condition = (ExprNode) visit(ctx.condition());
+            if (ctx.condition()!=null) condition = (ExprNode) visit(ctx.condition());
             ExprNode stepExpr = null;
             if (ctx.expression()!=null) stepExpr = (ExprNode) visit(ctx.expression());
             return new ForStmtNode(new Location(ctx.getStart()),

@@ -886,7 +886,8 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(ExprStmtNode node) {
         node.setScope(currentScope());
-        node.getExpr().accept(this);
+        if (node.getExpr()!=null)
+            node.getExpr().accept(this);
     }
 
     @Override
@@ -1073,27 +1074,37 @@ public class SemanticChecker implements ASTVisitor {
                     node.getLocation());
             throw new SemanticError();
         }
-        Type retType = typeTable.getType(currentScope().getFuncRetType());
-        if (node.hasReturnValue()) {
-            ExprNode retValue = node.getReturnValue();
-            retValue.accept(this);
-            if (retType.equals(new VoidType())) {
-                exceptionHandler.error("The function should not return value.",
-                        node.getLocation());
-                throw new SemanticError();
+        DeclSpecifierSeqNode retSpecifier = currentScope().getFuncRetType();
+        if (retSpecifier!=null) {
+            Type retType = typeTable.getType(retSpecifier);
+            if (node.hasReturnValue()) {
+                ExprNode retValue = node.getReturnValue();
+                retValue.accept(this);
+                if (retType.getName().equals("void")) {
+                    exceptionHandler.error("The function should not return value.",
+                            node.getLocation());
+                    throw new SemanticError();
+                }
+                Type stmtRetType = retValue.getType();
+                if (!Type.canAssign(retType, stmtRetType)) {
+                    exceptionHandler.error("The returned expression \""
+                            + retValue.getText() + "\" of type \""
+                            + retValue.getType().toString() +"\" is not of type \""
+                            + retType.toString() + "\".", node.getLocation());
+                    throw new SemanticError();
+                }
             }
-            Type stmtRetType = retValue.getType();
-            if (!Type.canAssign(retType, stmtRetType)) {
-                exceptionHandler.error("The returned expression \""
-                        + retValue.getText() + "\" of type \""
-                        + retValue.getType().toString() +"\" is not of type \""
-                        + retType.toString() + "\".", node.getLocation());
-                throw new SemanticError();
+            else {
+                if (!retType.getName().equals("void")) {
+                    exceptionHandler.error("A return statement without required return value.",
+                            node.getLocation());
+                    throw new SemanticError();
+                }
             }
         }
-        else {
-            if (!retType.equals(new VoidType())) {
-                exceptionHandler.error("A return statement without required return value.",
+        else { // constructor
+            if (node.hasReturnValue()) {
+                exceptionHandler.error("Constructor should not return value.",
                         node.getLocation());
                 throw new SemanticError();
             }
@@ -1109,7 +1120,7 @@ public class SemanticChecker implements ASTVisitor {
             for (var varNode: node.getVarNodes()) {
                 try {
                     varNode.accept(this);
-                    globalScope.declareVariable(varNode,
+                    currentScope().declareVariable(varNode,
                             VarEntity.VarEntityType.local,
                             exceptionHandler);
                 }
