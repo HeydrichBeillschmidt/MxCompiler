@@ -28,7 +28,6 @@ public class TypeChecker implements ASTVisitor {
         for (var decl: node.getDeclarations()) {
             decl.accept(this);
         }
-        typeTable.checkTypes(exceptionHandler);
     }
     /* expressions */
     @Override public void visit(ThisExprNode node) {}

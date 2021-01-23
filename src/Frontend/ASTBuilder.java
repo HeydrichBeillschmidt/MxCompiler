@@ -93,8 +93,9 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
         }
         else { // Postfix
             String op = ctx.PlusPlus()!=null ? "++" : "--";
+            ExprNode post = (ExprNode) visit(ctx.postfixExpression());
             return new PostfixExprNode(new Location(ctx.getStart()), ctx.getText(),
-                    op, (ExprNode) visit(ctx.expression()));
+                    op, post);
         }
     }
 
@@ -162,8 +163,12 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     public ASTNode visitNewDeclarator(MxParser.NewDeclaratorContext ctx) {
         ArrayList<ExprNode> indexes = new ArrayList<>();
         if (ctx.expression()!=null) {
-            ExprNode first = ((ExprSeqNode) visit(ctx.expression())).getSubExpressions().get(0);
-            indexes.add(first);
+            ExprSeqNode indexTmp = (ExprSeqNode) visit(ctx.expression());
+            if (indexTmp.getSubExpressions().size() > 1) {
+                exceptionHandler.error("Subscript of multiple expressions in new declaration.",
+                        indexTmp.getLocation());
+            }
+            indexes.add(indexTmp.getSubExpressions().get(0));
         }
         else {
             indexes = ((ExprSeqNode) visit(ctx.newDeclarator())).getSubExpressions();
@@ -431,9 +436,9 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     @Override
     public ASTNode visitSelectionStatement(MxParser.SelectionStatementContext ctx) {
         ExprNode condition = (ExprNode) visit(ctx.condition());
-        StmtNode selectBody, elseBody = null;
+        StmtNode selectBody = (StmtNode) visit(ctx.statement(0));
         if (ctx.If()!=null) {
-            selectBody = (StmtNode) visit(ctx.statement(0));
+            StmtNode elseBody = null;
             if (ctx.Else()!=null) {
                 elseBody = (StmtNode) visit(ctx.statement(1));
             }

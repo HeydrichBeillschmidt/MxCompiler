@@ -1316,12 +1316,14 @@ public class SemanticChecker implements ASTVisitor {
                 node.getSpecifier(), currentScope().getClassType());
         scopeStack.push(scope);
 
-        try {
-            node.getSpecifier().accept(this);
-        }
-        catch (SemanticError err) {
-            scopeStack.pop();
-            throw new SemanticError();
+        if (node.getSpecifier()!=null) { // function, rather than constructor
+            try {
+                node.getSpecifier().accept(this);
+            }
+            catch (SemanticError err) {
+                scopeStack.pop();
+                throw new SemanticError();
+            }
         }
 
         boolean errored = false;
