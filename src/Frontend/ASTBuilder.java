@@ -728,9 +728,11 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitCvQualifier(MxParser.CvQualifierContext ctx) {
+        /*
         if (ctx.Const()!=null)
             return new NonTypeSpecifierNode(new Location(ctx.getStart()), "const");
-        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "volatile");
+        else */
+        return new NonTypeSpecifierNode(new Location(ctx.getStart()), "volatile");
     }
 
     /* function */
