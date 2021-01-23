@@ -1173,6 +1173,7 @@ public class SemanticChecker implements ASTVisitor {
                 }
             }
         }
+        // first define constructors and methods
         if (node.hasConstructor()) {
             ArrayList<FuncNode> constructors = node.getConstructors();
             for (var constructor: constructors) {
@@ -1185,7 +1186,6 @@ public class SemanticChecker implements ASTVisitor {
                 try {
                     scope.declareConstructor(constructor,
                             exceptionHandler);
-                    constructor.accept(this);
                 }
                 catch (SemanticError err) {
                     errored = true;
@@ -1204,6 +1204,27 @@ public class SemanticChecker implements ASTVisitor {
                 try {
                     scope.declareFunction(method, FunctionEntity.FuncEntityType.method,
                             exceptionHandler);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
+            }
+        }
+        // then resolve them
+        if (node.hasConstructor()) {
+            ArrayList<FuncNode> constructors = node.getConstructors();
+            for (var constructor: constructors) {
+                try {
+                    constructor.accept(this);
+                }
+                catch (SemanticError err) {
+                    errored = true;
+                }
+            }
+        }
+        if (methods!=null) {
+            for (var method: methods) {
+                try {
                     method.accept(this);
                 }
                 catch (SemanticError err) {
