@@ -27,7 +27,7 @@ public class StringType extends Type {
         builtinMethods.add(builtinMethod);
 
         // string substring(int left, int right);
-        builtinMethodParameters.clear();
+        builtinMethodParameters = new ArrayList<>();
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("left", "int"));
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("right","int"));
         builtinMethod = new FunctionEntity("substring", location,
@@ -36,14 +36,14 @@ public class StringType extends Type {
         builtinMethods.add(builtinMethod);
 
         // int parseInt();
-        builtinMethodParameters.clear();
+        builtinMethodParameters = new ArrayList<>();
         builtinMethod = new FunctionEntity("parseInt", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
 
         // int ord(int pos);
-        builtinMethodParameters.clear();
+        builtinMethodParameters = new ArrayList<>();
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("pos", "int"));
         builtinMethod = new FunctionEntity("ord", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
