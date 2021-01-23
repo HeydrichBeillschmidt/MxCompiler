@@ -1,5 +1,6 @@
 package Mx.AST;
 
+import Mx.Utils.ExceptionHandler;
 import Mx.Utils.Location;
 
 import java.util.ArrayList;
@@ -43,17 +44,17 @@ public class MemberSpecificationNode extends DeclarationNode {
     public ArrayList<FuncNode> getConstructors() {
         return constructors;
     }
-    public ArrayList<String> correctConstructors(String className) {
+    public void correctConstructors(String className, ExceptionHandler h) {
         ArrayList<FuncNode> correctedConstructors = new ArrayList<>();
-        ArrayList<String> unknownConstructorNames = new ArrayList<>();
         for (var cstr: constructors) {
             if (cstr.getName().equals(className))
                 correctedConstructors.add(cstr);
-            else
-                unknownConstructorNames.add(cstr.getName());
+            else {
+                h.error("Mis-declared constructor with wrong name "
+                        + cstr.getName() + ".", cstr.getLocation());
+            }
         }
         constructors = correctedConstructors;
-        return unknownConstructorNames;
     }
 
     @Override
