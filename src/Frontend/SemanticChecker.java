@@ -50,6 +50,11 @@ public class SemanticChecker implements ASTVisitor {
             for (var decl: node.getDeclarations()) {
                 if (decl instanceof FuncNode) {
                     try {
+                        if (typeTable.hasType(((FuncNode)decl).getName())) {
+                            exceptionHandler.error("Duplicate name for function name and class name.",
+                                    decl.getLocation());
+                            throw new SemanticError();
+                        }
                         globalScope.declareFunction(decl,
                                 FunctionEntity.FuncEntityType.function,
                                 exceptionHandler);
@@ -70,7 +75,9 @@ public class SemanticChecker implements ASTVisitor {
                         }
                     }
                     else if (decl instanceof FuncNode) {
-                        decl.accept(this);
+                        if (!typeTable.hasType(((FuncNode)decl).getName())) {
+                            decl.accept(this);
+                        }
                     }
                 }
                 catch (SemanticError err) {
@@ -1214,6 +1221,8 @@ public class SemanticChecker implements ASTVisitor {
         if (node.hasConstructor()) {
             ArrayList<FuncNode> constructors = node.getConstructors();
             for (var constructor: constructors) {
+                if (!constructor.getName().equals(node.getClassName()))
+                    continue;
                 try {
                     constructor.accept(this);
                 }
@@ -1224,6 +1233,8 @@ public class SemanticChecker implements ASTVisitor {
         }
         if (methods!=null) {
             for (var method: methods) {
+                if (method.getName().equals(node.getClassName()))
+                    continue;
                 try {
                     method.accept(this);
                 }
