@@ -1183,9 +1183,9 @@ public class SemanticChecker implements ASTVisitor {
                     continue;
                 }
                 try {
-                    constructor.accept(this);
                     scope.declareConstructor(constructor,
                             exceptionHandler);
+                    constructor.accept(this);
                 }
                 catch (SemanticError err) {
                     errored = true;
@@ -1202,9 +1202,9 @@ public class SemanticChecker implements ASTVisitor {
                     continue;
                 }
                 try {
-                    method.accept(this);
                     scope.declareFunction(method, FunctionEntity.FuncEntityType.method,
                             exceptionHandler);
+                    method.accept(this);
                 }
                 catch (SemanticError err) {
                     errored = true;

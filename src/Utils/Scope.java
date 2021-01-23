@@ -242,7 +242,7 @@ public class Scope {
         else return null;
     }
     public FunctionEntity getConstructorEntity(ArrayList<VarNode> parameters) {
-        if (constructorEntities!=null) {
+        if (constructorEntities!=null&&constructorEntities.size()!=0) {
             for (var ce: constructorEntities) {
                 if ((parameters==null||parameters.size()==0)
                         && (ce.getParameters()==null||ce.getParameters().size()==0)) {
@@ -265,6 +265,9 @@ public class Scope {
                     }
                 }
             }
+        }
+        if (parentScope!=null) {
+            return parentScope.getConstructorEntity(parameters);
         }
         return null;
     }
