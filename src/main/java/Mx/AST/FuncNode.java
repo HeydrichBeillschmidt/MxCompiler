@@ -73,6 +73,7 @@ public class FuncNode extends DeclarationNode {
                 specifier, generatedParameters, funcBody, entityType);
     }
     public void addModularFunction(IRModule module, TypeTable astTypeTable) {
+        // generate IR function
         FunctionEntity funcEntity = getScope().getFuncEntity(decoratedName);
         IRType retType = null;
         if (funcEntity.getReturnType()!=null) {
@@ -99,6 +100,7 @@ public class FuncNode extends DeclarationNode {
             Register ptrThis = new Register(new PointerType(parThis.getType()),
                     "this.addr");
             func.setClassPtr(ptrThis);
+            func.addSymbol(ptrThis);
             curBlock.addInst(new Alloca(curBlock, ptrThis, parThis.getType()));
             curBlock.addInst(new Store(curBlock, parThis, ptrThis));
         }
@@ -106,6 +108,7 @@ public class FuncNode extends DeclarationNode {
             Parameter parTmp = parameterList.get(i + offset);
             Register ptrTmp = new Register(new PointerType(parTmp.getType()),
                     parTmp.getName() + ".addr");
+            func.addSymbol(ptrTmp);
             curBlock.addInst(new Alloca(curBlock, ptrTmp, parTmp.getType()));
             curBlock.addInst(new Store(curBlock, parTmp, ptrTmp));
             entityParameterList.get(i).setAllocatedAddr(ptrTmp);

@@ -34,8 +34,8 @@ public class Store extends IRInst {
     @Override
     public String toString() {
         return "store " + ((PointerType)addr.getType()).getBaseType().toString() + " "
-                + value.toString() + " "
-                + addr.getType().toString() + ", " + addr.toString()
+                + value.toString() + ", "
+                + addr.getType().toString() + " " + addr.toString()
                 + ", align " + value.getType().size()/8;
     }
     @Override

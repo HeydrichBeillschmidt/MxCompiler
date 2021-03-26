@@ -10,6 +10,7 @@ import Mx.IR.TypeSystem.PointerType;
 import Mx.IR.TypeSystem.VoidType;
 import Mx.Utils.Errors.SyntaxError;
 import Mx.Utils.ExceptionHandler;
+import Mx.Utils.FuncSymbolTable;
 
 import java.util.ArrayList;
 
@@ -22,14 +23,17 @@ public class Function {
     private final IRBlock returnBlock;
     private Register retVal;
     private Register classPtr;
+    private final FuncSymbolTable symbolTable;
     private boolean sideEffect;
 
     public Function(IRType retType, String name, ArrayList<Parameter> parameterList) {
         this.name = name;
+        this.symbolTable = new FuncSymbolTable();
         this.parameterList = parameterList;
         ArrayList<IRType> parameterTypeList = new ArrayList<>();
         for (var p: parameterList) {
             parameterTypeList.add(p.getType());
+            symbolTable.put(p);
         }
         this.functionType = new FunctionType(retType, parameterTypeList);
         this.entranceBlock = null;
@@ -49,6 +53,8 @@ public class Function {
             entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
             Register returnValue = new Register(retType, "returnValue");
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));
+            symbolTable.put(retVal);
+            symbolTable.put(returnValue);
         }
     }
 
@@ -84,6 +90,7 @@ public class Function {
         if (entranceBlock==null) entranceBlock = block;
         else exitBlock.addBlock(block);
         exitBlock = block;
+        addSymbol(block);
     }
     public ArrayList<IRBlock> getAllBlocks() {
         ArrayList<IRBlock> ans = new ArrayList<>();
@@ -109,6 +116,9 @@ public class Function {
     }
     public void setClassPtr(Register classPtr) {
         this.classPtr = classPtr;
+    }
+    public void addSymbol(Object obj) {
+        symbolTable.put(obj);
     }
     public boolean hasSideEffect() {
         return sideEffect;
