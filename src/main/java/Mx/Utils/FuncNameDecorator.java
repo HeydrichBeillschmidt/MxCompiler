@@ -113,7 +113,7 @@ public class FuncNameDecorator {
                 case 'P': // pointer; can repeat multiple times
                     while (decoratedName.charAt(begin)=='P') begin += 2;
                 case 'U': { // struct
-                    begin = decoratedName.substring(begin).indexOf("@@") + 2;
+                    begin += decoratedName.substring(begin).indexOf("@@") + 2;
                     break;
                 }
                 case '_': { // bool
