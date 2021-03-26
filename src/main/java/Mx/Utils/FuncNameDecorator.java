@@ -9,8 +9,6 @@ import Mx.Types.ClassType;
 import Mx.Types.Type;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FuncNameDecorator {
     private static String typeNameDecorationCast(TypeSpecifierNode type) {
@@ -85,9 +83,7 @@ public class FuncNameDecorator {
         }
     }
     public static boolean funcCallMatched(String decoratedName, String decoratedEnd) {
-        Pattern p = Pattern.compile(decoratedEnd);
-        Matcher m = p.matcher(decoratedName);
-        return m.find();
+        return extractDecoratedEnd(decoratedName).equals(decoratedEnd);
     }
 
     public static String extractPureFuncName(String decoratedName) {
@@ -98,5 +94,35 @@ public class FuncNameDecorator {
             last = decoratedName.indexOf("@");
             return decoratedName.substring(1, last);
         }
+    }
+    public static String extractDecoratedEnd(String decoratedName) {
+        int begin;
+        if (decoratedName.charAt(1)=='?') { // constructor
+            begin = decoratedName.indexOf("@@QEA") + 5;
+        }
+        else {
+            int tmp = decoratedName.indexOf("@@YG");
+            if (tmp > 0) { // function
+                begin = tmp + 4;
+            }
+            else { // method
+                begin = decoratedName.indexOf("@@QEA") + 5;
+            }
+            // discard return type decoration
+            switch (decoratedName.charAt(begin)) {
+                case 'P': // pointer; can repeat multiple times
+                    while (decoratedName.charAt(begin)=='P') begin += 2;
+                case 'U': { // struct
+                    begin = decoratedName.substring(begin).indexOf("@@") + 2;
+                    break;
+                }
+                case '_': { // bool
+                    begin += 2;
+                    break;
+                }
+                default: ++begin;
+            }
+        }
+        return decoratedName.substring(begin);
     }
 }
