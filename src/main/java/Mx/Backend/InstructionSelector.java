@@ -1,6 +1,7 @@
 package Mx.Backend;
 
 import Mx.ASM.*;
+import Mx.ASM.Operand.GlobalVar;
 import Mx.IR.*;
 import Mx.IR.Instruction.*;
 
@@ -20,7 +21,24 @@ public class InstructionSelector implements IRVisitor {
     }
 
     @Override
-    public void visit(IRModule node) {}
+    public void visit(IRModule node) {
+        for (var gv: node.getGlobalVariables().values()) {
+            GlobalVar asmGv = new GlobalVar(gv.getName());
+            asmModule.getGlobalVars().put(gv.getName(), asmGv);
+        }
+        for (var ef: node.getExternalFunctions().values()) {
+            String name = ef.getName();
+            asmModule.getExternalFunctions().put(name,
+                    new ASMFunction(name, null) );
+        }
+        for (var f: node.getFunctions().values()) {
+            String name = f.getName();
+            asmModule.getFunctions().put(name, new ASMFunction(name, f));
+        }
+        for (var f: node.getFunctions().values()) {
+            f.accept(this);
+        }
+    }
 
     @Override
     public void visit(Function node) {}

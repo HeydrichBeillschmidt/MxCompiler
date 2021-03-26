@@ -1,11 +1,14 @@
 package Mx.ASM;
 
 import Mx.ASM.Instruction.ASMInst;
+import Mx.IR.IRBlock;
 
 import java.util.ArrayList;
 
 public class ASMBlock {
     private final String name;
+
+    private final IRBlock irBlock;
 
     private ASMInst headInst;
     private ASMInst tailInst;
@@ -16,8 +19,9 @@ public class ASMBlock {
     private final ArrayList<ASMBlock> predecessors;
     private final ArrayList<ASMBlock> successors;
 
-    public ASMBlock(String name) {
+    public ASMBlock(String name, IRBlock irBlock) {
         this.name = name;
+        this.irBlock = irBlock;
         this.prevBlock = null;
         this.nextBlock = null;
         this.predecessors = new ArrayList<>();
@@ -26,6 +30,9 @@ public class ASMBlock {
 
     public String getName() {
         return name;
+    }
+    public IRBlock getIRBlock() {
+        return irBlock;
     }
 
     public ASMInst getHeadInst() {

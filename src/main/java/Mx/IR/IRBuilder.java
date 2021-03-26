@@ -1447,7 +1447,7 @@ public class IRBuilder implements ASTVisitor {
         curFunc = func;
         curBlock = func.getEntranceBlock();
         node.getFuncBody().accept(this);
-        if (!curBlock.endWithTerminalInst()) {
+        if (curBlock.endWithNonTerminalInst()) {
             curBlock.addInst(new Br(curBlock, null,
                     curFunc.getReturnBlock(), null) );
         }

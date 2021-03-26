@@ -86,8 +86,8 @@ public class IRBlock {
         }
         return ans;
     }
-    public boolean endWithTerminalInst() {
-        return tailInst!=null && tailInst.isTerminalInst();
+    public boolean endWithNonTerminalInst() {
+        return tailInst == null || !tailInst.isTerminalInst();
     }
 
     public IRBlock getPrevBlock() {

@@ -2,6 +2,8 @@ package Mx.ASM.Operand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PhysicalReg extends Register {
     public static ArrayList<String> phyRegNames = new ArrayList<>(Arrays.asList(
@@ -11,6 +13,40 @@ public class PhysicalReg extends Register {
             "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11",
             "t3", "t4", "t5", "t6"
     ));
+    private static final ArrayList<Integer> saveStatus = new ArrayList<>(Arrays.asList(
+            0,1,0,0,0,
+            1,1,1,2,2,
+            1,1,1,1,1,1,1,1,
+            2,2,2,2,2,2,2,2,2,2,
+            1,1,1,1
+    ));
+    public static Map<String, PhysicalReg> phyRegs;
+    public static Map<String, PhysicalReg> callerSavePhyRegs;
+    public static Map<String, PhysicalReg> calleeSavePhyRegs;
+    public static Map<String, PhysicalReg> assignablePhyRegs;
+
+    static {
+        phyRegs = new HashMap<>();
+        callerSavePhyRegs = new HashMap<>();
+        calleeSavePhyRegs = new HashMap<>();
+        assignablePhyRegs = new HashMap<>();
+        for (int i = 0; i < 32; ++i) {
+            String prName = phyRegNames.get(i);
+            PhysicalReg pr = new PhysicalReg(prName);
+            phyRegs.put(prName, pr);
+            switch (saveStatus.get(i)) {
+                case 1: {
+                    callerSavePhyRegs.put(prName, pr);
+                    assignablePhyRegs.put(prName, pr);
+                    break;
+                }
+                case 2: {
+                    calleeSavePhyRegs.put(prName, pr);
+                    assignablePhyRegs.put(prName, pr);
+                }
+            }
+        }
+    }
 
     public PhysicalReg(String name) {
         super(name);

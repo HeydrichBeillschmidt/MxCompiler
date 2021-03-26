@@ -104,7 +104,7 @@ public class Function {
     public void checkTermination(ExceptionHandler e) {
         ArrayList<IRBlock> blocks = getAllBlocks();
         for (var b: blocks) {
-            if (!b.endWithTerminalInst()) {
+            if (b.endWithNonTerminalInst()) {
                 e.error("Function \"" + name + "\" has no return statement.");
                 throw new SyntaxError();
             }
