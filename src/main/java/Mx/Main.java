@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) {
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/sema/misc-package/misc-1.mx";
+        //String filename = "testcases/sema/class-package/class-1.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
