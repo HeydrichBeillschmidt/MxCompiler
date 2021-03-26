@@ -283,6 +283,7 @@ public class SemanticChecker implements ASTVisitor {
         }
         else { // funcName instance of IdExprNode
             boolean found = false;
+            ArrayList<FunctionEntity> pendingList = new ArrayList<>();
             String decoratedEnd = FuncNameDecorator.funcCallDecoratedEnd(parameters);
             for (var f: currentScope().getOverloadedFuncEntities(
                     ((IdExprNode) funcName).getIdentifier() ) ) {
@@ -291,12 +292,38 @@ public class SemanticChecker implements ASTVisitor {
                     func = f;
                     break;
                 }
+                pendingList.add(f);
             }
             if (!found) {
-                exceptionHandler.error("Function \""
-                                + funcName.getText() + "\" is not declared.",
-                        funcName.getLocation());
-                throw new SemanticError();
+                boolean obscureMatch = false;
+                for (var f: pendingList) {
+                    ArrayList<VarEntity> funcParameters = f.getParameters();
+                    if (parameters.size()!=funcParameters.size()) continue;
+                    boolean parMatch = true;
+                    if (parameters.size() != 0) {
+                        for (int i = 0, it = parameters.size(); i < it; ++i) {
+                            ExprNode rhs = parameters.get(i);
+                            VarEntity lhs = funcParameters.get(i);
+                            Type lType = typeTable.getType(lhs.getSpecifier());
+                            Type rType = rhs.getType();
+                            if (Type.canNotAssign(lType, rType)) {
+                                parMatch = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (parMatch) {
+                        obscureMatch = true;
+                        func = f;
+                        break;
+                    }
+                }
+                if (!obscureMatch) {
+                    exceptionHandler.error("Function \""
+                                    + funcName.getText() + "\" is not declared.",
+                            funcName.getLocation());
+                    throw new SemanticError();
+                }
             }
         }
 
