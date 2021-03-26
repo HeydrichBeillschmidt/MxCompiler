@@ -20,8 +20,8 @@ public class Main {
     public static void main(String[] args) {
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/sema/class-package/class-1.mx";
-        String filename = "test.mx";
+        String filename = "testcases/sema/misc-package/misc-1.mx";
+        //String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
         try {
@@ -71,7 +71,7 @@ public class Main {
             exceptionHandler.print();
             throw new RuntimeException();
         }
-/*
+
         IRBuilder irBuilder = new IRBuilder(semanticChecker.getGlobalScope(),
                 semanticChecker.getTypeTable(), exceptionHandler);
         try {
@@ -88,6 +88,6 @@ public class Main {
             throw new RuntimeException();
         }
 
-        new IRPrinter("test.ll").exec(irBuilder.getModule());*/
+        new IRPrinter("test.ll").exec(irBuilder.getModule());
     }
 }

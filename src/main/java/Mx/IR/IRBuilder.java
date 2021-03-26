@@ -96,8 +96,8 @@ public class IRBuilder implements ASTVisitor {
         ConstString ptr = module.getConstStrByValue(node.getValue());
         String name;
         if (ptr==null) {
-            name = "__const." + curFunc.getName() + ".str"
-                    + module.getConstStrings().size();
+            name = "__const." + (curFunc==null ? "" : curFunc.getName())
+                    + ".str" + module.getConstStrings().size();
             ptr = module.addConstString(node.getValue(), name);
         }
         else name = ptr.getName();

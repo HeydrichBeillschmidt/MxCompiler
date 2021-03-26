@@ -47,8 +47,8 @@ public class BinaryOp extends IRInst {
     }
     @Override
     public String toString() {
-        return dst.toString() + " = " + opName.toString() + dst.getType().toString()
-                + op1.toString() + ", " + op2.toString();
+        return dst.toString() + " = " + opName.toString() + " " + dst.getType().toString()
+                + " " + op1.toString() + ", " + op2.toString();
     }
     @Override
     public void accept(IRVisitor visitor) {

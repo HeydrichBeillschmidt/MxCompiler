@@ -55,14 +55,24 @@ public class IRPrinter implements IRVisitor {
                 writer.println(g.printToString());
             writer.println("");
         }
-        if (node.getFunctions().size() > 0) {
-            writer.println("; Function Attrs: noinline nounwind optnone uwtable");
-            for (var f: node.getFunctions().values())
-                f.accept(this);
+        if (node.getConstStrings().size() > 0) {
+            for (var cs: node.getConstStrings().values())
+                writer.println("@" + cs.getName()
+                        + " = private unnamed_addr constant "
+                        + cs.toString() + ", align 1");
             writer.println("");
         }
-        for (var ef: node.getExternalFunctions().values())
+        if (node.getFunctions().size() > 0) {
+            for (var f: node.getFunctions().values()) {
+                writer.println("; Function Attrs: noinline nounwind optnone uwtable");
+                f.accept(this);
+                writer.println("");
+            }
+        }
+        for (var ef: node.getExternalFunctions().values()) {
             writer.println("declare " + ef.declareToString());
+            writer.println("");
+        }
     }
 
     @Override

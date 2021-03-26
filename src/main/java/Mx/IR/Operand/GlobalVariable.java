@@ -17,7 +17,7 @@ public class GlobalVariable extends Operand {
     }
     public String printToString() {
         assert getType() instanceof PointerType;
-        return "@" + name + " = global "
+        return "@" + name + " = dso_local global "
                 + ((PointerType)getType()).getBaseType().toString()
                 + " zeroinitializer, align " + getType().size()/8;
     }

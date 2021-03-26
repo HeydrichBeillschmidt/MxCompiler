@@ -31,7 +31,7 @@ public class ConstString extends Constant {
         text = text.replace("\t", "\\09");
         text = text.replace("\"", "\\22");
 
-        return "\"" + text + "\"";
+        return "[" + value.length() + " x i8] c\"" + text + "\"";
     }
     @Override
     public boolean equals(Object obj) {

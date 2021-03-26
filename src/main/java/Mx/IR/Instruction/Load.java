@@ -42,7 +42,8 @@ public class Load extends IRInst {
     @Override
     public String toString() {
         return dst.toString() + " = load " + loadType.toString() + ", "
-                + addr.getType().toString() + " " + addr.toString();
+                + addr.getType().toString() + " " + addr.toString()
+                + ", align " + dst.getType().size()/8;
     }
     @Override
     public void accept(IRVisitor visitor) {
