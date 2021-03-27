@@ -51,6 +51,23 @@ public class IRBuilder implements ASTVisitor {
     public void visit(ASTRoot node) {
         if (node.getDeclarations()!=null) {
             for (var decl: node.getDeclarations()) {
+                if (decl instanceof VarNode) {
+                    if (((VarNode)decl).getSpecifier().getTypeSpecifier()
+                            instanceof ClassSpecifierNode ) {
+                        ClassSpecifierNode csp = (ClassSpecifierNode)
+                                ((VarNode)decl).getSpecifier().getTypeSpecifier();
+                        if (csp.hasConstructor()) {
+                            for (var c: csp.getConstructors())
+                                c.addModularFunction(module, astTypeTable);
+                        }
+                        if (csp.getMethods()!=null) {
+                            for (var m: csp.getMethods())
+                                m.addModularFunction(module, astTypeTable);
+                        }
+                    }
+                }
+            }
+            for (var decl: node.getDeclarations()) {
                 if (decl instanceof FuncNode)
                     ((FuncNode) decl).addModularFunction(module, astTypeTable);
             }
@@ -1339,12 +1356,14 @@ public class IRBuilder implements ASTVisitor {
         }
         if (node.hasConstructor()) {
             for (var constructor: node.getConstructors()) {
-                constructor.addModularFunction(module, astTypeTable);
+                if (module.hasNoFunction(constructor.getDecoratedName()))
+                    constructor.addModularFunction(module, astTypeTable);
             }
         }
         if (node.getMethods()!=null) {
             for (var method: node.getMethods()) {
-                method.addModularFunction(module, astTypeTable);
+                if (module.hasNoFunction(method.getDecoratedName()))
+                    method.addModularFunction(module, astTypeTable);
             }
         }
         if (node.hasConstructor()) {
