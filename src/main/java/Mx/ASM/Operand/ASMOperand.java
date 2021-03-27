@@ -1,6 +1,7 @@
 package Mx.ASM.Operand;
 
 abstract public class ASMOperand {
+    abstract public String emitCode();
     @Override
-    public abstract String toString();
+    abstract public String toString();
 }

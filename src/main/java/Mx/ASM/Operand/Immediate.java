@@ -12,6 +12,10 @@ public class Immediate extends ASMOperand {
     }
 
     @Override
+    public String emitCode() {
+        return String.valueOf(value);
+    }
+    @Override
     public String toString() {
         return String.valueOf(value);
     }

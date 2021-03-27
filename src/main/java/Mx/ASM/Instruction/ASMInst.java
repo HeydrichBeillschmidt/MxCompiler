@@ -1,14 +1,24 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.Operand.VirtualReg;
+
+import java.util.HashSet;
+import java.util.Set;
 
 abstract public class ASMInst {
     private final ASMBlock block;
     private ASMInst prevInst;
     private ASMInst nextInst;
 
+    //  for liveness analysis
+    private final Set<VirtualReg> uses;
+    private final Set<VirtualReg> defs;
+
     public ASMInst(ASMBlock block) {
         this.block = block;
+        this.uses = new HashSet<>();
+        this.defs = new HashSet<>();
     }
 
     public ASMBlock getBlock() {
@@ -26,4 +36,21 @@ abstract public class ASMInst {
     public void setNextInst(ASMInst nextInst) {
         this.nextInst = nextInst;
     }
+
+    public Set<VirtualReg> getUses() {
+        return uses;
+    }
+    public void addUse(VirtualReg pr) {
+        uses.add(pr);
+    }
+    public Set<VirtualReg> getDefs() {
+        return defs;
+    }
+    public void addDef(VirtualReg pr) {
+        defs.add(pr);
+    }
+
+    abstract public String emitCode();
+    @Override
+    abstract public String toString();
 }

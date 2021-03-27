@@ -4,6 +4,8 @@ import Mx.ASM.Instruction.ASMInst;
 import Mx.IR.IRBlock;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ASMBlock {
     private final String name;
@@ -16,8 +18,11 @@ public class ASMBlock {
     private ASMBlock prevBlock;
     private ASMBlock nextBlock;
 
+    //  for liveness analysis
     private final ArrayList<ASMBlock> predecessors;
     private final ArrayList<ASMBlock> successors;
+    private final Set<ASMBlock> uses;
+    private final Set<ASMBlock> defs;
 
     public ASMBlock(String name, IRBlock irBlock) {
         this.name = name;
@@ -26,6 +31,8 @@ public class ASMBlock {
         this.nextBlock = null;
         this.predecessors = new ArrayList<>();
         this.successors = new ArrayList<>();
+        this.uses = new HashSet<>();
+        this.defs = new HashSet<>();
     }
 
     public String getName() {
@@ -117,5 +124,18 @@ public class ASMBlock {
     }
     public void addSuccessor(ASMBlock successor) {
         successors.add(successor);
+    }
+
+    public Set<ASMBlock> getUses() {
+        return uses;
+    }
+    public void addUse(ASMBlock b) {
+        uses.add(b);
+    }
+    public Set<ASMBlock> getDefs() {
+        return defs;
+    }
+    public void addDef(ASMBlock b) {
+        defs.add(b);
     }
 }

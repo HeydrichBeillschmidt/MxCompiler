@@ -12,6 +12,10 @@ public class GlobalVar extends ASMOperand {
     }
 
     @Override
+    public String emitCode() {
+        return name;
+    }
+    @Override
     public String toString() {
         return name;
     }
