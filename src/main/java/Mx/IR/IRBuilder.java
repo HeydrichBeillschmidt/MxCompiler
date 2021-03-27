@@ -71,6 +71,7 @@ public class IRBuilder implements ASTVisitor {
                 if (decl instanceof FuncNode)
                     ((FuncNode) decl).addModularFunction(module, astTypeTable);
             }
+
             curFunc = initializer;
             curBlock = initializer.getEntranceBlock();
             for (var decl: node.getDeclarations()) {
@@ -81,6 +82,7 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addInst(new Br(curBlock, null,
                     curFunc.getReturnBlock(), null));
             curFunc.addBlock(curFunc.getReturnBlock());
+
             for (var decl: node.getDeclarations()) {
                 if (decl instanceof FuncNode) decl.accept(this);
             }
