@@ -3,6 +3,7 @@ package Mx.ASM.Instruction;
 import Mx.ASM.ASMBlock;
 import Mx.ASM.Operand.VirtualReg;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,13 +42,20 @@ abstract public class ASMInst {
         return uses;
     }
     public void addUse(VirtualReg pr) {
-        uses.add(pr);
+        if (pr!=null)
+            uses.add(pr);
+    }
+    public void addUses(ArrayList<VirtualReg> prs) {
+        uses.addAll(prs);
     }
     public Set<VirtualReg> getDefs() {
         return defs;
     }
     public void addDef(VirtualReg pr) {
         defs.add(pr);
+    }
+    public void addDefs(ArrayList<VirtualReg> prs) {
+        defs.addAll(prs);
     }
 
     abstract public String emitCode();

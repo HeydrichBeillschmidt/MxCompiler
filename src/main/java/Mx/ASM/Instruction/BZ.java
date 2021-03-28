@@ -1,0 +1,43 @@
+package Mx.ASM.Instruction;
+
+import Mx.ASM.ASMBlock;
+import Mx.ASM.Operand.VirtualReg;
+
+// branch compared with zero
+public class BZ extends ASMInst {
+    public enum OpName {
+        beqz, bnez, bltz, bgez, blez, bgtz
+    }
+
+    private final OpName opName;
+    private VirtualReg rs1;
+    private ASMBlock dst;
+
+    public BZ(ASMBlock block, OpName opName, VirtualReg rs1, ASMBlock dst) {
+        super(block);
+        this.opName = opName;
+        this.rs1 = rs1;
+        this.dst = dst;
+
+        addUse(rs1);
+    }
+
+    public OpName getOpName() {
+        return opName;
+    }
+    public VirtualReg getRs1() {
+        return rs1;
+    }
+    public ASMBlock getDst() {
+        return dst;
+    }
+
+    @Override
+    public String emitCode() {
+        return "\t" + opName.toString() + "\t" + rs1.emitCode() + ", " + dst.emitCode();
+    }
+    @Override
+    public String toString() {
+        return opName.toString() + " " + rs1.toString() + ", " + dst.toString();
+    }
+}

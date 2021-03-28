@@ -16,6 +16,13 @@ public class MV extends ASMInst {
         addDef(rd);
     }
 
+    public VirtualReg getRd() {
+        return rd;
+    }
+    public VirtualReg getRs() {
+        return rs;
+    }
+
     @Override
     public String emitCode() {
         return "\tmv\t" + rd.emitCode() + ", " + rs.emitCode();

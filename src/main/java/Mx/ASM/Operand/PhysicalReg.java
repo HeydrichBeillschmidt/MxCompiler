@@ -25,6 +25,13 @@ public class PhysicalReg extends Register {
     public static Map<String, PhysicalReg> calleeSavePhyRegs;
     public static Map<String, PhysicalReg> assignablePhyRegs;
 
+    public static Map<String, VirtualReg> virtualRegs;
+    public static VirtualReg zeroVR;
+    public static VirtualReg raVR;
+    public static ArrayList<VirtualReg> argVRs;
+    public static ArrayList<VirtualReg> callerSaveVRs;
+    public static ArrayList<VirtualReg> calleeSaveVRs;
+
     static {
         phyRegs = new HashMap<>();
         callerSavePhyRegs = new HashMap<>();
@@ -45,6 +52,25 @@ public class PhysicalReg extends Register {
                     assignablePhyRegs.put(prName, pr);
                 }
             }
+        }
+
+        virtualRegs = new HashMap<>();
+        for (var prn: phyRegNames) {
+            VirtualReg vr = new VirtualReg("."+prn);
+            vr.fixColor(phyRegs.get(prn));
+            virtualRegs.put(prn, vr);
+        }
+        zeroVR = virtualRegs.get("zero");
+        raVR = virtualRegs.get("ra");
+        argVRs = new ArrayList<>();
+        for (int i = 0; i < 8; ++i) {
+            argVRs.add(virtualRegs.get("a"+i));
+        }
+        for (var rsn: callerSavePhyRegs.keySet()) {
+            callerSaveVRs.add(virtualRegs.get(rsn));
+        }
+        for (var esn: calleeSavePhyRegs.keySet()) {
+            calleeSaveVRs.add(virtualRegs.get(esn));
         }
     }
 
