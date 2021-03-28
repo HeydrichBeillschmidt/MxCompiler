@@ -33,7 +33,7 @@ public class Function {
         ArrayList<IRType> parameterTypeList = new ArrayList<>();
         for (var p: parameterList) {
             parameterTypeList.add(p.getType());
-            symbolTable.put(p);
+            symbolTable.putIR(p);
         }
         this.functionType = new FunctionType(retType, parameterTypeList);
         this.entranceBlock = null;
@@ -53,8 +53,8 @@ public class Function {
             entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
             Register returnValue = new Register(retType, "returnValue");
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));
-            symbolTable.put(retVal);
-            symbolTable.put(returnValue);
+            symbolTable.putIR(retVal);
+            symbolTable.putIR(returnValue);
         }
     }
 
@@ -118,7 +118,7 @@ public class Function {
         this.classPtr = classPtr;
     }
     public void addSymbol(Object obj) {
-        symbolTable.put(obj);
+        symbolTable.putIR(obj);
     }
     public boolean hasSideEffect() {
         return sideEffect;

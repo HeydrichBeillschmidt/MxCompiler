@@ -1,5 +1,7 @@
 package Mx.Utils;
 
+import Mx.ASM.ASMBlock;
+import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.IRBlock;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
@@ -15,7 +17,7 @@ public class FuncSymbolTable {
         symbolTable = new HashMap<>();
     }
 
-    public void put(Object obj) {
+    public void putIR(Object obj) {
         String name;
         if (obj instanceof IRBlock) name = ((IRBlock)obj).getName();
         else if (obj instanceof Parameter) name = ((Parameter)obj).getName();
@@ -35,6 +37,17 @@ public class FuncSymbolTable {
         if (obj instanceof IRBlock) ((IRBlock)obj).setName(name+objLabel);
         else if (obj instanceof Parameter) ((Parameter)obj).setName(name+objLabel);
         else ((Register)obj).setName(name+objLabel);
+    }
+    public void putASM(Object obj) {
+        String name;
+        if (obj instanceof VirtualReg) name = ((VirtualReg)obj).getName();
+        else if (obj instanceof ASMBlock) name = ((ASMBlock)obj).getName();
+        else throw new RuntimeException();
+        assert !symbolTable.containsKey(name);
+
+        ArrayList<Object> arr = new ArrayList<>();
+        arr.add(obj);
+        symbolTable.put(name, arr);
     }
     public boolean contains(String name) {
         return symbolTable.containsKey(name);

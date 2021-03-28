@@ -1,7 +1,7 @@
 package Mx.ASM.Operand;
 
 public class Immediate extends ASMOperand {
-    private int value;
+    private final int value;
 
     public Immediate(int value) {
         this.value = value;
@@ -18,5 +18,10 @@ public class Immediate extends ASMOperand {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Immediate)) return false;
+        return value==((Immediate)obj).value;
     }
 }

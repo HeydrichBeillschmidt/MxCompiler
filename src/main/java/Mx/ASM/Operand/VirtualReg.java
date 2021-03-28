@@ -14,6 +14,9 @@ public class VirtualReg extends Register {
     private VirtualReg alias;
     private PhysicalReg color;
 
+    private boolean colorFixed;
+    private double spillCost;
+
     public VirtualReg(String name) {
         super(name);
 
@@ -22,8 +25,31 @@ public class VirtualReg extends Register {
         moveList = new HashSet<>();
         alias = null;
         color = null;
+        colorFixed = false;
+        spillCost = 0;
     }
 
+    public ArrayList<VirtualReg> getAdjList() {
+        return adjList;
+    }
+    public int getDegree() {
+        return degree;
+    }
+    public void increaseDegree() {
+        ++degree;
+    }
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
+    public Set<MV> getMoveList() {
+        return moveList;
+    }
+    public VirtualReg getAlias() {
+        return alias;
+    }
+    public void setAlias(VirtualReg alias) {
+        this.alias = alias;
+    }
     public boolean hasColor() {
         return color !=null;
     }
@@ -31,8 +57,12 @@ public class VirtualReg extends Register {
         assert color !=null;
         return color;
     }
-    public void setColor(PhysicalReg pr) {
-        this.color = pr;
+    public void setColor(PhysicalReg color) {
+        this.color = color;
+    }
+    public void fixColor(PhysicalReg color) {
+        this.colorFixed = true;
+        this.color = color;
     }
 
     @Override

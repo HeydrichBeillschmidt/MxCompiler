@@ -4,6 +4,7 @@ import Mx.ASM.*;
 import Mx.ASM.Operand.GlobalVar;
 import Mx.IR.*;
 import Mx.IR.Instruction.*;
+import Mx.IR.TypeSystem.PointerType;
 
 public class InstructionSelector implements IRVisitor {
     private final ASMModule asmModule;
@@ -23,7 +24,8 @@ public class InstructionSelector implements IRVisitor {
     @Override
     public void visit(IRModule node) {
         for (var gv: node.getGlobalVariables().values()) {
-            GlobalVar asmGv = new GlobalVar(gv.getName());
+            GlobalVar asmGv = new GlobalVar(gv.getName(),
+                    ((PointerType)gv.getType()).getBaseType().size());
             asmModule.getGlobalVars().put(gv.getName(), asmGv);
         }
         for (var ef: node.getExternalFunctions().values()) {

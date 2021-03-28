@@ -138,4 +138,12 @@ public class ASMBlock {
     public void addDef(ASMBlock b) {
         defs.add(b);
     }
+
+    public String emitCode() {
+        return name;
+    }
+    @Override
+    public String toString() {
+        return name;
+    }
 }
