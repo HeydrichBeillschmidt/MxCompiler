@@ -46,7 +46,14 @@ public class InstructionSelector implements IRVisitor {
     public void visit(Function node) {}
 
     @Override
-    public void visit(IRBlock node) {}
+    public void visit(IRBlock node) {
+        curBlock = curFunc.getBlocks().get(node.getName());
+        IRInst instIte = node.getHeadInst();
+        while (instIte!=null) {
+            instIte.accept(this);
+            instIte = instIte.getNextInst();
+        }
+    }
 
     @Override
     public void visit(Alloca node) {}

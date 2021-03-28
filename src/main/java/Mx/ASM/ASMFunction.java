@@ -1,5 +1,6 @@
 package Mx.ASM;
 
+import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.Utils.FuncSymbolTable;
@@ -11,6 +12,8 @@ import java.util.Map;
 public class ASMFunction {
     private final String name;
 
+    private final ArrayList<VirtualReg> parameters;
+
     private ASMBlock entranceBlock;
     private ASMBlock exitBlock;
 
@@ -21,6 +24,7 @@ public class ASMFunction {
         this.name = name;
         this.blocks = new HashMap<>();
         this.symbolTable = new FuncSymbolTable();
+        this.parameters = new ArrayList<>();
 
         if (irFunc==null) return;
 
@@ -40,10 +44,21 @@ public class ASMFunction {
         }
         this.entranceBlock = blocks.get(irBlocks.get(0).getName());
         this.exitBlock = blocks.get(irBlocks.get(irBlocks.size()-1).getName());
+
+
+        for (var p: irFunc.getParameterList()) {
+            VirtualReg vr = new VirtualReg(p.getName());
+            parameters.add(vr);
+            symbolTable.putASM(vr);
+        }
     }
 
     public String getName() {
         return name;
+    }
+
+    public ArrayList<VirtualReg> getParameters() {
+        return parameters;
     }
 
     public ASMBlock getEntranceBlock() {
