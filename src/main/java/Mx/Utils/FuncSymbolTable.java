@@ -38,7 +38,7 @@ public class FuncSymbolTable {
         else if (obj instanceof Parameter) ((Parameter)obj).setName(name+objLabel);
         else ((Register)obj).setName(name+objLabel);
     }
-    public void putASM(Object obj) {
+    public void putASMUnique(Object obj) {
         String name;
         if (obj instanceof VirtualReg) name = ((VirtualReg)obj).getName();
         else if (obj instanceof ASMBlock) name = ((ASMBlock)obj).getName();
@@ -48,6 +48,24 @@ public class FuncSymbolTable {
         ArrayList<Object> arr = new ArrayList<>();
         arr.add(obj);
         symbolTable.put(name, arr);
+    }
+    public void putASMMultiple(Object obj) {
+        String name;
+        if (obj instanceof VirtualReg) name = ((VirtualReg)obj).getName();
+        else throw new RuntimeException();
+
+        ArrayList<Object> arr = new ArrayList<>();
+        arr.add(obj);
+        if (!symbolTable.containsKey(name)) {
+            symbolTable.put(name, arr);
+        }
+        else {
+            int cnt = 1;
+            while (symbolTable.containsKey(name+cnt)) ++cnt;
+            name += cnt;
+            ((VirtualReg)obj).setName(name);
+            symbolTable.put(name, arr);
+        }
     }
     public boolean contains(String name) {
         return symbolTable.containsKey(name);

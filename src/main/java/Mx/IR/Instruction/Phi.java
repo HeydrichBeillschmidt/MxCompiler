@@ -20,7 +20,9 @@ public class Phi extends IRInst {
         this.dst = dst;
         this.values = values;
         this.blocks = blocks;
+        for (var v: values) v.addUse(this);
         dst.setDef(this);
+        addUses(values);
 
         assert values.size() == blocks.size();
         for (var v: values) {
@@ -43,6 +45,10 @@ public class Phi extends IRInst {
         blocks.add(block);
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return true;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

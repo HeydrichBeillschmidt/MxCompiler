@@ -223,7 +223,7 @@ public class IRModule {
         return externalFunctions.get(decoratedName);
     }
     public boolean hasNoFunction(String decoratedName) {
-        return functions.containsKey(decoratedName);
+        return !functions.containsKey(decoratedName);
     }
     public void addFunction(Function func) {
         functions.put(func.getName(), func);

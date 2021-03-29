@@ -1,5 +1,7 @@
 package Mx.IR.Operand;
 
+import Mx.IR.IRBlock;
+import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.IRInst;
 import Mx.IR.TypeSystem.IRType;
 
@@ -23,6 +25,14 @@ public class Register extends Operand {
     }
     public void setDef(IRInst def) {
         this.def = def;
+    }
+    public boolean isForBranch(IRBlock block) {
+        if (getUses().size()==1) {
+            for (var u: getUses()) {
+                if (u instanceof Br) return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -1,12 +1,32 @@
 package Mx.ASM.Operand;
 
-abstract public class Address {
-    abstract public VirtualReg getBase();
-    abstract public int getOffset();
+public class Address {
+    private final VirtualReg base;
+    private final Immediate offset;
 
-    abstract public String emitCode();
+    public Address(VirtualReg base, Immediate offset) {
+        this.base = base;
+        this.offset = offset;
+    }
+
+    public VirtualReg getBase() {
+        return base;
+    }
+    public int getOffset() {
+        return offset.getValue();
+    }
+
+    public String emitCode() {
+        return offset.emitCode() + "(" + base.emitCode() + ")";
+    }
     @Override
-    abstract public String toString();
+    public String toString() {
+        return offset.toString() + "(" + base.toString() + ")";
+    }
     @Override
-    abstract public boolean equals(Object obj);
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Address)) return false;
+        return base==((Address)obj).base
+                && offset.equals(((Address)obj).offset);
+    }
 }

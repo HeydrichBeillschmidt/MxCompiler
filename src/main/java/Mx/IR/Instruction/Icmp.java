@@ -11,7 +11,7 @@ import Mx.IR.TypeSystem.PointerType;
 
 public class Icmp extends IRInst {
     public enum IcmpOpName {
-        eq, ne, sgt, sge, slt, sle
+        eq, ne, slt, sge, sle, sgt
     }
     private final Register dst;
     private final IcmpOpName opName;
@@ -27,7 +27,11 @@ public class Icmp extends IRInst {
         this.type = type;
         this.op1 = op1;
         this.op2 = op2;
+        op1.addUse(this);
+        op2.addUse(this);
         dst.setDef(this);
+        addUse(op1);
+        addUse(op2);
 
         assert type.equals(op1.getType())
                 || (op1 instanceof Null && type instanceof PointerType);
@@ -52,6 +56,10 @@ public class Icmp extends IRInst {
         return op2;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return true;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

@@ -1,9 +1,11 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
+import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.PointerType;
 import Mx.IR.TypeSystem.VoidType;
@@ -19,6 +21,8 @@ public class Ret extends IRInst {
         if (!(retType instanceof VoidType)) {
             assert retType.equals(retValue.getType())
                     || (retValue instanceof Null && retType instanceof PointerType);
+            retValue.addUse(this);
+            addUse(retValue);
         }
         else {
             assert retValue==null;
@@ -32,6 +36,14 @@ public class Ret extends IRInst {
         return retValue;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return false;
+    }
+    @Override
+    public Register getDst() {
+        return IRBuilder.pseudoReg;
+    }
     @Override
     public boolean isTerminalInst() {
         return true;

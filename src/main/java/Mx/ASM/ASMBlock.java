@@ -9,6 +9,7 @@ import java.util.Set;
 
 public class ASMBlock {
     private final String name;
+    private final String asmName;
 
     private final IRBlock irBlock;
 
@@ -24,8 +25,9 @@ public class ASMBlock {
     private final Set<ASMBlock> uses;
     private final Set<ASMBlock> defs;
 
-    public ASMBlock(String name, IRBlock irBlock) {
+    public ASMBlock(String name, String asmName, IRBlock irBlock) {
         this.name = name;
+        this.asmName = asmName;
         this.irBlock = irBlock;
         this.prevBlock = null;
         this.nextBlock = null;
@@ -37,6 +39,9 @@ public class ASMBlock {
 
     public String getName() {
         return name;
+    }
+    public String getAsmName() {
+        return asmName;
     }
     public IRBlock getIRBlock() {
         return irBlock;
@@ -140,7 +145,7 @@ public class ASMBlock {
     }
 
     public String emitCode() {
-        return name;
+        return asmName;
     }
     @Override
     public String toString() {

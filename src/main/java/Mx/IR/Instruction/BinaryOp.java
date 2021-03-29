@@ -14,6 +14,7 @@ public class BinaryOp extends IRInst {
     private final BinaryOpName opName;
     private final Operand op1;
     private final Operand op2;
+    private final boolean commutable;
 
     public BinaryOp(IRBlock block, Register dst, BinaryOpName opName,
                     Operand op1, Operand op2) {
@@ -22,7 +23,14 @@ public class BinaryOp extends IRInst {
         this.opName = opName;
         this.op1 = op1;
         this.op2 = op2;
+        this.commutable = opName==BinaryOpName.add || opName==BinaryOpName.mul
+                || opName==BinaryOpName.and || opName==BinaryOpName.or
+                || opName==BinaryOpName.xor;
+        op1.addUse(this);
+        op2.addUse(this);
         dst.setDef(this);
+        addUse(op1);
+        addUse(op2);
 
         assert op1.getType().equals(dst.getType());
         assert op2.getType().equals(dst.getType());
@@ -40,7 +48,14 @@ public class BinaryOp extends IRInst {
     public Operand getOp2() {
         return op2;
     }
+    public boolean isCommutable() {
+        return commutable;
+    }
 
+    @Override
+    public boolean needWriteBack() {
+        return true;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

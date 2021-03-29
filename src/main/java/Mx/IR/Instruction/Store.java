@@ -1,9 +1,11 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
+import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.PointerType;
 
 public class Store extends IRInst {
@@ -14,6 +16,10 @@ public class Store extends IRInst {
         super(block);
         this.value = value;
         this.addr = addr;
+        value.addUse(this);
+        addr.addUse(this);
+        addUse(value);
+        addUse(addr);
 
         assert addr.getType() instanceof PointerType;
         assert ((PointerType)addr.getType()).getBaseType().equals(value.getType())
@@ -27,6 +33,14 @@ public class Store extends IRInst {
         return addr;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return false;
+    }
+    @Override
+    public Register getDst() {
+        return IRBuilder.pseudoReg;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

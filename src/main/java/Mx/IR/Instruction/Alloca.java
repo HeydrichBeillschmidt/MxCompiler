@@ -27,6 +27,10 @@ public class Alloca extends IRInst {
     }
 
     @Override
+    public boolean needWriteBack() {
+        return true;
+    }
+    @Override
     public boolean isTerminalInst() {
         return false;
     }

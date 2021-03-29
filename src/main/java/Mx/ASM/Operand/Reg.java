@@ -1,9 +1,9 @@
 package Mx.ASM.Operand;
 
-abstract public class Register extends ASMOperand {
+abstract public class Reg extends ASMOperand {
     private String name;
 
-    public Register(String name) {
+    public Reg(String name) {
         this.name = name;
     }
 

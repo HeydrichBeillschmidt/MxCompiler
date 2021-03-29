@@ -21,7 +21,11 @@ public class GetElementPtr extends IRInst {
         this.dst = dst;
         this.ptr = ptr;
         this.index = index;
+        ptr.addUse(this);
+        for (var i: index) i.addUse(this);
         dst.setDef(this);
+        addUse(ptr);
+        addUses(index);
 
         assert ptr.getType() instanceof PointerType;
         assert dst.getType() instanceof PointerType;
@@ -41,6 +45,10 @@ public class GetElementPtr extends IRInst {
         return index;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return true;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

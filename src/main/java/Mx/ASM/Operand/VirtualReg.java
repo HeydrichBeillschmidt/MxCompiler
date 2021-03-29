@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class VirtualReg extends Register {
+public class VirtualReg extends Reg {
     //  Some attributes for graph coloring.
     private ArrayList<VirtualReg> adjList;
     private int degree;

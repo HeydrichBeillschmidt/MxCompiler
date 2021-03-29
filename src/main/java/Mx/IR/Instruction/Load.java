@@ -18,7 +18,9 @@ public class Load extends IRInst {
         this.dst = dst;
         this.loadType = loadType;
         this.addr = addr;
+        addr.addUse(this);
         dst.setDef(this);
+        addUse(addr);
 
         assert addr.getType() instanceof PointerType;
         assert ((PointerType)addr.getType()).getBaseType().equals(loadType);
@@ -35,6 +37,10 @@ public class Load extends IRInst {
         return addr;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return true;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;

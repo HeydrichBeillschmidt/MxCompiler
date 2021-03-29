@@ -2,23 +2,28 @@ package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
-import Mx.IR.Operand.Operand;
-import Mx.IR.Operand.Register;
-import Mx.IR.TypeSystem.IRType;
+import Mx.IR.Operand.*;
+import Mx.IR.TypeSystem.PointerType;
 
-public class BitCast extends IRInst {
+public class Move extends IRInst {
     private final Register dst;
     private final Operand src;
-    private final IRType castType;
 
-    public BitCast(IRBlock block, Register dst, Operand src, IRType castType) {
+    public Move(IRBlock block, Register dst, Operand src, boolean doAddUse) {
         super(block);
         this.dst = dst;
         this.src = src;
-        this.castType = castType;
-        src.addUse(this);
-        dst.setDef(this);
+        if (doAddUse) {
+            src.addUse(this);
+            dst.setDef(this);
+        }
         addUse(src);
+        assert src.getType().equals(dst.getType())
+                || (dst.getType() instanceof PointerType
+                    && src instanceof Null);
+        assert src instanceof Register
+                || src instanceof Parameter
+                || src instanceof Constant;
     }
 
     public Register getDst() {
@@ -26,9 +31,6 @@ public class BitCast extends IRInst {
     }
     public Operand getSrc() {
         return src;
-    }
-    public IRType getCastType() {
-        return castType;
     }
 
     @Override
@@ -41,9 +43,7 @@ public class BitCast extends IRInst {
     }
     @Override
     public String toString() {
-        return dst.toString() + " = bitcast "
-                + src.getType().toString() + " " + src.toString()
-                + " to " + castType.toString();
+        return "move " + dst.toString() + " " + src.toString();
     }
     @Override
     public void accept(IRVisitor visitor) {

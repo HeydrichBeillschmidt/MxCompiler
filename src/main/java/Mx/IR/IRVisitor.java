@@ -14,6 +14,7 @@ public interface IRVisitor {
     void visit(GetElementPtr node);
     void visit(Icmp node);
     void visit(Load node);
+    void visit(Move node);
     void visit(Phi node);
     void visit(Ret node);
     void visit(Store node);

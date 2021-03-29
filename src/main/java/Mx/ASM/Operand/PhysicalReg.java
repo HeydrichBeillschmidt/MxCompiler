@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PhysicalReg extends Register {
+public class PhysicalReg extends Reg {
     public static ArrayList<String> phyRegNames = new ArrayList<>(Arrays.asList(
             "zero", "ra", "sp", "gp", "tp",
             "t0", "t1", "t2", "s0", "s1",

@@ -33,9 +33,13 @@ public class Call extends IRInst {
         for (int i = 0, it = parameterList.size(); i < it; ++i) {
             if (parameterList.get(i) instanceof Null)
                 assert callee.getFunctionType().getParameterTypes().get(i) instanceof VoidType;
-            else
-                assert parameterList.get(i).getType().equals(callee.getFunctionType().getParameterTypes().get(i));
+            else {
+                assert parameterList.get(i).getType().equals(
+                        callee.getFunctionType().getParameterTypes().get(i) );
+                parameterList.get(i).addUse(this);
+            }
         }
+        addUses(parameterList);
     }
 
     public Register getDst() {
@@ -48,6 +52,10 @@ public class Call extends IRInst {
         return parameterList;
     }
 
+    @Override
+    public boolean needWriteBack() {
+        return dst!=IRBuilder.pseudoReg;
+    }
     @Override
     public boolean isTerminalInst() {
         return false;
