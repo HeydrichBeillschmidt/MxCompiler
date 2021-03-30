@@ -28,6 +28,7 @@ public class PhysicalReg extends Reg {
     public static Map<String, VirtualReg> virtualRegs;
     public static VirtualReg zeroVR;
     public static VirtualReg raVR;
+    public static VirtualReg spVR;
     public static ArrayList<VirtualReg> argVRs;
     public static ArrayList<VirtualReg> callerSaveVRs;
     public static ArrayList<VirtualReg> calleeSaveVRs;
@@ -62,6 +63,7 @@ public class PhysicalReg extends Reg {
         }
         zeroVR = virtualRegs.get("zero");
         raVR = virtualRegs.get("ra");
+        spVR = virtualRegs.get("sp");
         argVRs = new ArrayList<>();
         for (int i = 0; i < 8; ++i) {
             argVRs.add(virtualRegs.get("a"+i));

@@ -1,7 +1,9 @@
 package Mx.ASM;
 
 import Mx.ASM.Instruction.ASMInst;
+import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.IRBlock;
+import Mx.IR.Instruction.IRInst;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,8 +24,10 @@ public class ASMBlock {
     //  for liveness analysis
     private final ArrayList<ASMBlock> predecessors;
     private final ArrayList<ASMBlock> successors;
-    private final Set<ASMBlock> uses;
-    private final Set<ASMBlock> defs;
+    private Set<VirtualReg> uses;
+    private Set<VirtualReg> defs;
+    private Set<VirtualReg> liveIn;
+    private Set<VirtualReg> liveOut;
 
     public ASMBlock(String name, String asmName, IRBlock irBlock) {
         this.name = name;
@@ -33,8 +37,6 @@ public class ASMBlock {
         this.nextBlock = null;
         this.predecessors = new ArrayList<>();
         this.successors = new ArrayList<>();
-        this.uses = new HashSet<>();
-        this.defs = new HashSet<>();
     }
 
     public String getName() {
@@ -91,6 +93,15 @@ public class ASMBlock {
         target.setNextInst(instToAdd);
         instToAdd.setPrevInst(target);
     }
+    public ArrayList<ASMInst> getAllInst() {
+        ArrayList<ASMInst> ans = new ArrayList<>();
+        ASMInst tmp = headInst;
+        while (tmp!=null) {
+            ans.add(tmp);
+            tmp = tmp.getNextInst();
+        }
+        return ans;
+    }
 
     public ASMBlock getPrevBlock() {
         return prevBlock;
@@ -131,17 +142,55 @@ public class ASMBlock {
         successors.add(successor);
     }
 
-    public Set<ASMBlock> getUses() {
+    public void solveUsesAndDefs() {
+        uses = new HashSet<>();
+        defs = new HashSet<>();
+
+        for (ASMInst inst = headInst; inst!=null; inst = inst.getNextInst()) {
+            /* consider liveness analysis formula:
+             * -- in[n] = use[n] U (out[n] - def[n])
+             * -- out[n] = {U in[s] for s in successor[n]}
+             * inside a basic block,
+             * consider the sub-block p of all prev insts of current inst n,
+             * we have out[p] = in[n], which would induce
+             * -- in[p] = use[p] U ( (use[n] U (out[n]-def[n])) - def[p])
+             * notice that in[p] and out[n] is also in[pn] and out[pn], so
+             * -- use[pn] = use[p] U (use[n] - def[p])
+             * -- def[pn] = def[n] U def[p]
+             * so just traverse the block to get uses and defs of the total block.
+             */
+            Set<VirtualReg> curUse = new HashSet<>(inst.getUses());
+            curUse.removeAll(defs);
+            uses.addAll(curUse);
+            defs.addAll(inst.getDefs());
+        }
+
+        liveIn = new HashSet<>();
+        liveOut = new HashSet<>();
+    }
+    public Set<VirtualReg> getUses() {
         return uses;
     }
-    public void addUse(ASMBlock b) {
-        uses.add(b);
-    }
-    public Set<ASMBlock> getDefs() {
+    public Set<VirtualReg> getDefs() {
         return defs;
     }
-    public void addDef(ASMBlock b) {
-        defs.add(b);
+    public void solveLiveInsAndOuts() {
+        Set<VirtualReg> liveOutNewer = new HashSet<>();
+        for (var b: successors) liveOutNewer.addAll(b.liveIn);
+        Set<VirtualReg> liveInNewer = new HashSet<>(liveOutNewer);
+        liveInNewer.removeAll(defs);
+        liveInNewer.addAll(uses);
+
+        liveOut.addAll(liveOutNewer);
+        if (!liveIn.equals(liveInNewer)) {
+            liveIn = liveInNewer;
+        }
+    }
+    public Set<VirtualReg> getLiveIn() {
+        return liveIn;
+    }
+    public Set<VirtualReg> getLiveOut() {
+        return liveOut;
     }
 
     public String emitCode() {

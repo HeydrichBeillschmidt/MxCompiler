@@ -15,6 +15,7 @@ public class Call extends IRInst {
     private final Register dst;
     private final Function callee;
     private final ArrayList<Operand> parameterList;
+    private final boolean voidCall;
 
     public Call(IRBlock block, Register dst, Function callee,
                 ArrayList<Operand> parameterList) {
@@ -23,10 +24,13 @@ public class Call extends IRInst {
         this.callee = callee;
         this.parameterList = parameterList;
 
-        if (dst.getType().equals(new VoidType()))
+        if (dst.getType().equals(new VoidType())) {
             assert callee.getFunctionType().getReturnType().equals(new VoidType());
+            this.voidCall = true;
+        }
         else {
             assert dst.getType().equals(callee.getFunctionType().getReturnType());
+            this.voidCall = false;
             dst.setDef(this);
         }
         assert parameterList.size()==callee.getParameterList().size();
@@ -51,6 +55,9 @@ public class Call extends IRInst {
     public ArrayList<Operand> getParameterList() {
         return parameterList;
     }
+    public boolean isVoidCall() {
+        return voidCall;
+    }
 
     @Override
     public boolean needWriteBack() {
@@ -62,7 +69,7 @@ public class Call extends IRInst {
     }
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder("");
+        StringBuilder string = new StringBuilder();
         if (!(dst.equals(IRBuilder.pseudoReg))) {
             string.append(dst.toString()).append(" = ");
         }

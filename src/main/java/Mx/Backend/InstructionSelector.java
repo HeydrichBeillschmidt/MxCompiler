@@ -10,6 +10,7 @@ import Mx.IR.TypeSystem.PointerType;
 import Mx.IR.TypeSystem.StructureType;
 import Mx.IR.TypeSystem.VoidType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class InstructionSelector implements IRVisitor {
         // set sp
         StackPtr stackBase = new StackPtr(0);
         stackBase.reverse();
-        VirtualReg sp = PhysicalReg.virtualRegs.get("sp");
+        VirtualReg sp = PhysicalReg.spVR;
         curBlock.addInst(new IAL(curBlock, sp, IAL.OpName.addi, sp, stackBase));
 
         // save ra and callee-save regs
@@ -87,7 +88,7 @@ public class InstructionSelector implements IRVisitor {
             VirtualReg vr = curFunc.getParameters().get(i);
             StackPtr stackPtr = new StackPtr(paraOffset);
             curBlock.addInst(new LD(curBlock, p.getType().size()/8,
-                    vr, new Address(PhysicalReg.virtualRegs.get("sp"), stackPtr)) );
+                    vr, new Address(PhysicalReg.spVR, stackPtr)) );
             paraOffset += 4;
         }
 
@@ -165,7 +166,29 @@ public class InstructionSelector implements IRVisitor {
     }
 
     @Override
-    public void visit(Call node) {}
+    public void visit(Call node) {
+        // move first 8 parameters to a0-a7, then save the rest
+        ArrayList<Operand> irParameters = node.getParameterList();
+        for (int i = 0, it = Integer.min(8, irParameters.size()); i < it; ++i) {
+            VirtualReg vr = resolveToVR(irParameters.get(i));
+            curBlock.addInst(new MV(curBlock, PhysicalReg.argVRs.get(i), vr));
+        }
+        int stackedParasSz = 0;
+        for (int i = 8, it = irParameters.size(); i < it; ++i) {
+            Operand p = irParameters.get(i);
+            curBlock.addInst(new ST(curBlock, p.getType().size()/8, resolveToVR(p),
+                    new Address(PhysicalReg.spVR, new Immediate(stackedParasSz)) ) );
+            stackedParasSz += 4;
+        }
+        curFunc.compareAndSetStParmsSz(stackedParasSz);
+
+        ASMFunction callee = asmModule.getFunction(node.getCallee().getName());
+        curBlock.addInst(new CALL(curBlock, callee));
+        if (node.isVoidCall()) {
+            curBlock.addInst(new MV(curBlock, resolveToVR(node.getDst()),
+                    PhysicalReg.argVRs.get(0)) );
+        }
+    }
 
     @Override
     public void visit(GetElementPtr node) {
@@ -274,21 +297,13 @@ public class InstructionSelector implements IRVisitor {
             curBlock.addInst(new LD(curBlock, size, rd,
                     new Address(lui, new RelocationImm((GlobalVar) addr, false)) ) );
         }
+        else if (curFunc.getUnresolvedGEP().containsKey(addr)) {
+            curBlock.addInst(new LD(curBlock, size, rd,
+                    curFunc.getUnresolvedGEP().get(addr) ) );
+        }
         else {
-            if (node.getAddr() instanceof Null) {
-                curBlock.addInst(new LD(curBlock, size, rd,
-                        new Address(PhysicalReg.zeroVR, new Immediate(1)) ) );
-            }
-            else {
-                if (curFunc.getUnresolvedGEP().containsKey(addr)) {
-                    curBlock.addInst(new LD(curBlock, size, rd,
-                            curFunc.getUnresolvedGEP().get(addr) ) );
-                }
-                else {
-                    curBlock.addInst(new LD(curBlock, size, rd,
-                            new Address(addr, new Immediate(0)) ) );
-                }
-            }
+            curBlock.addInst(new LD(curBlock, size, rd,
+                    new Address(addr, new Immediate(0)) ) );
         }
     }
 
@@ -341,21 +356,13 @@ public class InstructionSelector implements IRVisitor {
             curBlock.addInst(new ST(curBlock, size, value,
                     new Address(lui, new RelocationImm((GlobalVar) addr, false)) ) );
         }
+        else if (curFunc.getUnresolvedGEP().containsKey(addr)) {
+            curBlock.addInst(new ST(curBlock, size, value,
+                    curFunc.getUnresolvedGEP().get(addr) ) );
+        }
         else {
-            if (node.getAddr() instanceof Null) {
-                curBlock.addInst(new ST(curBlock, size, value,
-                        new Address(PhysicalReg.zeroVR, new Immediate(1)) ) );
-            }
-            else {
-                if (curFunc.getUnresolvedGEP().containsKey(addr)) {
-                    curBlock.addInst(new ST(curBlock, size, value,
-                            curFunc.getUnresolvedGEP().get(addr) ) );
-                }
-                else {
-                    curBlock.addInst(new ST(curBlock, size, value,
-                            new Address(addr, new Immediate(0)) ) );
-                }
-            }
+            curBlock.addInst(new ST(curBlock, size, value,
+                    new Address(addr, new Immediate(0)) ) );
         }
     }
 
@@ -484,15 +491,15 @@ public class InstructionSelector implements IRVisitor {
         else {
             RAL.OpName asmOpName;
             switch (opName) {
-                case add: asmOpName = RAL.OpName.add;
-                case sub: asmOpName = RAL.OpName.sub;
-                case mul: asmOpName = RAL.OpName.mul;
-                case sdiv:asmOpName = RAL.OpName.div;
-                case srem:asmOpName = RAL.OpName.rem;
-                case shl: asmOpName = RAL.OpName.sll;
-                case ashr:asmOpName = RAL.OpName.sra;
-                case and: asmOpName = RAL.OpName.and;
-                case or:  asmOpName = RAL.OpName.or;
+                case add: asmOpName = RAL.OpName.add; break;
+                case sub: asmOpName = RAL.OpName.sub; break;
+                case mul: asmOpName = RAL.OpName.mul; break;
+                case sdiv:asmOpName = RAL.OpName.div; break;
+                case srem:asmOpName = RAL.OpName.rem; break;
+                case shl: asmOpName = RAL.OpName.sll; break;
+                case ashr:asmOpName = RAL.OpName.sra; break;
+                case and: asmOpName = RAL.OpName.and; break;
+                case or:  asmOpName = RAL.OpName.or;  break;
                 default:  asmOpName = RAL.OpName.xor;
             }
             curBlock.addInst(new RAL(curBlock, rd, asmOpName,

@@ -15,6 +15,7 @@ public class ASMFunction {
     private final String name;
 
     private final ArrayList<VirtualReg> parameters;
+    private int stackedParmsSize;
 
     private ASMBlock entranceBlock;
     private ASMBlock exitBlock;
@@ -29,6 +30,7 @@ public class ASMFunction {
         this.unresolvedGEP = new HashMap<>();
         this.symbolTable = new FuncSymbolTable();
         this.parameters = new ArrayList<>();
+        this.stackedParmsSize = 0;
 
         if (irFunc==null) return;
 
@@ -76,6 +78,12 @@ public class ASMFunction {
     public ArrayList<VirtualReg> getParameters() {
         return parameters;
     }
+    public int getStackedParmsSize() {
+        return stackedParmsSize;
+    }
+    public void compareAndSetStParmsSz(int ns) {
+        if (ns > stackedParmsSize) stackedParmsSize = ns;
+    }
 
     public ASMBlock getEntranceBlock() {
         return entranceBlock;
@@ -104,5 +112,44 @@ public class ASMFunction {
     }
     public VirtualReg getSymbol(String name) {
         return (VirtualReg) symbolTable.get(name).get(0);
+    }
+
+    // for liveness analysis
+    public ArrayList<ASMBlock> getDFSOrder() {
+        ArrayList<ASMBlock> order = new ArrayList<>();
+        ArrayList<ASMBlock> visited = new ArrayList<>();
+        _dfsRecursive(entranceBlock, order, visited);
+        return order;
+    }
+    private void _dfsRecursive(ASMBlock block, ArrayList<ASMBlock> order,
+                               ArrayList<ASMBlock> visited) {
+        order.add(block);
+        visited.add(block);
+        for (var suc: block.getSuccessors()) {
+            if (!visited.contains(suc)) {
+                _dfsRecursive(suc, order, visited);
+            }
+        }
+    }
+    public ArrayList<ASMBlock> getReversedDFSOrder() {
+        ArrayList<ASMBlock> order = new ArrayList<>();
+        ArrayList<ASMBlock> visited = new ArrayList<>();
+        _reversedDFSRecursive(exitBlock, order, visited);
+        return order;
+    }
+    private void _reversedDFSRecursive(ASMBlock block, ArrayList<ASMBlock> order,
+                                       ArrayList<ASMBlock> visited) {
+        order.add(block);
+        visited.add(block);
+        for (var pred: block.getPredecessors()) {
+            if (!visited.contains(pred)) {
+                _dfsRecursive(pred, order, visited);
+            }
+        }
+    }
+
+    public void performLvnAnalysis() {
+        for (var b: blocks.values()) b.solveUsesAndDefs();
+        for (var b: getReversedDFSOrder()) b.solveLiveInsAndOuts();
     }
 }

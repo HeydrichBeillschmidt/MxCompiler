@@ -18,8 +18,7 @@ public class Br extends IRInst {
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
 
-        condition.addUse(this);
-        addUse(condition);
+        linkControlFlow();
     }
 
     public Operand getCondition() {
@@ -30,6 +29,18 @@ public class Br extends IRInst {
     }
     public IRBlock getThenBlock() {
         return thenBlock;
+    }
+
+    public void linkControlFlow() {
+        getBlock().getSuccessors().add(thenBlock);
+        thenBlock.getPredecessors().add(getBlock());
+        if (condition!=null) {
+            getBlock().getSuccessors().add(elseBlock);
+            elseBlock.getPredecessors().add(getBlock());
+
+            condition.addUse(this);
+            addUse(condition);
+        }
     }
 
     @Override
