@@ -3,6 +3,10 @@ package Mx.ASM.Instruction;
 import Mx.ASM.ASMBlock;
 import Mx.ASM.Operand.VirtualReg;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 // compare rs with zero
 public class SZ extends ASMInst {
     public enum OpName {
@@ -18,14 +22,8 @@ public class SZ extends ASMInst {
         this.rd = rd;
         this.opName = opName;
         this.rs = rs;
-
-        addUse(rs);
-        addDef(rd);
     }
 
-    public VirtualReg getRd() {
-        return rd;
-    }
     public OpName getOpName() {
         return opName;
     }
@@ -33,6 +31,26 @@ public class SZ extends ASMInst {
         return rs;
     }
 
+    @Override
+    public VirtualReg getRd() {
+        return rd;
+    }
+    @Override
+    public void setRd(VirtualReg rd) {
+        this.rd = rd;
+    }
+    @Override
+    public void replaceRs(VirtualReg oldRs, VirtualReg newRs) {
+        if (rs==oldRs) rs = newRs;
+    }
+    @Override
+    public Set<VirtualReg> getUses() {
+        return new HashSet<>(Collections.singletonList(rs));
+    }
+    @Override
+    public Set<VirtualReg> getDefs() {
+        return new HashSet<>(Collections.singletonList(rd));
+    }
     @Override
     public String emitCode() {
         return "\t" + opName.toString() + "\t"

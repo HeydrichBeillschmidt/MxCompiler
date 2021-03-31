@@ -1,10 +1,14 @@
 package Mx;
 
+import Mx.ASM.ASMModule;
 import Mx.AST.ASTRoot;
+import Mx.Backend.InstructionSelector;
+import Mx.Backend.RegisterAllocator;
 import Mx.Frontend.*;
 import Mx.Generated.MxLexer;
 import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
+import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
 import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
@@ -89,5 +93,15 @@ public class Main {
         }
 
         //new IRPrinter("test.ll").exec(irBuilder.getModule());
+
+        IRModule irModule = irBuilder.getModule();
+
+        InstructionSelector instructionSelector = new InstructionSelector();
+        irModule.accept(instructionSelector);
+
+        ASMModule asmModule = instructionSelector.getAsmModule();
+
+        RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
+        registerAllocator.run();
     }
 }

@@ -12,14 +12,8 @@ abstract public class ASMInst {
     private ASMInst prevInst;
     private ASMInst nextInst;
 
-    //  for liveness analysis
-    private final Set<VirtualReg> uses;
-    private final Set<VirtualReg> defs;
-
     public ASMInst(ASMBlock block) {
         this.block = block;
-        this.uses = new HashSet<>();
-        this.defs = new HashSet<>();
     }
 
     public ASMBlock getBlock() {
@@ -37,26 +31,38 @@ abstract public class ASMInst {
     public void setNextInst(ASMInst nextInst) {
         this.nextInst = nextInst;
     }
+    public void replaceByInst(ASMInst inst) {
+        inst.prevInst = prevInst;
+        if (prevInst!=null) prevInst.setNextInst(inst);
+        else block.setHeadInst(inst);
+        inst.nextInst = nextInst;
+        if (nextInst!=null) nextInst.setPrevInst(inst);
+        else block.setTailInst(inst);
+    }
+    public void removeSelfFromBlock() {
+        if (nextInst!=null) nextInst.setPrevInst(prevInst);
+        else block.setTailInst(prevInst);
+        if (prevInst!=null) prevInst.setNextInst(nextInst);
+        else block.setHeadInst(nextInst);
+    }
+
+    public VirtualReg getRd() {
+        return null;
+    }
+    public void setRd(VirtualReg rd) {}
+    public void replaceRd(VirtualReg oldRd, VirtualReg newRd) {
+        if (getRd()==oldRd) setRd(newRd);
+    }
+    public void replaceRs(VirtualReg oldRs, VirtualReg newRs) {}
 
     public Set<VirtualReg> getUses() {
-        return uses;
-    }
-    public void addUse(VirtualReg pr) {
-        if (pr!=null)
-            uses.add(pr);
-    }
-    public void addUses(ArrayList<VirtualReg> prs) {
-        uses.addAll(prs);
+        return new HashSet<>();
     }
     public Set<VirtualReg> getDefs() {
-        return defs;
+        return new HashSet<>();
     }
-    public void addDef(VirtualReg pr) {
-        defs.add(pr);
-    }
-    public void addDefs(ArrayList<VirtualReg> prs) {
-        defs.addAll(prs);
-    }
+
+    public void countStackLen(int stackLen) {}
 
     abstract public String emitCode();
     @Override

@@ -4,26 +4,37 @@ import Mx.ASM.ASMBlock;
 import Mx.ASM.Operand.GlobalVar;
 import Mx.ASM.Operand.VirtualReg;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 // load address
 public class LA extends ASMInst {
-    private final VirtualReg rd;
+    private VirtualReg rd;
     private final GlobalVar globalVar;
 
     public LA(ASMBlock block, VirtualReg rd, GlobalVar globalVar) {
         super(block);
         this.rd = rd;
         this.globalVar = globalVar;
-
-        addDef(rd);
     }
 
-    public VirtualReg getRd() {
-        return rd;
-    }
     public GlobalVar getGlobalVar() {
         return globalVar;
     }
 
+    @Override
+    public VirtualReg getRd() {
+        return rd;
+    }
+    @Override
+    public void setRd(VirtualReg rd) {
+        this.rd = rd;
+    }
+    @Override
+    public Set<VirtualReg> getDefs() {
+        return new HashSet<>(Collections.singletonList(rd));
+    }
     @Override
     public String emitCode() {
         return "\tla\t" + rd.emitCode() + ", " + globalVar.getName();

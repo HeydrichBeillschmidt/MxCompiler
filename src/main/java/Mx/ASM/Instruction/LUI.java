@@ -4,6 +4,10 @@ import Mx.ASM.ASMBlock;
 import Mx.ASM.Operand.Immediate;
 import Mx.ASM.Operand.VirtualReg;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 // load upper immediate
 public class LUI extends ASMInst {
     private VirtualReg rd;
@@ -13,17 +17,24 @@ public class LUI extends ASMInst {
         super(block);
         this.rd = rd;
         this.imm = imm;
-
-        addDef(rd);
     }
 
-    public VirtualReg getRd() {
-        return rd;
-    }
     public Immediate getImm() {
         return imm;
     }
 
+    @Override
+    public VirtualReg getRd() {
+        return rd;
+    }
+    @Override
+    public void setRd(VirtualReg rd) {
+        this.rd = rd;
+    }
+    @Override
+    public Set<VirtualReg> getDefs() {
+        return new HashSet<>(Collections.singletonList(rd));
+    }
     @Override
     public String emitCode() {
         return "\tlui\t" + rd.emitCode() + ", " + imm.emitCode();

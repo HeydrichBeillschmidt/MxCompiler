@@ -1,5 +1,6 @@
 package Mx.ASM;
 
+import Mx.ASM.Instruction.MV;
 import Mx.ASM.Operand.Address;
 import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.Function;
@@ -7,9 +8,7 @@ import Mx.IR.IRBlock;
 import Mx.IR.Instruction.IRInst;
 import Mx.Utils.FuncSymbolTable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ASMFunction {
     private final String name;
@@ -54,19 +53,18 @@ public class ASMFunction {
 
         // deal with regs
         for (var p: irFunc.getParameterList()) {
-            VirtualReg vr = new VirtualReg(p.getName());
+            VirtualReg vr = new VirtualReg(p.getType().size(), p.getName());
             parameters.add(vr);
             symbolTable.putASMUnique(vr);
         }
         for (var b: irBlocks) {
-            IRInst instIte = b.getHeadInst();
-            while (instIte!=null) {
+            for (IRInst instIte = b.getHeadInst(); instIte!=null; instIte = instIte.getNextInst()) {
                 if (instIte.needWriteBack()) {
-                    VirtualReg vr = new VirtualReg(instIte.getDst().getName());
-                    symbolTable.putASMUnique(vr);
+                    int dstSize = instIte.getDst().getType().size();
+                    String dstName = instIte.getDst().getName();
+                    if (!symbolTable.contains(dstName))
+                        symbolTable.putASMUnique(new VirtualReg(dstSize, dstName));
                 }
-
-                instIte = instIte.getNextInst();
             }
         }
     }
@@ -114,7 +112,24 @@ public class ASMFunction {
         return (VirtualReg) symbolTable.get(name).get(0);
     }
 
-    // for liveness analysis
+    public ArrayList<ASMBlock> getBFSOrder() {
+        ArrayList<ASMBlock> order = new ArrayList<>();
+        Queue<ASMBlock> queue = new LinkedList<>();
+        Set<ASMBlock> visited = new HashSet<>();
+        queue.add(entranceBlock);
+        visited.add(entranceBlock);
+        do {
+            ASMBlock curBlock = queue.poll();
+            assert curBlock != null;
+            order.add(curBlock);
+            for (var s: curBlock.getSuccessors()) {
+                if (!visited.contains(s)) queue.offer(s);
+            }
+            visited.addAll(curBlock.getSuccessors());
+        }
+        while (!queue.isEmpty());
+        return order;
+    }
     public ArrayList<ASMBlock> getDFSOrder() {
         ArrayList<ASMBlock> order = new ArrayList<>();
         ArrayList<ASMBlock> visited = new ArrayList<>();
@@ -151,5 +166,15 @@ public class ASMFunction {
     public void performLvnAnalysis() {
         for (var b: blocks.values()) b.solveUsesAndDefs();
         for (var b: getReversedDFSOrder()) b.solveLiveInsAndOuts();
+    }
+
+    public void removeRedundantMV() {
+        for (var b: blocks.values()) {
+            for (var i: b.getAllInst()) {
+                if (i instanceof MV && i.getRd().getColor()==((MV)i).getRs().getColor()) {
+                    i.removeSelfFromBlock();
+                }
+            }
+        }
     }
 }
