@@ -40,40 +40,40 @@ public class RegisterAllocator {
     //  Data structures.
     //  --  node work lists, sets, and stacks. always mutually disjoint.
     //      -- machine registers, preassigned a color
-    private final Set<VirtualReg> precolored;
+    private Set<VirtualReg> precolored;
     //      -- temporary registers, not precolored and not yet processed
-    private final Set<VirtualReg> initial;
+    private Set<VirtualReg> initial;
     //      -- low-degree non-move-related nodes
-    private final Set<VirtualReg> simplifyWorklist;
+    private Set<VirtualReg> simplifyWorklist;
     //      -- low-degree move-related nodes
-    private final Set<VirtualReg> freezeWorklist;
+    private Set<VirtualReg> freezeWorklist;
     //      -- high-degree nodes
-    private final Set<VirtualReg> spillWorklist;
+    private Set<VirtualReg> spillWorklist;
     //      -- nodes marked for spilling during this round; initially empty
-    private final Set<VirtualReg> spilledNodes;
+    private Set<VirtualReg> spilledNodes;
     //      -- registers that have been coalesced; when u <- v is coalesced,
     //          v is added to this set and u put back on some work list (or vice versa)
-    private final Set<VirtualReg> coalescedNodes;
+    private Set<VirtualReg> coalescedNodes;
     //      -- nodes successfully colored
-    private final Set<VirtualReg> coloredNodes;
+    private Set<VirtualReg> coloredNodes;
     //      -- stack containing temporaries removed from the graph
-    private final Stack<VirtualReg> selectStack;
+    private Stack<VirtualReg> selectStack;
 
     //  --  move sets. mutually disjoint.
     //      -- moves that have been coalesced
-    private final Set<MV> coalescedMoves;
+    private Set<MV> coalescedMoves;
     //      -- moves whose source and target interfere
-    private final Set<MV> constrainedMoves;
+    private Set<MV> constrainedMoves;
     //      -- moves that will no longer be considered for coalescing
-    private final Set<MV> frozenMoves;
+    private Set<MV> frozenMoves;
     //      -- moves enable for possible coalescing
-    private final Set<MV> worklistMoves;
+    private Set<MV> worklistMoves;
     //      -- moves not yet ready for coalescing
-    private final Set<MV> activeMoves;
+    private Set<MV> activeMoves;
 
     //  --  other data structures.
     //      -- the set of interference edges in the graph; if (u, v) in adjSet, then so does (v, u)
-    private final Set<Edge> adjSet;
+    private Set<Edge> adjSet;
     //      adjList, degree, moveList, alias and color are attributes of VR.
     //      -- adjList: adjacency list representation of the graph; for each non-precolored temporary u,
     //          adjList[u] is the set of nodes that interfere with u
