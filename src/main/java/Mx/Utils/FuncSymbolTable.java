@@ -6,9 +6,7 @@ import Mx.IR.IRBlock;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class FuncSymbolTable {
     private final Map<String, ArrayList<Object>> symbolTable;
@@ -56,16 +54,13 @@ public class FuncSymbolTable {
 
         ArrayList<Object> arr = new ArrayList<>();
         arr.add(obj);
-        if (!symbolTable.containsKey(name)) {
-            symbolTable.put(name, arr);
-        }
-        else {
+        if (symbolTable.containsKey(name)) {
             int cnt = 1;
-            while (symbolTable.containsKey(name+cnt)) ++cnt;
+            while (symbolTable.containsKey(name + cnt)) ++cnt;
             name += cnt;
-            ((VirtualReg)obj).setName(name);
-            symbolTable.put(name, arr);
+            ((VirtualReg) obj).setName(name);
         }
+        symbolTable.put(name, arr);
     }
     public boolean contains(String name) {
         return symbolTable.containsKey(name);

@@ -23,7 +23,7 @@ public class PhysicalReg extends Reg {
     public static Map<String, PhysicalReg> phyRegs;
     public static Map<String, PhysicalReg> callerSavePhyRegs;
     public static Map<String, PhysicalReg> calleeSavePhyRegs;
-    public static Map<String, PhysicalReg> assignablePhyRegs;
+    public static ArrayList<PhysicalReg> assignablePhyRegs;
 
     public static Map<String, VirtualReg> virtualRegs;
     public static VirtualReg zeroVR;
@@ -37,7 +37,7 @@ public class PhysicalReg extends Reg {
         phyRegs = new HashMap<>();
         callerSavePhyRegs = new HashMap<>();
         calleeSavePhyRegs = new HashMap<>();
-        assignablePhyRegs = new HashMap<>();
+        assignablePhyRegs = new ArrayList<>();
         for (int i = 0; i < 32; ++i) {
             String prName = phyRegNames.get(i);
             PhysicalReg pr = new PhysicalReg(prName);
@@ -45,19 +45,21 @@ public class PhysicalReg extends Reg {
             switch (saveStatus.get(i)) {
                 case 1: {
                     callerSavePhyRegs.put(prName, pr);
-                    assignablePhyRegs.put(prName, pr);
                     break;
                 }
                 case 2: {
                     calleeSavePhyRegs.put(prName, pr);
-                    assignablePhyRegs.put(prName, pr);
                 }
             }
         }
+        assignablePhyRegs.addAll(callerSavePhyRegs.values());
+        assignablePhyRegs.addAll(calleeSavePhyRegs.values());
+        assignablePhyRegs.remove(0);
+        assignablePhyRegs.add(phyRegs.get("ra"));
 
         virtualRegs = new HashMap<>();
         for (var prn: phyRegNames) {
-            VirtualReg vr = new VirtualReg("."+prn);
+            VirtualReg vr = new VirtualReg(4, "."+prn);
             vr.fixColor(phyRegs.get(prn));
             virtualRegs.put(prn, vr);
         }

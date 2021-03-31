@@ -1,8 +1,8 @@
 package Mx.ASM.Operand;
 
 public class Address {
-    private final VirtualReg base;
-    private final Immediate offset;
+    private VirtualReg base;
+    private Immediate offset;
 
     public Address(VirtualReg base, Immediate offset) {
         this.base = base;
@@ -12,8 +12,14 @@ public class Address {
     public VirtualReg getBase() {
         return base;
     }
-    public int getOffset() {
-        return offset.getValue();
+    public void setBase(VirtualReg base) {
+        this.base = base;
+    }
+    public Immediate getOffset() {
+        return offset;
+    }
+    public void setOffset(Immediate offset) {
+        this.offset = offset;
     }
 
     public String emitCode() {

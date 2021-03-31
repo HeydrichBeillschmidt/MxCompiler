@@ -68,11 +68,11 @@ public class InstructionSelector implements IRVisitor {
         curBlock.addInst(new IAL(curBlock, sp, IAL.OpName.addi, sp, stackBase));
 
         // save ra and callee-save regs
-        VirtualReg savedVR = new VirtualReg(PhysicalReg.raVR.getName()+".save");
+        VirtualReg savedVR = new VirtualReg(4, PhysicalReg.raVR.getName()+".save");
         curFunc.addSymbolUnique(savedVR);
         curBlock.addInst(new MV(curBlock, savedVR, PhysicalReg.raVR));
         for (var vr: PhysicalReg.calleeSaveVRs) {
-            savedVR = new VirtualReg(vr.getName()+".save");
+            savedVR = new VirtualReg(4, vr.getName()+".save");
             curFunc.addSymbolUnique(savedVR);
             curBlock.addInst(new MV(curBlock, savedVR, vr));
         }
@@ -206,7 +206,7 @@ public class InstructionSelector implements IRVisitor {
             }
             else {
                 VirtualReg ptr = resolveToVR(node.getPtr());
-                VirtualReg rTmp = new VirtualReg("slli");
+                VirtualReg rTmp = new VirtualReg(4, "slli");
                 curFunc.addSymbolMultiple(rTmp);
                 curBlock.addInst(new IAL(curBlock, rTmp, IAL.OpName.slli,
                         resolveToVR(idx), new Immediate(2) ) );
@@ -240,7 +240,7 @@ public class InstructionSelector implements IRVisitor {
         if (node.getDst().isForBranch(node.getBlock())) return;
         switch (node.getOpName()) {
             case eq: {
-                VirtualReg rTmp = new VirtualReg("xor");
+                VirtualReg rTmp = new VirtualReg(4, "xor");
                 curFunc.addSymbolMultiple(rTmp);
                 addBinaryInst(rTmp, BinaryOp.BinaryOpName.xor,
                         node.getOp1(), node.getOp2(), true);
@@ -249,7 +249,7 @@ public class InstructionSelector implements IRVisitor {
                 break;
             }
             case ne: {
-                VirtualReg rTmp = new VirtualReg("xor");
+                VirtualReg rTmp = new VirtualReg(4, "xor");
                 curFunc.addSymbolMultiple(rTmp);
                 addBinaryInst(rTmp, BinaryOp.BinaryOpName.xor,
                         node.getOp1(), node.getOp2(), true);
@@ -262,7 +262,7 @@ public class InstructionSelector implements IRVisitor {
                 break;
             }
             case sge: {
-                VirtualReg rTmp = new VirtualReg("slt");
+                VirtualReg rTmp = new VirtualReg(4, "slt");
                 curFunc.addSymbolMultiple(rTmp);
                 addSLTInst(rTmp, node.getOp1(), node.getOp2());
                 curBlock.addInst(new IAL(curBlock, resolveToVR(node.getDst()),
@@ -270,7 +270,7 @@ public class InstructionSelector implements IRVisitor {
                 break;
             }
             case sle: {
-                VirtualReg rTmp = new VirtualReg("slt");
+                VirtualReg rTmp = new VirtualReg(4, "slt");
                 curFunc.addSymbolMultiple(rTmp);
                 addSLTInst(rTmp, node.getOp2(), node.getOp1());
                 curBlock.addInst(new IAL(curBlock, resolveToVR(node.getDst()),
@@ -290,7 +290,7 @@ public class InstructionSelector implements IRVisitor {
         VirtualReg addr = resolveToVR(node.getAddr());
         int size = node.getLoadType().size() / 8;
         if (addr instanceof GlobalVar) {
-            VirtualReg lui = new VirtualReg("lui");
+            VirtualReg lui = new VirtualReg(4, "lui");
             curFunc.addSymbolMultiple(lui);
             curBlock.addInst(new LUI(curBlock, lui,
                     new RelocationImm((GlobalVar) addr, true) ) );
@@ -340,6 +340,9 @@ public class InstructionSelector implements IRVisitor {
         savedVR = curFunc.getSymbol(PhysicalReg.raVR.getName() + ".save");
         curBlock.addInst(new MV(curBlock, savedVR, PhysicalReg.raVR));
 
+        curBlock.addInst(new IAL(curBlock, PhysicalReg.spVR,
+                IAL.OpName.addi, PhysicalReg.spVR, new StackPtr(0) ) );
+
         curBlock.addInst(new RET(curBlock));
     }
 
@@ -349,7 +352,7 @@ public class InstructionSelector implements IRVisitor {
         VirtualReg value = resolveToVR(node.getValue());
         int size = node.getValue().getType().size() / 8;
         if (addr instanceof GlobalVar) {
-            VirtualReg lui = new VirtualReg("lui");
+            VirtualReg lui = new VirtualReg(4, "lui");
             curFunc.addSymbolMultiple(lui);
             curBlock.addInst(new LUI(curBlock, lui,
                     new RelocationImm((GlobalVar) addr, true) ) );
@@ -377,7 +380,7 @@ public class InstructionSelector implements IRVisitor {
             int value = ((ConstBool) os).getValue() ? 1 : 0;
             if (value!=0) {
                 if (RdsOfLI.containsKey(value)) return RdsOfLI.get(value);
-                VirtualReg vr = new VirtualReg("constBool");
+                VirtualReg vr = new VirtualReg(4, "constBool");
                 RdsOfLI.put(value, vr);
                 curFunc.addSymbolMultiple(vr);
                 curBlock.addInst(new LI(curBlock, vr, new Immediate(value)));
@@ -388,7 +391,7 @@ public class InstructionSelector implements IRVisitor {
             int value = ((ConstInt)os).getValue();
             if (value!=0) {
                 if (RdsOfLI.containsKey(value)) return RdsOfLI.get(value);
-                VirtualReg vr = new VirtualReg("constInt");
+                VirtualReg vr = new VirtualReg(4, "constInt");
                 RdsOfLI.put(value, vr);
                 curFunc.addSymbolMultiple(vr);
                 curBlock.addInst(new LI(curBlock, vr, new Immediate(value)));
