@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.VirtualReg;
 
 import java.util.HashSet;
@@ -59,5 +60,9 @@ public class BR extends ASMInst {
     public String toString() {
         return opName.toString() + " " + rs1.emitCode()
                 + ", " + rs2.emitCode() + ", " + dst.emitCode();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

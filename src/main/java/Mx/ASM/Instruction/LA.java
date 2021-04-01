@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.GlobalVar;
 import Mx.ASM.Operand.VirtualReg;
 
@@ -42,5 +43,9 @@ public class LA extends ASMInst {
     @Override
     public String toString() {
         return "la " + rd.getName() + ", " + globalVar.getName();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

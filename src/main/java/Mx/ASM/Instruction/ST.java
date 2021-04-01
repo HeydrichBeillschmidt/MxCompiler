@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.Address;
 import Mx.ASM.Operand.Immediate;
 import Mx.ASM.Operand.StackPtr;
@@ -60,5 +61,9 @@ public class ST extends ASMInst {
     public String toString() {
         return "\ts"+((size== 1)?"b":((size==4)?"w":"h"))+"\t"
                 + rs.toString() + ", " + addr.toString();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

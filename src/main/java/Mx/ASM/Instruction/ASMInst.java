@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.VirtualReg;
 
 import java.util.ArrayList;
@@ -67,4 +68,6 @@ abstract public class ASMInst {
     abstract public String emitCode();
     @Override
     abstract public String toString();
+
+    abstract public void accept(ASMVisitor visitor);
 }

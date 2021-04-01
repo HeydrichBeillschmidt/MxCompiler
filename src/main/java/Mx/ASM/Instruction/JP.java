@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 
 public class JP extends ASMInst {
     private ASMBlock dst;
@@ -25,5 +26,9 @@ public class JP extends ASMInst {
     @Override
     public String toString() {
         return "j " + dst.toString();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,6 +1,7 @@
 package Mx;
 
 import Mx.ASM.ASMModule;
+import Mx.ASM.CodeEmitter;
 import Mx.AST.ASTRoot;
 import Mx.Backend.InstructionSelector;
 import Mx.Backend.RegisterAllocator;
@@ -92,7 +93,7 @@ public class Main {
             throw new RuntimeException();
         }
 
-        //new IRPrinter("test.ll").exec(irBuilder.getModule());
+        //new IRPrinter("test.ll").run(irBuilder.getModule());
 
         IRModule irModule = irBuilder.getModule();
 
@@ -103,5 +104,8 @@ public class Main {
 
         RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
         registerAllocator.run();
+
+        CodeEmitter codeEmitter = new CodeEmitter("output.s");
+        codeEmitter.run(asmModule);
     }
 }

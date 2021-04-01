@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.VirtualReg;
 
 import java.util.Collections;
@@ -59,5 +60,9 @@ public class SZ extends ASMInst {
     @Override
     public String toString() {
         return opName.toString() + " " + rd.toString() + ", " + rs.toString();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

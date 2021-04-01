@@ -34,4 +34,8 @@ public class ASMModule {
     public Map<GlobalVar, String> getStrValues() {
         return strValues;
     }
+
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
+    }
 }

@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 public class IRPrinter implements IRVisitor {
     private final OutputStream sOut;
     private final PrintWriter writer;
-    private final String indent = "    ";
 
     public IRPrinter(String fileName) {
         try {
@@ -25,7 +24,7 @@ public class IRPrinter implements IRVisitor {
         }
     }
 
-    public void exec(IRModule module) {
+    public void run(IRModule module) {
         module.accept(this);
         try {
             writer.close();
@@ -99,56 +98,61 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(Alloca node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(BinaryOp node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(BitCast node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Br node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Call node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(GetElementPtr node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Icmp node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Load node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
+    }
+
+    @Override
+    public void visit(Move node) {
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Phi node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Ret node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 
     @Override
     public void visit(Store node) {
-        writer.println(indent + node.toString());
+        writer.println("\t" + node.toString());
     }
 }

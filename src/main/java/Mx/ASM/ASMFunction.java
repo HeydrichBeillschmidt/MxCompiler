@@ -12,6 +12,7 @@ import java.util.*;
 
 public class ASMFunction {
     private final String name;
+    private final int funcID;
 
     private final ArrayList<VirtualReg> parameters;
     private int stackedParmsSize;
@@ -25,6 +26,7 @@ public class ASMFunction {
 
     public ASMFunction(String name, int funcID, Function irFunc) {
         this.name = name;
+        this.funcID = funcID;
         this.blocks = new HashMap<>();
         this.unresolvedGEP = new HashMap<>();
         this.symbolTable = new FuncSymbolTable();
@@ -37,7 +39,8 @@ public class ASMFunction {
         ArrayList<IRBlock> irBlocks = irFunc.getAllBlocks();
         for (var b: irBlocks) {
             ASMBlock block = new ASMBlock(b.getName(),
-                    ".LBB"+funcID+"_"+blocks.size(), b);
+                    ".LBB"+funcID+"_"+blocks.size(),
+                    b, this);
             addBlock(block);
         }
         for (var b: irBlocks) {
@@ -71,6 +74,9 @@ public class ASMFunction {
 
     public String getName() {
         return name;
+    }
+    public int getFuncID() {
+        return funcID;
     }
 
     public ArrayList<VirtualReg> getParameters() {
@@ -112,6 +118,13 @@ public class ASMFunction {
         return (VirtualReg) symbolTable.get(name).get(0);
     }
 
+    public ArrayList<ASMBlock> getLiteralOrder() {
+        ArrayList<ASMBlock> order = new ArrayList<>();
+        for (ASMBlock b = entranceBlock; b!=null; b = b.getNextBlock()) {
+            order.add(b);
+        }
+        return order;
+    }
     public ArrayList<ASMBlock> getBFSOrder() {
         ArrayList<ASMBlock> order = new ArrayList<>();
         Queue<ASMBlock> queue = new LinkedList<>();
@@ -176,5 +189,9 @@ public class ASMFunction {
                 }
             }
         }
+    }
+
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

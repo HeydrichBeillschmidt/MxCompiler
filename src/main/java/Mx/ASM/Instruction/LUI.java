@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.Immediate;
 import Mx.ASM.Operand.VirtualReg;
 
@@ -42,5 +43,9 @@ public class LUI extends ASMInst {
     @Override
     public String toString() {
         return "lui " + rd.toString() + ", " + imm.toString();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

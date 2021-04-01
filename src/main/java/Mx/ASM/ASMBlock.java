@@ -15,6 +15,8 @@ public class ASMBlock {
 
     private final IRBlock irBlock;
 
+    private final ASMFunction func;
+
     private ASMInst headInst;
     private ASMInst tailInst;
 
@@ -29,10 +31,11 @@ public class ASMBlock {
     private Set<VirtualReg> liveIn;
     private Set<VirtualReg> liveOut;
 
-    public ASMBlock(String name, String asmName, IRBlock irBlock) {
+    public ASMBlock(String name, String asmName, IRBlock irBlock, ASMFunction func) {
         this.name = name;
         this.asmName = asmName;
         this.irBlock = irBlock;
+        this.func = func;
         this.prevBlock = null;
         this.nextBlock = null;
         this.predecessors = new ArrayList<>();
@@ -47,6 +50,9 @@ public class ASMBlock {
     }
     public IRBlock getIRBlock() {
         return irBlock;
+    }
+    public ASMFunction getFunc() {
+        return func;
     }
 
     public ASMInst getHeadInst() {
@@ -199,5 +205,9 @@ public class ASMBlock {
     @Override
     public String toString() {
         return name;
+    }
+
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

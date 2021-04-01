@@ -2,6 +2,7 @@ package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
 import Mx.ASM.ASMFunction;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.PhysicalReg;
 import Mx.ASM.Operand.VirtualReg;
 
@@ -37,5 +38,9 @@ public class CALL extends ASMInst {
     @Override
     public String toString() {
         return "call " + callee.getName();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

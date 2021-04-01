@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.Immediate;
 import Mx.ASM.Operand.StackPtr;
 import Mx.ASM.Operand.VirtualReg;
@@ -49,5 +50,9 @@ public class LI extends ASMInst {
     @Override
     public String toString() {
         return "li " + rd.toString() + ", " + imm.toString();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }

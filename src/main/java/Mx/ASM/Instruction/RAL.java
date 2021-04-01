@@ -1,6 +1,7 @@
 package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
+import Mx.ASM.ASMVisitor;
 import Mx.ASM.Operand.VirtualReg;
 
 import java.util.Collections;
@@ -70,5 +71,9 @@ public class RAL extends ASMInst {
     public String toString() {
         return opName.toString() + " " + rd.emitCode()
                 + ", " + rs1.emitCode() + ", " + rs2.emitCode();
+    }
+    @Override
+    public void accept(ASMVisitor visitor) {
+        visitor.visit(this);
     }
 }
