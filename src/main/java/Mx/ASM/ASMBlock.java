@@ -160,6 +160,11 @@ public class ASMBlock {
              * consider the sub-block p of all prev insts of current inst n,
              * we have out[p] = in[n], which would induce
              * -- in[p] = use[p] U ( (use[n] U (out[n]-def[n])) - def[p])
+             * we have formula
+             * -- (A U B) - C = (A - C) U (B - C)
+             * -- (A - B) - C = A - (B U C)
+             * which would induce
+             * -- in[p] = use[p] U (use[n] - def[p]) U (out[n] - (def[n] U def[p]))
              * notice that in[p] and out[n] is also in[pn] and out[pn], so
              * -- use[pn] = use[p] U (use[n] - def[p])
              * -- def[pn] = def[n] U def[p]
