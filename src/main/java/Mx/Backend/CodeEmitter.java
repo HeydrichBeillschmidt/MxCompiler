@@ -1,5 +1,6 @@
-package Mx.ASM;
+package Mx.Backend;
 
+import Mx.ASM.*;
 import Mx.ASM.Instruction.*;
 import Mx.ASM.Operand.GlobalVar;
 

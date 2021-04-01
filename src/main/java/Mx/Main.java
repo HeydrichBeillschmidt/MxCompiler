@@ -1,16 +1,13 @@
 package Mx;
 
 import Mx.ASM.ASMModule;
-import Mx.ASM.CodeEmitter;
 import Mx.AST.ASTRoot;
-import Mx.Backend.InstructionSelector;
-import Mx.Backend.RegisterAllocator;
+import Mx.Backend.*;
 import Mx.Frontend.*;
 import Mx.Generated.MxLexer;
 import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
-import Mx.IR.IRPrinter;
 import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
