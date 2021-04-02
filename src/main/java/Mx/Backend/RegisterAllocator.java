@@ -40,40 +40,44 @@ public class RegisterAllocator {
     //  Data structures.
     //  --  node work lists, sets, and stacks. always mutually disjoint.
     //      -- machine registers, preassigned a color
-    private Set<VirtualReg> precolored;
+    private final Set<VirtualReg> precolored;
     //      -- temporary registers, not precolored and not yet processed
-    private Set<VirtualReg> initial;
+    private final Set<VirtualReg> initial;
     //      -- low-degree non-move-related nodes
-    private Set<VirtualReg> simplifyWorklist;
+    private final Set<VirtualReg> simplifyWorklist;
     //      -- low-degree move-related nodes
-    private Set<VirtualReg> freezeWorklist;
+    private final Set<VirtualReg> freezeWorklist;
     //      -- high-degree nodes
-    private Set<VirtualReg> spillWorklist;
+    private final Set<VirtualReg> spillWorklist;
     //      -- nodes marked for spilling during this round; initially empty
-    private Set<VirtualReg> spilledNodes;
+    private final Set<VirtualReg> spilledNodes;
     //      -- registers that have been coalesced; when u <- v is coalesced,
     //          v is added to this set and u put back on some work list (or vice versa)
-    private Set<VirtualReg> coalescedNodes;
+    private final Set<VirtualReg> coalescedNodes;
     //      -- nodes successfully colored
-    private Set<VirtualReg> coloredNodes;
+    private final Set<VirtualReg> coloredNodes;
     //      -- stack containing temporaries removed from the graph
-    private Stack<VirtualReg> selectStack;
+    private final Stack<VirtualReg> selectStack;
 
     //  --  move sets. mutually disjoint.
+    //      (will, the first 3 sets just collect useless moves)
     //      -- moves that have been coalesced
-    private Set<MV> coalescedMoves;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Set<MV> coalescedMoves;
     //      -- moves whose source and target interfere
-    private Set<MV> constrainedMoves;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Set<MV> constrainedMoves;
     //      -- moves that will no longer be considered for coalescing
-    private Set<MV> frozenMoves;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Set<MV> frozenMoves;
     //      -- moves enable for possible coalescing
-    private Set<MV> worklistMoves;
+    private final Set<MV> worklistMoves;
     //      -- moves not yet ready for coalescing
-    private Set<MV> activeMoves;
+    private final Set<MV> activeMoves;
 
     //  --  other data structures.
     //      -- the set of interference edges in the graph; if (u, v) in adjSet, then so does (v, u)
-    private Set<Edge> adjSet;
+    private final Set<Edge> adjSet;
     //      adjList, degree, moveList, alias and color are attributes of VR.
     //      -- adjList: adjacency list representation of the graph; for each non-precolored temporary u,
     //          adjList[u] is the set of nodes that interfere with u
@@ -125,7 +129,7 @@ public class RegisterAllocator {
 
             while (!(simplifyWorklist.isEmpty() && worklistMoves.isEmpty()
                     && freezeWorklist.isEmpty() && spillWorklist.isEmpty())) {
-                if (!spillWorklist.isEmpty()) simplify();
+                if (!simplifyWorklist.isEmpty()) simplify();
                 else if (!worklistMoves.isEmpty()) coalesce();
                 else if (!freezeWorklist.isEmpty()) freeze();
                 else /* if (!spillWorklist.isEmpty()) */ selectSpill();
@@ -325,7 +329,7 @@ public class RegisterAllocator {
     }
     // George's coalescence heuristic for coalescing a precolored reg
     private boolean OK(VirtualReg t, VirtualReg r) {
-        return t.getDegree() < K && precolored.contains(t) && adjSet.contains(new Edge(t, r));
+        return t.getDegree() < K || precolored.contains(t) || adjSet.contains(new Edge(t, r));
     }
     // Briggs's conservative coalescence heuristic
     private boolean conservative(Set<VirtualReg> nodes) {
@@ -386,6 +390,7 @@ public class RegisterAllocator {
         // todo: select using favorite heuristic
         VirtualReg m = spillWorklist.iterator().next();
         spillWorklist.remove(m);
+        simplifyWorklist.add(m);
         freezeMoves(m);
     }
 
@@ -418,13 +423,16 @@ public class RegisterAllocator {
                 if (i.getRd()!=null) getAlias(i.getRd());
             }
         }
+        int cnt = 0;
         for (var b: curFunc.getBlocks().values()) {
             for (var i: b.getAllInst()) {
                 for (VirtualReg u: i.getUses()) {
                     if (u.getStackOffset()!=null) {
                         if (i.getDefs().contains(u)) {
-                            VirtualReg tmp = new VirtualReg(u.getSize(), "tmp");
+                            VirtualReg tmp = new VirtualReg(u.getSize(),
+                                    u.getName() + ".spill" + cnt++);
                             curFunc.addSymbolMultiple(tmp);
+                            curFunc.removeSymbol(u);
                             i.replaceRs(u, tmp);
                             i.replaceRd(u, tmp);
                             b.addPrevInst(i, new LD(b, tmp.getSize(), tmp,
@@ -440,8 +448,10 @@ public class RegisterAllocator {
                                 i = iToReplace;
                             }
                             else {
-                                VirtualReg tmp = new VirtualReg(u.getSize(), "'tmp");
+                                VirtualReg tmp = new VirtualReg(u.getSize(),
+                                        u.getName() + ".spill" + cnt++);
                                 curFunc.addSymbolMultiple(tmp);
+                                curFunc.removeSymbol(u);
                                 i.replaceRs(u, tmp);
                                 b.addPrevInst(i, new LD(b, tmp.getSize(), tmp,
                                         new Address(PhysicalReg.spVR, u.getStackOffset()) ) );
@@ -459,10 +469,12 @@ public class RegisterAllocator {
                                 i = iToReplace;
                             }
                             else {
-                                VirtualReg tmp = new VirtualReg(d.getSize(), "'tmp");
+                                VirtualReg tmp = new VirtualReg(d.getSize(),
+                                        d.getName() + ".spill" + cnt++);
                                 curFunc.addSymbolMultiple(tmp);
-                                i.replaceRs(d, tmp);
-                                b.addPrevInst(i, new ST(b, tmp.getSize(), tmp,
+                                curFunc.removeSymbol(d);
+                                i.replaceRd(d, tmp);
+                                b.addNextInst(i, new ST(b, tmp.getSize(), tmp,
                                         new Address(PhysicalReg.spVR, d.getStackOffset()) ) );
                             }
                         }
