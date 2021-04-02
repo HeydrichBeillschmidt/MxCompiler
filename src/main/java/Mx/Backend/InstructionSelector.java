@@ -371,6 +371,10 @@ public class InstructionSelector implements IRVisitor {
 
     private VirtualReg resolveToVR(Operand os) {
         if (os instanceof Register) {
+            if (!curFunc.containsSymbol(((Register) os).getName())) {
+                curFunc.addSymbolUnique(new VirtualReg(os.getType().size()/8,
+                        ((Register) os).getName() ) );
+            }
             return curFunc.getSymbol(((Register)os).getName());
         }
         else if (os instanceof Parameter) {

@@ -21,8 +21,8 @@ public class PhysicalReg extends Reg {
             1,1,1,1
     ));
     public static Map<String, PhysicalReg> phyRegs;
-    public static Map<String, PhysicalReg> callerSavePhyRegs;
-    public static Map<String, PhysicalReg> calleeSavePhyRegs;
+    public static ArrayList<PhysicalReg> callerSavePhyRegs;
+    public static ArrayList<PhysicalReg> calleeSavePhyRegs;
     public static ArrayList<PhysicalReg> assignablePhyRegs;
 
     public static Map<String, VirtualReg> virtualRegs;
@@ -35,8 +35,8 @@ public class PhysicalReg extends Reg {
 
     static {
         phyRegs = new HashMap<>();
-        callerSavePhyRegs = new HashMap<>();
-        calleeSavePhyRegs = new HashMap<>();
+        callerSavePhyRegs = new ArrayList<>();
+        calleeSavePhyRegs = new ArrayList<>();
         assignablePhyRegs = new ArrayList<>();
         for (int i = 0; i < 32; ++i) {
             String prName = phyRegNames.get(i);
@@ -44,16 +44,16 @@ public class PhysicalReg extends Reg {
             phyRegs.put(prName, pr);
             switch (saveStatus.get(i)) {
                 case 1: {
-                    callerSavePhyRegs.put(prName, pr);
+                    callerSavePhyRegs.add(pr);
                     break;
                 }
                 case 2: {
-                    calleeSavePhyRegs.put(prName, pr);
+                    calleeSavePhyRegs.add(pr);
                 }
             }
         }
-        assignablePhyRegs.addAll(callerSavePhyRegs.values());
-        assignablePhyRegs.addAll(calleeSavePhyRegs.values());
+        assignablePhyRegs.addAll(callerSavePhyRegs);
+        assignablePhyRegs.addAll(calleeSavePhyRegs);
         assignablePhyRegs.remove(0);
         assignablePhyRegs.add(phyRegs.get("ra"));
 
@@ -70,12 +70,10 @@ public class PhysicalReg extends Reg {
         for (int i = 0; i < 8; ++i) {
             argVRs.add(virtualRegs.get("a"+i));
         }
-        for (var rsn: callerSavePhyRegs.keySet()) {
-            callerSaveVRs.add(virtualRegs.get(rsn));
-        }
-        for (var esn: calleeSavePhyRegs.keySet()) {
-            calleeSaveVRs.add(virtualRegs.get(esn));
-        }
+        callerSaveVRs = new ArrayList<>();
+        calleeSaveVRs = new ArrayList<>();
+        callerSavePhyRegs.forEach(p -> callerSaveVRs.add(virtualRegs.get(p.getName())));
+        calleeSavePhyRegs.forEach(p -> calleeSaveVRs.add(virtualRegs.get(p.getName())));
     }
 
     public PhysicalReg(String name) {

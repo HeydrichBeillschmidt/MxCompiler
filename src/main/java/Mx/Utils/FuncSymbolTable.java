@@ -62,6 +62,11 @@ public class FuncSymbolTable {
         }
         symbolTable.put(name, arr);
     }
+    public void removeASM(VirtualReg vr) {
+        assert symbolTable.containsKey(vr.getName());
+        assert symbolTable.get(vr.getName()).get(0)==vr;
+        symbolTable.remove(vr.getName());
+    }
     public boolean contains(String name) {
         return symbolTable.containsKey(name);
     }

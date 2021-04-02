@@ -56,14 +56,14 @@ public class ASMFunction {
 
         // deal with regs
         for (var p: irFunc.getParameterList()) {
-            VirtualReg vr = new VirtualReg(p.getType().size(), p.getName());
+            VirtualReg vr = new VirtualReg(p.getType().size()/8, p.getName());
             parameters.add(vr);
             symbolTable.putASMUnique(vr);
         }
         for (var b: irBlocks) {
             for (IRInst instIte = b.getHeadInst(); instIte!=null; instIte = instIte.getNextInst()) {
                 if (instIte.needWriteBack()) {
-                    int dstSize = instIte.getDst().getType().size();
+                    int dstSize = instIte.getDst().getType().size()/8;
                     String dstName = instIte.getDst().getName();
                     if (!symbolTable.contains(dstName))
                         symbolTable.putASMUnique(new VirtualReg(dstSize, dstName));
@@ -114,8 +114,14 @@ public class ASMFunction {
     public void addSymbolMultiple(VirtualReg vr) {
         symbolTable.putASMMultiple(vr);
     }
+    public boolean containsSymbol(String name) {
+        return symbolTable.contains(name);
+    }
     public VirtualReg getSymbol(String name) {
         return (VirtualReg) symbolTable.get(name).get(0);
+    }
+    public void removeSymbol(VirtualReg vr) {
+        symbolTable.removeASM(vr);
     }
 
     public ArrayList<ASMBlock> getLiteralOrder() {
