@@ -1,6 +1,7 @@
 package Mx.IR;
 
 import Mx.IR.Instruction.Alloca;
+import Mx.IR.Instruction.Load;
 import Mx.IR.Instruction.Ret;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
@@ -52,6 +53,7 @@ public class Function {
                     "retval");
             entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
             Register returnValue = new Register(retType, "returnValue");
+            returnBlock.addInst(new Load(returnBlock, returnValue, retType, retVal));
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));
             symbolTable.putIR(retVal);
             symbolTable.putIR(returnValue);

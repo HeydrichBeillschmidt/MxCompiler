@@ -8,6 +8,7 @@ import Mx.Generated.MxLexer;
 import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
+import Mx.IR.IRPrinter;
 import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
@@ -22,7 +23,7 @@ public class Main {
     public static void main(String[] args) {
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/sema/misc-package/misc-1.mx";
+        //String filename = "testcases/sema/misc-package/misc-34.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -102,7 +103,7 @@ public class Main {
         RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
         registerAllocator.run();
 
-        CodeEmitter codeEmitter = new CodeEmitter("output.s");
-        codeEmitter.run(asmModule);
+        //CodeEmitter codeEmitter = new CodeEmitter("output.s");
+        //codeEmitter.run(asmModule);
     }
 }

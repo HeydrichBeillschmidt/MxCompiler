@@ -13,6 +13,7 @@ public class ForStmtNode extends StmtNode {
 
     private IRBlock condBlock;
     private IRBlock incBlock;
+    private IRBlock bodyBlock;
     private IRBlock endBlock;
 
     public ForStmtNode(Location loc, StmtNode forInitStmt,
@@ -61,6 +62,12 @@ public class ForStmtNode extends StmtNode {
     }
     public void setIncBlock(IRBlock incBlock) {
         this.incBlock = incBlock;
+    }
+    public IRBlock getBodyBlock() {
+        return bodyBlock;
+    }
+    public void setBodyBlock(IRBlock bodyBlock) {
+        this.bodyBlock = bodyBlock;
     }
     public IRBlock getEndBlock() {
         return endBlock;

@@ -99,10 +99,8 @@ public class InstructionSelector implements IRVisitor {
     @Override
     public void visit(IRBlock node) {
         curBlock = curFunc.getBlocks().get(node.getName());
-        IRInst instIte = node.getHeadInst();
-        while (instIte!=null) {
-            instIte.accept(this);
-            instIte = instIte.getNextInst();
+        for (var i: node.getAllInst()) {
+            i.accept(this);
         }
     }
 
@@ -199,17 +197,18 @@ public class InstructionSelector implements IRVisitor {
         }
         else if (node.getIndex().size()==1) { // array
             Operand idx = node.getIndex().get(0);
+            int typeSize = node.getType().size() / 8;
             if (idx instanceof Constant) {
-                int offset = ((ConstInt)idx).getValue() * 4;
+                int offset = ((ConstInt)idx).getValue() * typeSize;
                 addBinaryInst(rd, BinaryOp.BinaryOpName.add, node.getPtr(),
                         new ConstInt(offset, 32), true);
             }
             else {
                 VirtualReg ptr = resolveToVR(node.getPtr());
-                VirtualReg rTmp = new VirtualReg(4, "slli");
+                VirtualReg rTmp = new VirtualReg(4, "mul");
                 curFunc.addSymbolMultiple(rTmp);
-                curBlock.addInst(new IAL(curBlock, rTmp, IAL.OpName.slli,
-                        resolveToVR(idx), new Immediate(2) ) );
+                addBinaryInst(rTmp, BinaryOp.BinaryOpName.mul,
+                        idx, new ConstInt(typeSize, 32), true);
                 curBlock.addInst(new RAL(curBlock, rd, RAL.OpName.add, ptr, rTmp));
             }
         }
@@ -221,7 +220,7 @@ public class InstructionSelector implements IRVisitor {
             else {
                 StructureType structT = (StructureType)
                         ((PointerType)node.getPtr().getType()).getBaseType();
-                int idx = ((ConstInt)node.getIndex().get(0)).getValue();
+                int idx = ((ConstInt)node.getIndex().get(1)).getValue();
                 int offset = structT.calcOffset(idx)/8;
                 if (structT.getMemberTypes().get(idx) instanceof PointerType) {
                     addBinaryInst(rd, BinaryOp.BinaryOpName.add, node.getPtr(),

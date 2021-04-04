@@ -269,7 +269,7 @@ public class IRBuilder implements ASTVisitor {
             assert func != null;
             IRType retType = func.getFunctionType().getReturnType();
             Register dst = pseudoReg;
-            if (!(retType instanceof VoidType)) {
+            if (retType!=null && !(retType instanceof VoidType)) {
                 dst = new Register(retType, "funcCallRet");
                 curFunc.addSymbol(dst);
             }
@@ -302,20 +302,20 @@ public class IRBuilder implements ASTVisitor {
         assert objectType instanceof ClassType;
         String memberName = node.getMemberName();
 
-        Operand ptr = node.getObjectName().getResult();
-        ArrayList<Operand> index = new ArrayList<>();
-        index.add(new ConstInt(0, 32));
         ArrayList<VarEntity> members = ((ClassType)objectType).getMembers();
         int pos, sz = members.size();
         for (pos = 0; pos < sz; ++pos) {
             if (members.get(pos).getName().equals(memberName)) break;
         }
-        index.add(new ConstInt(pos, 32));
         IRType irType = module.getIRType(
                 astTypeTable.getType(members.get(pos).getSpecifier()) );
         Register dst = new Register(new PointerType(irType),
                 objectType.getName() + "." + memberName + ".addr");
         curFunc.addSymbol(dst);
+        Operand ptr = node.getObjectName().getResult();
+        ArrayList<Operand> index = new ArrayList<>();
+        index.add(new ConstInt(0, 32));
+        index.add(new ConstInt(pos, 32));
         curBlock.addInst(new GetElementPtr(curBlock, dst, ptr, index));
 
         Register result = new Register(irType,
@@ -351,7 +351,6 @@ public class IRBuilder implements ASTVisitor {
         Operand addr;
         Register result = new Register(IRModule.int32T,
                 "prefix_op" + node.getOperator());
-        curFunc.addSymbol(result);
         switch (node.getOperator()) {
             case "++":  // ++x
                 addr = node.getSubExpr().getAddr();
@@ -380,7 +379,7 @@ public class IRBuilder implements ASTVisitor {
                         new ConstInt(0, 32), value));
                 node.setResult(result);
                 break;
-            case "~":  // ~x
+            case "~": // ~x
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.xor,
                         value, new ConstInt(-1, 32)));
@@ -394,6 +393,7 @@ public class IRBuilder implements ASTVisitor {
                 node.setResult(result);
             default:
         }
+        curFunc.addSymbol(result);
     }
 
     @Override
@@ -578,7 +578,7 @@ public class IRBuilder implements ASTVisitor {
                         case "/":   opName = BinaryOp.BinaryOpName.sdiv;break;
                         default:    opName = BinaryOp.BinaryOpName.srem;
                     }
-                    mulE = new Register(IRModule.int32T, opName.toString()+(i+1));
+                    mulE = new Register(IRModule.int32T, opName.toString());
                     curFunc.addSymbol(mulE);
                     curBlock.addInst(new BinaryOp(curBlock, mulE, opName, mul, valueE));
                     mul = mulE;
@@ -619,7 +619,7 @@ public class IRBuilder implements ASTVisitor {
                         opName = ops.get(i).equals("+")
                                 ? BinaryOp.BinaryOpName.add
                                 : BinaryOp.BinaryOpName.sub;
-                        addE = new Register(IRModule.int32T, opName.toString()+(i+1));
+                        addE = new Register(IRModule.int32T, opName.toString());
                         curFunc.addSymbol(addE);
                         curBlock.addInst(new BinaryOp(curBlock, addE, opName, add, valueE));
                         add = addE;
@@ -640,9 +640,9 @@ public class IRBuilder implements ASTVisitor {
                     for (int i = 1, it = ops.size(); i < it; ++i) {
                         terms.get(i+1).accept(this);
                         valueE = terms.get(i+1).getResult();
-                        addE = new Register(IRModule.stringT, "add"+(i+1));
+                        addE = new Register(IRModule.stringT, "add");
                         curFunc.addSymbol(addE);
-                        parameters.clear();
+                        parameters = new ArrayList<>();
                         parameters.add(add);
                         parameters.add(valueE);
                         curBlock.addInst(new Call(curBlock, addE, func, parameters));
@@ -684,7 +684,7 @@ public class IRBuilder implements ASTVisitor {
                     opName = ops.get(i).equals(">>")
                             ? BinaryOp.BinaryOpName.ashr
                             : BinaryOp.BinaryOpName.shl;
-                    shiftE = new Register(IRModule.int32T, opName.toString()+(i+1));
+                    shiftE = new Register(IRModule.int32T, opName.toString());
                     curFunc.addSymbol(shiftE);
                     curBlock.addInst(new BinaryOp(curBlock, shiftE, opName, shift, valueE));
                     shift = shiftE;
@@ -775,7 +775,7 @@ public class IRBuilder implements ASTVisitor {
                         opName = ops.get(i).equals("==")
                                 ? Icmp.IcmpOpName.eq
                                 : Icmp.IcmpOpName.ne;
-                        cmpE = new Register(IRModule.boolT, opName.toString()+(i+1));
+                        cmpE = new Register(IRModule.boolT, opName.toString());
                         curFunc.addSymbol(cmpE);
                         curBlock.addInst(new Icmp(curBlock, cmpE, opName,
                                 IRModule.boolT, cmp, valueE));
@@ -850,7 +850,7 @@ public class IRBuilder implements ASTVisitor {
                 for (int i = 2, it = node.getOpNum(); i <= it; ++i) {
                     tests.get(i).accept(this);
                     valueE = tests.get(i).getResult();
-                    tstE = new Register(IRModule.int32T, "bitwise_and"+i);
+                    tstE = new Register(IRModule.int32T, "bitwise_and");
                     curFunc.addSymbol(tstE);
                     curBlock.addInst(new BinaryOp(curBlock, tstE,
                             BinaryOp.BinaryOpName.and, tst, valueE));
@@ -883,7 +883,7 @@ public class IRBuilder implements ASTVisitor {
                 for (int i = 2, it = node.getOpNum(); i <= it; ++i) {
                     tests.get(i).accept(this);
                     valueE = tests.get(i).getResult();
-                    tstE = new Register(IRModule.int32T, "xor"+i);
+                    tstE = new Register(IRModule.int32T, "xor");
                     curFunc.addSymbol(tstE);
                     curBlock.addInst(new BinaryOp(curBlock, tstE,
                             BinaryOp.BinaryOpName.xor, tst, valueE));
@@ -916,7 +916,7 @@ public class IRBuilder implements ASTVisitor {
                 for (int i = 2, it = node.getOpNum(); i <= it; ++i) {
                     tests.get(i).accept(this);
                     valueE = tests.get(i).getResult();
-                    tstE = new Register(IRModule.int32T, "bitwise_or"+i);
+                    tstE = new Register(IRModule.int32T, "bitwise_or");
                     curFunc.addSymbol(tstE);
                     curBlock.addInst(new BinaryOp(curBlock, tstE,
                             BinaryOp.BinaryOpName.or, tst, valueE));
@@ -938,10 +938,16 @@ public class IRBuilder implements ASTVisitor {
         Operand value = tests.get(0).getResult();
 
         if (tests.size() > 1) {
-            ArrayList<Operand> values = new ArrayList<>();
-            ArrayList<IRBlock> blocks = new ArrayList<>();
-            values.add(new ConstBool(false));
-            blocks.add(curBlock);
+            // to avoid phi
+            Register tmp = new Register(IRModule.boolT, "logicalAnd_tmpAddr");
+            curFunc.addSymbol(tmp);
+            curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
+            curBlock.addInst(new Store(curBlock, value, tmp));
+
+            //ArrayList<Operand> values = new ArrayList<>();
+            //ArrayList<IRBlock> blocks = new ArrayList<>();
+            //values.add(new ConstBool(false));
+            //blocks.add(curBlock);
 
             IRBlock branchBlock = new IRBlock("logicalAnd_branch");
             IRBlock endBlock = new IRBlock("logicalAnd_end");
@@ -950,8 +956,11 @@ public class IRBuilder implements ASTVisitor {
             curBlock = branchBlock;
             tests.get(1).accept(this);
             Operand valueE = tests.get(1).getResult();
-            values.add(valueE);
-            blocks.add(curBlock);
+            //values.add(valueE);
+            //blocks.add(curBlock);
+            // to avoid phi
+            curBlock.addInst(new Store(curBlock, valueE, tmp));
+
             curFunc.addBlock(branchBlock);
 
             int opNum = node.getOpNum();
@@ -963,8 +972,11 @@ public class IRBuilder implements ASTVisitor {
                     curBlock = branchBlock;
                     tests.get(i).accept(this);
                     valueE = tests.get(i).getResult();
-                    values.add(valueE);
-                    blocks.add(curBlock);
+                    //values.add(valueE);
+                    //blocks.add(curBlock);
+                    // to avoid phi
+                    curBlock.addInst(new Store(curBlock, valueE, tmp));
+
                     curFunc.addBlock(branchBlock);
                 }
             }
@@ -973,7 +985,10 @@ public class IRBuilder implements ASTVisitor {
             curBlock = endBlock;
             Register dst = new Register(IRModule.boolT, "logical_and");
             curFunc.addSymbol(dst);
-            curBlock.addInst(new Phi(curBlock, dst, values, blocks));
+            //curBlock.addInst(new Phi(curBlock, dst, values, blocks));
+            // to avoid phi
+            curBlock.addInst(new Load(curBlock, dst, IRModule.boolT, tmp));
+
             curFunc.addBlock(endBlock);
             node.setResult(dst);
         }
@@ -990,33 +1005,45 @@ public class IRBuilder implements ASTVisitor {
         Operand value = tests.get(0).getResult();
 
         if (tests.size() > 1) {
-            ArrayList<Operand> values = new ArrayList<>();
-            ArrayList<IRBlock> blocks = new ArrayList<>();
-            values.add(new ConstBool(false));
-            blocks.add(curBlock);
+            // to avoid phi
+            Register tmp = new Register(IRModule.boolT, "logicalAnd_tmpAddr");
+            curFunc.addSymbol(tmp);
+            curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
+            curBlock.addInst(new Store(curBlock, value, tmp));
+
+            //ArrayList<Operand> values = new ArrayList<>();
+            //ArrayList<IRBlock> blocks = new ArrayList<>();
+            //values.add(new ConstBool(false));
+            //blocks.add(curBlock);
 
             IRBlock branchBlock = new IRBlock("logicalOr_branch");
             IRBlock endBlock = new IRBlock("logicalOr_end");
-            curBlock.addInst(new Br(curBlock, value, branchBlock, endBlock));
+            curBlock.addInst(new Br(curBlock, value, endBlock, branchBlock));
 
             curBlock = branchBlock;
             tests.get(1).accept(this);
             Operand valueE = tests.get(1).getResult();
-            values.add(valueE);
-            blocks.add(curBlock);
+            //values.add(valueE);
+            //blocks.add(curBlock);
+            // to avoid phi
+            curBlock.addInst(new Store(curBlock, valueE, tmp));
+
             curFunc.addBlock(branchBlock);
 
             int opNum = node.getOpNum();
             if (opNum > 1) {
                 for (int i = 2; i <= opNum; ++i) {
                     branchBlock = new IRBlock("logicalOr_branch"+i);
-                    curBlock.addInst(new Br(curBlock, valueE, branchBlock, endBlock));
+                    curBlock.addInst(new Br(curBlock, valueE, endBlock, branchBlock));
 
                     curBlock = branchBlock;
                     tests.get(i).accept(this);
                     valueE = tests.get(i).getResult();
-                    values.add(valueE);
-                    blocks.add(curBlock);
+                    //values.add(valueE);
+                    //blocks.add(curBlock);
+                    // to avoid phi
+                    curBlock.addInst(new Store(curBlock, valueE, tmp));
+
                     curFunc.addBlock(branchBlock);
                 }
             }
@@ -1025,7 +1052,10 @@ public class IRBuilder implements ASTVisitor {
             curBlock = endBlock;
             Register dst = new Register(IRModule.boolT, "logical_or");
             curFunc.addSymbol(dst);
-            curBlock.addInst(new Phi(curBlock, dst, values, blocks));
+            //curBlock.addInst(new Phi(curBlock, dst, values, blocks));
+            // to avoid phi
+            curBlock.addInst(new Load(curBlock, dst, IRModule.boolT, tmp));
+
             curFunc.addBlock(endBlock);
             node.setResult(dst);
         }
@@ -1244,6 +1274,7 @@ public class IRBuilder implements ASTVisitor {
         IRBlock endBlock = new IRBlock("for.end");
         node.setCondBlock(condBlock);
         node.setIncBlock(incBlock);
+        node.setBodyBlock(bodyBlock);
         node.setEndBlock(endBlock);
 
         if (node.hasInit()) node.getForInitStmt().accept(this);
@@ -1316,7 +1347,7 @@ public class IRBuilder implements ASTVisitor {
             else if (forStmt.hasCondition())
                 dstBlock = forStmt.getCondBlock();
             else
-                dstBlock = forStmt.getEndBlock();
+                dstBlock = forStmt.getBodyBlock();
         }
         curBlock.addInst(new Br(curBlock, null, dstBlock, null));
     }
@@ -1352,10 +1383,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(ClassSpecifierNode node) {
+        /* needn't visit members: type constructed already; initialize members at new inst
         if (node.getMembers()!=null) {
             for (var mem: node.getMembers())
                 mem.accept(this);
         }
+         */
         if (node.hasConstructor()) {
             for (var constructor: node.getConstructors()) {
                 if (module.hasNoFunction(constructor.getDecoratedName()))
