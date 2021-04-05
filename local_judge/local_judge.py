@@ -92,7 +92,7 @@ def main():
         TLE = False
         compilationFail = False
         try:
-            p = subprocess.run(['java', '-cp', 'antlr4-runtime-4.9.1.jar:./bin', 'Mx.Main', '-i', 'test.mx'],
+            p = subprocess.run(['java', '-classpath', '../lib/antlr-4.9.1-complete.jar:../bin', 'Mx.Main', "-codegen"],
                                timeout=5)
             if p.returncode:
                 compilationFail = True
@@ -110,8 +110,8 @@ def main():
             continue
         if test_codegen:
             if use_llvm:
-                os.system('mv ./test.s ./test.ll')
-                os.system(llc_cmd + ' --march=riscv32 -mattr=+m -o test.s test.ll')
+                os.system('mv ../test.s ../test.ll')
+                os.system(llc_cmd + ' --march=riscv32 -mattr=+m -o ../test.s ../test.ll')
 
             if os.system('%s --oj-mode < test.in 1>ravel.out 2>/dev/null'
                          % ravel_path):

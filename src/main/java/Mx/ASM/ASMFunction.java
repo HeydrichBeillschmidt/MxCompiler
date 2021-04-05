@@ -187,7 +187,25 @@ public class ASMFunction {
 
     public void performLvnAnalysis() {
         for (var b: blocks.values()) b.solveUsesAndDefs();
-        for (var b: getReversedDFSOrder()) b.solveLiveInsAndOuts();
+
+        ArrayList<ASMBlock> rOrder = getReversedDFSOrder();
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (var b: rOrder) {
+                Set<VirtualReg> liveInNewer = new HashSet<>();
+                Set<VirtualReg> liveOutNewer = new HashSet<>();
+                b.collectLiveInsAndOuts(liveInNewer, liveOutNewer);
+                if (!liveInNewer.equals(b.getLiveIn())) {
+                    b.setLiveIn(liveInNewer);
+                    changed = true;
+                }
+                if (!liveOutNewer.equals(b.getLiveOut())) {
+                    b.setLiveOut(liveOutNewer);
+                    changed = true;
+                }
+            }
+        }
     }
 
     public void removeRedundantMV() {

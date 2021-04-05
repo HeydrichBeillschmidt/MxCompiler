@@ -2,6 +2,7 @@ package Mx.ASM.Instruction;
 
 import Mx.ASM.ASMBlock;
 import Mx.ASM.ASMVisitor;
+import Mx.ASM.Operand.PhysicalReg;
 import Mx.ASM.Operand.VirtualReg;
 
 import java.util.ArrayList;
@@ -45,6 +46,14 @@ abstract public class ASMInst {
         else block.setTailInst(prevInst);
         if (prevInst!=null) prevInst.setNextInst(nextInst);
         else block.setHeadInst(nextInst);
+    }
+
+    public boolean isUselessAddSP() {
+        if (!(this instanceof IAL)) return false;
+        IAL i = (IAL) this;
+        return i.getOpName()==IAL.OpName.addi && i.getImm().getValue()==0
+                && i.getRd().equals(PhysicalReg.spVR)
+                && i.getRs1().equals(PhysicalReg.spVR);
     }
 
     public VirtualReg getRd() {

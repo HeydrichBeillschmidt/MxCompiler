@@ -185,23 +185,23 @@ public class ASMBlock {
     public Set<VirtualReg> getDefs() {
         return defs;
     }
-    public void solveLiveInsAndOuts() {
-        Set<VirtualReg> liveOutNewer = new HashSet<>();
-        for (var b: successors) liveOutNewer.addAll(b.liveIn);
-        Set<VirtualReg> liveInNewer = new HashSet<>(liveOutNewer);
+    public void collectLiveInsAndOuts(Set<VirtualReg> liveInNewer, Set<VirtualReg> liveOutNewer) {
+        for (var s: successors) liveOutNewer.addAll(s.liveIn);
+        liveInNewer.addAll(liveOutNewer);
         liveInNewer.removeAll(defs);
         liveInNewer.addAll(uses);
-
-        liveOut.addAll(liveOutNewer);
-        if (!liveIn.equals(liveInNewer)) {
-            liveIn = liveInNewer;
-        }
     }
     public Set<VirtualReg> getLiveIn() {
         return liveIn;
     }
+    public void setLiveIn(Set<VirtualReg> liveIn) {
+        this.liveIn = liveIn;
+    }
     public Set<VirtualReg> getLiveOut() {
         return liveOut;
+    }
+    public void setLiveOut(Set<VirtualReg> liveOut) {
+        this.liveOut = liveOut;
     }
 
     public String emitCode() {
