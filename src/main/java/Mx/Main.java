@@ -21,6 +21,18 @@ import java.io.InputStream;
 
 public class Main {
     public static void main(String[] args) {
+        boolean doCodegen = true, emitLL = false;
+
+        if (args.length > 0) {
+            for (String arg: args) {
+                switch (arg) {
+                    case "-semantic": doCodegen = false;break;
+                    case "-emit-llvm":emitLL = true;break;
+                    default:break;
+                }
+            }
+        }
+
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
         //String filename = "testcases/sema/misc-package/misc-34.mx";
@@ -75,35 +87,37 @@ public class Main {
             throw new RuntimeException();
         }
 
-        IRBuilder irBuilder = new IRBuilder(semanticChecker.getGlobalScope(),
-                semanticChecker.getTypeTable(), exceptionHandler);
-        try {
-            AST.accept(irBuilder);
-        }
-        catch (error err) {
+        if (doCodegen) {
+            IRBuilder irBuilder = new IRBuilder(semanticChecker.getGlobalScope(),
+                    semanticChecker.getTypeTable(), exceptionHandler);
+            try {
+                AST.accept(irBuilder);
+            }
+            catch (error err) {
+                if (exceptionHandler.hasError()) {
+                    exceptionHandler.print();
+                    throw new RuntimeException();
+                }
+            }
             if (exceptionHandler.hasError()) {
                 exceptionHandler.print();
                 throw new RuntimeException();
             }
+
+            if (emitLL) new IRPrinter("test.ll").run(irBuilder.getModule());
+
+            IRModule irModule = irBuilder.getModule();
+
+            InstructionSelector instructionSelector = new InstructionSelector();
+            irModule.accept(instructionSelector);
+
+            ASMModule asmModule = instructionSelector.getAsmModule();
+
+            RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
+            registerAllocator.run();
+
+            CodeEmitter codeEmitter = new CodeEmitter("output.s");
+            codeEmitter.run(asmModule);
         }
-        if (exceptionHandler.hasError()) {
-            exceptionHandler.print();
-            throw new RuntimeException();
-        }
-
-        //new IRPrinter("test.ll").run(irBuilder.getModule());
-
-        IRModule irModule = irBuilder.getModule();
-
-        InstructionSelector instructionSelector = new InstructionSelector();
-        irModule.accept(instructionSelector);
-
-        ASMModule asmModule = instructionSelector.getAsmModule();
-
-        RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
-        registerAllocator.run();
-
-        //CodeEmitter codeEmitter = new CodeEmitter("output.s");
-        //codeEmitter.run(asmModule);
     }
 }

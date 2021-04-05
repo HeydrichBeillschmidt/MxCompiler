@@ -3,6 +3,8 @@ package Mx.Types;
 import Mx.AST.Expressions.ExprNode;
 import Mx.Entities.FunctionEntity;
 import Mx.Entities.VarEntity;
+import Mx.IR.Operand.Null;
+import Mx.IR.Operand.Operand;
 import Mx.Utils.FuncNameDecorator;
 
 import java.util.ArrayList;
@@ -71,5 +73,10 @@ public class ClassType extends Type {
                 return method;
         }
         return null;
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return new Null();
     }
 }

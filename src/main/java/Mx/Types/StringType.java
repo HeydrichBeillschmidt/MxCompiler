@@ -4,6 +4,8 @@ import Mx.AST.Specifiers.BuiltInTypeSpecifierNode;
 import Mx.AST.Specifiers.DeclSpecifierSeqNode;
 import Mx.Entities.FunctionEntity;
 import Mx.Entities.VarEntity;
+import Mx.IR.Operand.Null;
+import Mx.IR.Operand.Operand;
 import Mx.Utils.Location;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class StringType extends Type {
 
         // int length();
         builtinMethodParameters = new ArrayList<>();
-        builtinMethod = new FunctionEntity("?length@string@@QEAHXZ", location,
+        builtinMethod = new FunctionEntity("_length$string$$QEAHXZ", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
@@ -30,14 +32,14 @@ public class StringType extends Type {
         builtinMethodParameters = new ArrayList<>();
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("left", "int"));
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("right","int"));
-        builtinMethod = new FunctionEntity("?substring@string@@QEAPADHH@Z", location,
+        builtinMethod = new FunctionEntity("_substring$string$$QEAPADHH$Z", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "string")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
 
         // int parseInt();
         builtinMethodParameters = new ArrayList<>();
-        builtinMethod = new FunctionEntity("?parseInt@string@@QEAHXZ", location,
+        builtinMethod = new FunctionEntity("_parseInt$string$$QEAHXZ", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
@@ -45,7 +47,7 @@ public class StringType extends Type {
         // int ord(int pos);
         builtinMethodParameters = new ArrayList<>();
         builtinMethodParameters.add(VarEntity.builtinMethodParameter("pos", "int"));
-        builtinMethod = new FunctionEntity("?ord@string@@QEAHH@Z", location,
+        builtinMethod = new FunctionEntity("_ord$string$$QEAHH$Z", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
@@ -65,5 +67,10 @@ public class StringType extends Type {
             if (method.getPureName().equals(name))
                 return method;
         return null;
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return new Null();
     }
 }

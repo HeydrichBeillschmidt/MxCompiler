@@ -54,13 +54,6 @@ public class IRPrinter implements IRVisitor {
                 writer.println(g.printToString());
             writer.println("");
         }
-        if (node.getConstStrings().size() > 0) {
-            for (var cs: node.getConstStrings().values())
-                writer.println("@" + cs.getName()
-                        + " = private unnamed_addr constant "
-                        + cs.toString() + ", align 1");
-            writer.println("");
-        }
         if (node.getFunctions().size() > 0) {
             for (var f: node.getFunctions().values()) {
                 writer.println("; Function Attrs: noinline nounwind optnone uwtable");
@@ -91,68 +84,44 @@ public class IRPrinter implements IRVisitor {
         writer.println(node.getName() + ":");
         IRInst inst = node.getHeadInst();
         while (inst!=null) {
-            inst.accept(this);
+            writer.println("\t"+inst.toString());
             inst = inst.getNextInst();
         }
     }
 
     @Override
-    public void visit(Alloca node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Alloca node) {}
 
     @Override
-    public void visit(BinaryOp node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(BinaryOp node) {}
 
     @Override
-    public void visit(BitCast node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(BitCast node) {}
 
     @Override
-    public void visit(Br node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Br node) {}
 
     @Override
-    public void visit(Call node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Call node) {}
 
     @Override
-    public void visit(GetElementPtr node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(GetElementPtr node) {}
 
     @Override
-    public void visit(Icmp node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Icmp node) {}
 
     @Override
-    public void visit(Load node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Load node) {}
 
     @Override
-    public void visit(Move node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Move node) {}
 
     @Override
-    public void visit(Phi node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Phi node) {}
 
     @Override
-    public void visit(Ret node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Ret node) {}
 
     @Override
-    public void visit(Store node) {
-        writer.println("\t" + node.toString());
-    }
+    public void visit(Store node) {}
 }

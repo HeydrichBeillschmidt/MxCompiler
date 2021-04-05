@@ -71,7 +71,7 @@ public class Scope {
         // void print(string str);
         builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("str", "string"));
-        builtinFunc = new FunctionEntity("?print@@YGXPAD@Z", defaultLoc,
+        builtinFunc = new FunctionEntity("_print$$YGXPAD$Z", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("print", builtinFunc);
@@ -79,7 +79,7 @@ public class Scope {
         // void println(string str);
         builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("str", "string"));
-        builtinFunc = new FunctionEntity("?println@@YGXPAD@Z", defaultLoc,
+        builtinFunc = new FunctionEntity("_println$$YGXPAD$Z", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("println", builtinFunc);
@@ -87,7 +87,7 @@ public class Scope {
         // void printInt(int n);
         builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("n", "int"));
-        builtinFunc = new FunctionEntity("?printInt@@YGXH@Z", defaultLoc,
+        builtinFunc = new FunctionEntity("_printInt$$YGXH$Z", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("printInt", builtinFunc);
@@ -95,21 +95,21 @@ public class Scope {
         // void printlnInt(int n);
         builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("n", "int"));
-        builtinFunc = new FunctionEntity("?printlnInt@@YGXH@Z", defaultLoc,
+        builtinFunc = new FunctionEntity("_printlnInt$$YGXH$Z", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "void")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("printlnInt", builtinFunc);
 
         // string getString();
         builtinFuncParameters = new ArrayList<>();
-        builtinFunc = new FunctionEntity("?getString@@YGPADXZ", defaultLoc,
+        builtinFunc = new FunctionEntity("_getString$$YGPADXZ", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "string")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("getString", builtinFunc);
 
         // int getInt();
         builtinFuncParameters = new ArrayList<>();
-        builtinFunc = new FunctionEntity("?getInt@@YGHXZ", defaultLoc,
+        builtinFunc = new FunctionEntity("_getInt$$YGHXZ", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "int")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("getInt", builtinFunc);
@@ -117,7 +117,7 @@ public class Scope {
         // string toString(int i);
         builtinFuncParameters = new ArrayList<>();
         builtinFuncParameters.add(VarEntity.builtinMethodParameter("i", "int"));
-        builtinFunc = new FunctionEntity("?toString@@YGPADH@Z", defaultLoc,
+        builtinFunc = new FunctionEntity("_toString$$YGPADH$Z", defaultLoc,
                 new DeclSpecifierSeqNode(defaultLoc, new BuiltInTypeSpecifierNode(defaultLoc, "string")),
                 builtinFuncParameters, null, FunctionEntity.FuncEntityType.function);
         putFunc("toString", builtinFunc);

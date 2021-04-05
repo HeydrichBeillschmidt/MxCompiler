@@ -5,19 +5,14 @@ import Mx.IR.TypeSystem.IntegerType;
 import Mx.IR.TypeSystem.PointerType;
 
 public class ConstString extends Constant {
-    private final String name;
     private final String value;
 
-    public ConstString(String name, String value) {
+    public ConstString(String value) {
         super(new PointerType(new ArrayType(value.length(),
                 new IntegerType(8)) ) );
         this.value = value;
-        this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
     public String getValue() {
         return value;
     }

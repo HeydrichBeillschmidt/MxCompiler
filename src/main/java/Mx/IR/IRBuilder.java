@@ -114,19 +114,14 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(StringLiteralNode node) {
-        ConstString ptr = module.getConstStrByValue(node.getValue());
-        String name;
-        if (ptr==null) {
-            name = "__const." + (curFunc==null ? "" : curFunc.getName())
-                    + ".str" + module.getConstStrings().size();
-            ptr = module.addConstString(node.getValue(), name);
-        }
-        else name = ptr.getName();
+        String name = "__const." + (curFunc==null ? "" : curFunc.getName())
+                + ".str" + module.getConstStrings().size();
         Register dst = new Register(IRModule.stringT, name);
+        GlobalVariable str = module.addConstString(node.getValue(), name);
         ArrayList<Operand> index = new ArrayList<>();
         index.add(new ConstInt(0, 32));
         index.add(new ConstInt(0, 32));
-        curBlock.addInst(new GetElementPtr(curBlock, dst, ptr, index));
+        curBlock.addInst(new GetElementPtr(curBlock, dst, str, index));
         node.setResult(dst);
     }
 
@@ -1434,14 +1429,22 @@ public class IRBuilder implements ASTVisitor {
             VarEntity varEntity = node.getScope().getVarEntity(name);
             if (node.getScope()==globalScope) {
                 GlobalVariable globalVar
-                        = new GlobalVariable(new PointerType(irType), name);
-                varEntity.setAllocatedAddr(globalVar);
-                module.addGlobalVariable(globalVar);
+                        = new GlobalVariable(new PointerType(irType), name, null);
+                Operand init;
                 if (node.hasInitializer()) {
                     node.getInitializer().accept(this);
-                    Operand init = node.getInitializer().getResult();
-                    curBlock.addInst(new Store(curBlock, init, globalVar));
+                    init = node.getInitializer().getResult();
+                    if (!init.isConstant()) {
+                        curBlock.addInst(new Store(curBlock, init, globalVar));
+                        init = astType.getDefaultValue();
+                    }
                 }
+                else {
+                    init = astType.getDefaultValue();
+                }
+                globalVar.setInit(init);
+                varEntity.setAllocatedAddr(globalVar);
+                module.addGlobalVariable(globalVar);
             }
             else {
                 Register ptrTmp = new Register(new PointerType(irType), name + ".addr");

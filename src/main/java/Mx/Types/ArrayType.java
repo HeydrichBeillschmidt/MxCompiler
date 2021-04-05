@@ -4,6 +4,8 @@ import Mx.AST.Specifiers.BuiltInTypeSpecifierNode;
 import Mx.AST.Specifiers.DeclSpecifierSeqNode;
 import Mx.Entities.FunctionEntity;
 import Mx.Entities.VarEntity;
+import Mx.IR.Operand.Null;
+import Mx.IR.Operand.Operand;
 import Mx.Utils.Location;
 
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class ArrayType extends Type {
 
         // int size();
         builtinMethodParameters = new ArrayList<>();
-        builtinMethod = new FunctionEntity("?size@array@@QEAHXZ", location,
+        builtinMethod = new FunctionEntity("_size$array$$QEAHXZ", location,
                 new DeclSpecifierSeqNode(location, new BuiltInTypeSpecifierNode(location, "int")),
                 builtinMethodParameters, null, FunctionEntity.FuncEntityType.method);
         builtinMethods.add(builtinMethod);
@@ -63,5 +65,9 @@ public class ArrayType extends Type {
             return baseType.equals(((ArrayType) obj).baseType)
                     && dimension==((ArrayType) obj).dimension;
         else return false;
+    }
+    @Override
+    public Operand getDefaultValue() {
+        return new Null();
     }
 }

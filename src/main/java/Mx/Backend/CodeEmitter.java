@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 public class CodeEmitter implements ASMVisitor {
     private final OutputStream sOut;
     private final PrintWriter writer;
-    private ASMModule module;
 
     public CodeEmitter(String fileName) {
         try {
@@ -28,7 +27,6 @@ public class CodeEmitter implements ASMVisitor {
     }
 
     public void run(ASMModule module) {
-        this.module = module;
         module.accept(this);
         try {
             writer.close();
@@ -46,19 +44,6 @@ public class CodeEmitter implements ASMVisitor {
         writer.println("\t.file\t\"code.mx\"");
         node.getFunctions().values().forEach(f -> f.accept(this));
         node.getGlobalVars().values().forEach(g -> g.accept(this));
-        node.getStrValues().forEach(this::runForStr);
-    }
-    private void runForStr(GlobalVar gv, String value) {
-        writer.println("\t.type\t" + gv.getName() + ",@object");
-        writer.println("\t.section\t.rodata");
-        writer.println(gv.getName() + ":");
-        String str = value.replace("\\", "\\\\");
-        str = str.replace("\n", "\\n");
-        str = str.replace("\0", "");
-        str = str.replace("\t", "\\t");
-        str = str.replace("\"", "\\\"");
-        writer.println("\t.asciz\t\"" + str + "\"");
-        writer.println("\t.size\t" + gv.getName() + ", " + value.length() + "\n");
     }
 
     @Override
@@ -91,15 +76,19 @@ public class CodeEmitter implements ASMVisitor {
 
     @Override
     public void visit(GlobalVar node) {
-        if (!module.getStrValues().containsKey(node)) {
-            writer.println("\t.type\t" + node.getName() + ",@object");
+        writer.println("\t.type\t" + node.getName() + ",@object");
+        if (node.isString()) {
+            writer.println("\t.section\t.sdata");
+            writer.println("\t.global\t" + node.getName());
+        }
+        else {
             writer.println("\t.section\t.bss");
             writer.println("\t.global\t" + node.getName());
             writer.println("\t.p2align\t2");
-            writer.println(node.getName() + ":");
-            writer.println("\t.word\t0");
-            writer.println("\t.size\t" + node.getName() + ", 4\n");
         }
+        writer.println(node.getName() + ":");
+        writer.println(node.emitCode());
+        writer.println("\t.size\t" + node.getName() + ", " + node.getSize() + "\n");
     }
 
     @Override

@@ -9,13 +9,11 @@ public class ASMModule {
     private final Map<String, ASMFunction> externalFunctions;
     private final Map<String, ASMFunction> functions;
     private final Map<String, GlobalVar> globalVars;
-    private final Map<GlobalVar, String> strValues;
 
     public ASMModule(){
         externalFunctions = new HashMap<>();
         functions = new HashMap<>();
         globalVars = new HashMap<>();
-        strValues = new HashMap<>();
     }
 
     public Map<String, ASMFunction> getExternalFunctions() {
@@ -30,9 +28,6 @@ public class ASMModule {
     }
     public Map<String, GlobalVar> getGlobalVars() {
         return globalVars;
-    }
-    public Map<GlobalVar, String> getStrValues() {
-        return strValues;
     }
 
     public void accept(ASMVisitor visitor) {

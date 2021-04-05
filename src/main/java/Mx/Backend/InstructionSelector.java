@@ -6,9 +6,7 @@ import Mx.ASM.Operand.*;
 import Mx.IR.*;
 import Mx.IR.Instruction.*;
 import Mx.IR.Operand.*;
-import Mx.IR.TypeSystem.PointerType;
-import Mx.IR.TypeSystem.StructureType;
-import Mx.IR.TypeSystem.VoidType;
+import Mx.IR.TypeSystem.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +33,22 @@ public class InstructionSelector implements IRVisitor {
     public void visit(IRModule node) {
         for (var gv: node.getGlobalVariables().values()) {
             GlobalVar asmGv = new GlobalVar(gv.getName(),
-                    ((PointerType)gv.getType()).getBaseType().size());
+                    ((PointerType)gv.getType()).getBaseType().size()/8);
             asmModule.getGlobalVars().put(gv.getName(), asmGv);
+
+            IRType type = ((PointerType)gv.getType()).getBaseType();
+            Operand init = gv.getInit();
+
+            if (type instanceof ArrayType) {
+                asmGv.setStrVal(((ConstString)init).getValue());
+            }
+            else if (type.equals(IRModule.int32T)) {
+                asmGv.setIntVal(((ConstInt)init).getValue());
+            }
+            else if (type.equals(IRModule.boolT)) {
+                asmGv.setBoolVal(((ConstBool)init).getValue() ? 1 : 0);
+            }
+            else asmGv.setIntVal(0);
         }
         for (var ef: node.getExternalFunctions().values()) {
             String name = ef.getName();
@@ -191,7 +203,7 @@ public class InstructionSelector implements IRVisitor {
     @Override
     public void visit(GetElementPtr node) {
         VirtualReg rd = resolveToVR(node.getDst());
-        if (node.getPtr() instanceof ConstString) {
+        if (node.getPtr() instanceof GlobalVariable) { // string literal
             curBlock.addInst(new LA(curBlock, rd,
                     (GlobalVar) resolveToVR(node.getPtr()) ) );
         }
@@ -399,19 +411,6 @@ public class InstructionSelector implements IRVisitor {
                 curFunc.addSymbolMultiple(vr);
                 curBlock.addInst(new LI(curBlock, vr, new Immediate(value)));
                 return vr;
-            }
-        }
-        else if (os instanceof ConstString) {
-            String name = ".L" + ((ConstString) os).getName();
-            if (asmModule.getGlobalVars().containsKey(name)) {
-                return asmModule.getGlobalVars().get(name);
-            }
-            else {
-                int size = ((PointerType)os.getType()).getBaseType().size();
-                GlobalVar gv = new GlobalVar(name, size/8);
-                asmModule.getGlobalVars().put(name, gv);
-                asmModule.getStrValues().put(gv, ((ConstString)os).getValue());
-                return gv;
             }
         }
         else if (os instanceof GlobalVariable) {

@@ -6,20 +6,36 @@ import Mx.IR.TypeSystem.PointerType;
 
 public class GlobalVariable extends Operand {
     private final String name;
+    private Operand init;
 
-    public GlobalVariable(IRType type, String name) {
+    public GlobalVariable(IRType type, String name, Operand init) {
         super(type);
         this.name = name;
+        this.init = init;
     }
 
     public String getName() {
         return name;
     }
+    public Operand getInit() {
+        return init;
+    }
+    public void setInit(Operand init) {
+        this.init = init;
+    }
     public String printToString() {
         assert getType() instanceof PointerType;
-        return "@" + name + " = dso_local global "
-                + ((PointerType)getType()).getBaseType().toString()
-                + " zeroinitializer, align " + getType().size()/8;
+        if (init instanceof ConstString) {
+            return "@" + name
+                    + " = private unnamed_addr constant "
+                    + init.toString() + ", align 1";
+        }
+        else {
+            return "@" + name + " = dso_local global "
+                    + ((PointerType) getType()).getBaseType().toString()
+                    + " " + init.toString()
+                    + ", align " + getType().size() / 8;
+        }
     }
 
     @Override

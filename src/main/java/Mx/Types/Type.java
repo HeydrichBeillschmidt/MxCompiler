@@ -30,4 +30,6 @@ abstract public class Type {
             return toString().equals(obj.toString());
         else return false;
     }
+
+    abstract public Operand getDefaultValue();
 }

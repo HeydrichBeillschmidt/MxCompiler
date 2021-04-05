@@ -19,8 +19,7 @@ public class IRModule {
     private final Map<String, Function> externalFunctions;
     private final Map<String, Function> functions;
     private final Map<String, GlobalVariable> globalVariables;
-    private final Map<String, ConstString> constStrings;
-    private final Map<String, ConstString> constStrValues;
+    private final Map<String, GlobalVariable> constStrings;
     private final Map<String, StructureType> structures;
     public static IRType stringT = new PointerType(new IntegerType(8)),
             charT = new IntegerType(8), voidT = new VoidType(),
@@ -31,7 +30,6 @@ public class IRModule {
         this.functions = new HashMap<>();
         this.globalVariables = new HashMap<>();
         this.constStrings = new HashMap<>();
-        this.constStrValues = new HashMap<>();
         this.structures = new HashMap<>();
 
         // dump AST types
@@ -64,55 +62,55 @@ public class IRModule {
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
-        func = new Function(retType, "?print@@YGXPAD@Z", parameters);
+        func = new Function(retType, "_print$$YGXPAD$Z", parameters);
         externalFunctions.put(func.getName(), func);
         // void println(string str);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
-        func = new Function(retType, "?println@@YGXPAD@Z", parameters);
+        func = new Function(retType, "_println$$YGXPAD$Z", parameters);
         externalFunctions.put(func.getName(), func);
         // void printInt(int n);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "n"));
-        func = new Function(retType, "?printInt@@YGXH@Z", parameters);
+        func = new Function(retType, "_printInt$$YGXH$Z", parameters);
         externalFunctions.put(func.getName(), func);
         // void printlnInt(int n);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "n"));
-        func = new Function(retType, "?printlnInt@@YGXH@Z", parameters);
+        func = new Function(retType, "_printlnInt$$YGXH$Z", parameters);
         externalFunctions.put(func.getName(), func);
         // string getString();
         retType = stringT;
         parameters = new ArrayList<>();
-        func = new Function(retType, "?getString@@YGPADXZ", parameters);
+        func = new Function(retType, "_getString$$YGPADXZ", parameters);
         externalFunctions.put(func.getName(), func);
         // int getInt();
         retType = int32T;
         parameters = new ArrayList<>();
-        func = new Function(retType, "?getInt@@YGHXZ", parameters);
+        func = new Function(retType, "_getInt$$YGHXZ", parameters);
         externalFunctions.put(func.getName(), func);
         // string toString(int i);
         retType = stringT;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "i"));
-        func = new Function(retType, "?toString@@YGPADH@Z", parameters);
+        func = new Function(retType, "_toString$$YGPADH$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // char* malloc(int size);
         retType = stringT;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "size"));
-        func = new Function(retType, "?malloc@@YGPADH@Z", parameters);
+        func = new Function(retType, "_malloc$$YGPADH$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.length(string str);
         retType = int32T;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
-        func = new Function(retType, "?length@string@@QEAHXZ", parameters);
+        func = new Function(retType, "_length$string$$QEAHXZ", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // string string.substring(string str, int left, int right);
@@ -121,14 +119,14 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str"));
         parameters.add(new Parameter(int32T, "left"));
         parameters.add(new Parameter(int32T, "right"));
-        func = new Function(retType, "?substring@string@@QEAPADHH@Z", parameters);
+        func = new Function(retType, "_substring$string$$QEAPADHH$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.parseInt(string str);
         retType = int32T;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
-        func = new Function(retType, "?parseInt@string@@QEAHXZ", parameters);
+        func = new Function(retType, "_parseInt$string$$QEAHXZ", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.ord(string str, int pos);
@@ -136,7 +134,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
         parameters.add(new Parameter(int32T, "pos"));
-        func = new Function(retType, "?ord@string@@QEAHH@Z", parameters);
+        func = new Function(retType, "_ord$string$$QEAHH$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // string strcat(string str1, string str2);
@@ -144,7 +142,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcat@@YGPADPADPAD@Z", parameters);
+        func = new Function(retType, "_strcat$$YGPADPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_eq(string str1, string str2);
@@ -152,7 +150,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_eq@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_eq$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_neq(string str1, string str2);
@@ -160,7 +158,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_neq@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_neq$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_lt(string str1, string str2);
@@ -168,7 +166,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_lt@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_lt$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_gt(string str1, string str2);
@@ -176,7 +174,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_gt@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_gt$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_le(string str1, string str2);
@@ -184,7 +182,7 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_le@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_le$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_ge(string str1, string str2);
@@ -192,16 +190,18 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
-        func = new Function(retType, "?strcmp_ge@@YG_NPADPAD@Z", parameters);
+        func = new Function(retType, "_strcmp_ge$$YG_NPADPAD$Z", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int array.size(array arr);
+        /*
         retType = int32T;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(new PointerType(charT), "arr"));
-        func = new Function(retType, "?size@array@@QEAHXZ", parameters);
+        func = new Function(retType, "_size$array$$QEAHXZ", parameters);
         func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
+         */
     }
 
     public Map<String, Function> getExternalFunctions() {
@@ -243,35 +243,34 @@ public class IRModule {
     public void addStructure(StructureType struct) {
         structures.put(struct.getName(), struct);
     }
-    public Map<String, ConstString> getConstStrings() {
+    public Map<String, GlobalVariable> getConstStrings() {
         return constStrings;
     }
-    public ConstString addConstString(String value, String name) {
+    public GlobalVariable addConstString(String value, String name) {
         value = value.replace("\\\\", "\\");
         value = value.replace("\\n", "\n");
         value = value.replace("\\t", "\t");
         value = value.replace("\\\"", "\"");
         value = value + "\0";
-        if (constStrValues.containsKey(value)) {
-            return constStrValues.get(value);
+        if (constStrings.containsKey(value)) {
+            return constStrings.get(value);
         }
         else {
-            ConstString str = new ConstString(name, value);
-            constStrings.put(name, str);
-            constStrValues.put(value, str);
-            return str;
+            GlobalVariable gv = new GlobalVariable(new PointerType(
+                    new Mx.IR.TypeSystem.ArrayType(value.length(), charT)),
+                    name, new ConstString(value));
+            globalVariables.put(name, gv);
+            constStrings.put(value, gv);
+            return gv;
         }
     }
-    public ConstString getConstString(String name) {
-        return constStrings.get(name);
-    }
-    public ConstString getConstStrByValue(String value) {
+    public GlobalVariable getConstStrByValue(String value) {
         value = value.replace("\\\\", "\\");
         value = value.replace("\\n", "\n");
         value = value.replace("\\t", "\t");
         value = value.replace("\\\"", "\"");
         value = value + "\0";
-        return constStrValues.getOrDefault(value, null);
+        return constStrings.getOrDefault(value, null);
     }
     public IRType getIRType(Type ty) {
         if (ty instanceof IntType) return int32T;
