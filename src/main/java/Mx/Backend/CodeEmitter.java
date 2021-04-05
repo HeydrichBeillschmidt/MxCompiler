@@ -57,9 +57,6 @@ public class CodeEmitter implements ASMVisitor {
         writer.print(" ".repeat(Integer.max(1, 39-node.getName().length())));
         writer.println("# @" + node.getName());
         node.getLiteralOrder().forEach(b -> b.accept(this));
-        writer.println(".Lfunc_end" + node.getFuncID() + ":");
-        writer.println("\t.size\t" + node.getName() + ", .Lfunc_end"
-                + node.getFuncID() + "-" + node.getName());
         writer.print(" ".repeat(40));
         writer.println("# -- End function");
     }
