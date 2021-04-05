@@ -37,7 +37,7 @@ public class IRBuilder implements ASTVisitor {
         this.astTypeTable = astTypeTable;
         this.exceptionHandler = exceptionHandler;
         this.initializer = new Function(new VoidType(),
-                "__init__", new ArrayList<>());
+                "___init__$$YGXXZ", new ArrayList<>());
         module.addFunction(initializer);
         curBlock = null;
         curFunc = null;
@@ -114,9 +114,12 @@ public class IRBuilder implements ASTVisitor {
 
     @Override
     public void visit(StringLiteralNode node) {
-        String name = "__const." + (curFunc==null ? "" : curFunc.getName())
-                + ".str" + module.getConstStrings().size();
+        String funcName = curFunc==null ? "" :
+                FuncNameDecorator.extractPureFuncName(curFunc.getName()).equals("main")
+                        ? "main" : curFunc.getName();
+        String name = "__const." + funcName + ".str" + module.getConstStrings().size();
         Register dst = new Register(IRModule.stringT, name);
+        curFunc.addSymbol(dst);
         GlobalVariable str = module.addConstString(node.getValue(), name);
         ArrayList<Operand> index = new ArrayList<>();
         index.add(new ConstInt(0, 32));
@@ -327,8 +330,8 @@ public class IRBuilder implements ASTVisitor {
         node.getSubExpr().accept(this);
         Operand value = node.getSubExpr().getResult();
         Operand addr = node.getSubExpr().getAddr();
-        Register result = new Register(IRModule.int32T,
-                "postfix_op" + node.getOperator());
+        Register result = new Register(IRModule.int32T, "postfix_"
+                + (node.getOperator().equals("++") ? "inc" : "dec"));
         curFunc.addSymbol(result);
         curBlock.addInst(new BinaryOp(curBlock, result,
                 node.getOperator().equals("++")
@@ -344,10 +347,10 @@ public class IRBuilder implements ASTVisitor {
         node.getSubExpr().accept(this);
         Operand value = node.getSubExpr().getResult();
         Operand addr;
-        Register result = new Register(IRModule.int32T,
-                "prefix_op" + node.getOperator());
+        Register result;
         switch (node.getOperator()) {
             case "++":  // ++x
+                result = new Register(IRModule.int32T, "prefix_inc");
                 addr = node.getSubExpr().getAddr();
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.add,
@@ -355,8 +358,10 @@ public class IRBuilder implements ASTVisitor {
                 curBlock.addInst(new Store(curBlock, result, addr));
                 node.setResult(result);
                 node.setAddr(addr);
+                curFunc.addSymbol(result);
                 break;
             case "--":  // --x
+                result = new Register(IRModule.int32T, "prefix_dec");
                 addr = node.getSubExpr().getAddr();
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.sub,
@@ -364,31 +369,36 @@ public class IRBuilder implements ASTVisitor {
                 curBlock.addInst(new Store(curBlock, result, addr));
                 node.setResult(result);
                 node.setAddr(addr);
+                curFunc.addSymbol(result);
                 break;
             case "+": // +x
                 node.setResult(value);
                 break;
             case "-": // -x
+                result = new Register(IRModule.int32T, "prefix_neg");
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.sub,
                         new ConstInt(0, 32), value));
                 node.setResult(result);
+                curFunc.addSymbol(result);
                 break;
             case "~": // ~x
+                result = new Register(IRModule.int32T, "prefix_bitwiseComplement");
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.xor,
                         value, new ConstInt(-1, 32)));
                 node.setResult(result);
+                curFunc.addSymbol(result);
                 break;
             case "!": // !x
-                result = new Register(IRModule.boolT, "prefix_op!");
+                result = new Register(IRModule.boolT, "prefix_logicalNot");
                 curBlock.addInst(new BinaryOp(curBlock, result,
                         BinaryOp.BinaryOpName.xor,
                         value, new ConstBool(true)));
                 node.setResult(result);
+                curFunc.addSymbol(result);
             default:
         }
-        curFunc.addSymbol(result);
     }
 
     @Override
@@ -934,7 +944,7 @@ public class IRBuilder implements ASTVisitor {
 
         if (tests.size() > 1) {
             // to avoid phi
-            Register tmp = new Register(IRModule.boolT, "logicalAnd_tmpAddr");
+            Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
             curFunc.addSymbol(tmp);
             curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
             curBlock.addInst(new Store(curBlock, value, tmp));
@@ -1001,7 +1011,7 @@ public class IRBuilder implements ASTVisitor {
 
         if (tests.size() > 1) {
             // to avoid phi
-            Register tmp = new Register(IRModule.boolT, "logicalAnd_tmpAddr");
+            Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
             curFunc.addSymbol(tmp);
             curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
             curBlock.addInst(new Store(curBlock, value, tmp));
@@ -1512,7 +1522,7 @@ public class IRBuilder implements ASTVisitor {
         func.addBlock(func.getReturnBlock());
         func.checkTermination(exceptionHandler);
         if (node.getPureName().equals("main")) {
-            func = module.getFunction("__init__");
+            func = module.getFunction("___init__$$YGXXZ");
             func.checkTermination(exceptionHandler);
             curFunc.getEntranceBlock().addInstAtHead(
                     new Call(curFunc.getEntranceBlock(), pseudoReg,

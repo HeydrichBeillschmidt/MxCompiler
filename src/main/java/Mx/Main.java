@@ -35,7 +35,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/sema/misc-package/misc-34.mx";
+        //String filename = "testcases/codegen/t55.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;

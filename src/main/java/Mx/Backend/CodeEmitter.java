@@ -41,7 +41,6 @@ public class CodeEmitter implements ASMVisitor {
     @Override
     public void visit(ASMModule node) {
         writer.println("\t.text");
-        writer.println("\t.file\t\"code.mx\"");
         node.getFunctions().values().forEach(f -> f.accept(this));
         node.getGlobalVars().values().forEach(g -> g.accept(this));
     }

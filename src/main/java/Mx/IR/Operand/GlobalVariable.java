@@ -31,7 +31,7 @@ public class GlobalVariable extends Operand {
                     + init.toString() + ", align 1";
         }
         else {
-            return "@" + name + " = dso_local global "
+            return "@" + name + " = global "
                     + ((PointerType) getType()).getBaseType().toString()
                     + " " + init.toString()
                     + ", align " + getType().size() / 8;

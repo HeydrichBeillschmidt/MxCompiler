@@ -66,7 +66,7 @@ public class Icmp extends IRInst {
     }
     @Override
     public String toString() {
-        return dst.toString() +" = icmp " + opName.toString() +" " + dst.getType().toString()
+        return dst.toString() +" = icmp " + opName.toString() +" " + type.toString()
                 + " " + op1.toString() + ", " + op2.toString();
     }
     @Override

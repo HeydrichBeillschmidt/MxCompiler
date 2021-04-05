@@ -11,6 +11,7 @@ import Mx.IR.TypeSystem.PointerType;
 import Mx.IR.TypeSystem.VoidType;
 import Mx.Utils.Errors.SyntaxError;
 import Mx.Utils.ExceptionHandler;
+import Mx.Utils.FuncNameDecorator;
 import Mx.Utils.FuncSymbolTable;
 
 import java.util.ArrayList;
@@ -130,11 +131,14 @@ public class Function {
     }
 
     public String declareToString() {
-        StringBuilder string = new StringBuilder("dso_local ");
+        StringBuilder string = new StringBuilder(/*"dso_local "*/);
         if (functionType.getReturnType()!=null) {
             string.append(functionType.getReturnType().toString());
         }
-        string.append(" @").append(name).append("(");
+        else string.append("void");
+        if (FuncNameDecorator.extractPureFuncName(name).equals("main"))
+            string.append(" @main(");
+        else string.append(" @").append(name).append("(");
         int it = parameterList.size();
         for (int i = 0; i < it; ++i) {
             Parameter parameter = parameterList.get(i);

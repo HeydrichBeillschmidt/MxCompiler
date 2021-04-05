@@ -1,4 +1,4 @@
-// Generated from C:/Days/Learning/SJTU/ACM/ComputerSystem/Compiler/Mx-Compiler-TS/src/main/resources\MxParser.g4 by ANTLR 4.9
+// Generated from C:/Days/Learning/SJTU/ACM/ComputerSystem/Compiler/MxCompiler/src/main/resources\MxParser.g4 by ANTLR 4.9.1
 package Mx.Generated;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

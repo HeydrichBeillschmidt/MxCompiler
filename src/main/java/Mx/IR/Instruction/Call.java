@@ -77,6 +77,7 @@ public class Call extends IRInst {
         if (callee.getFunctionType().getReturnType()!=null) {
             string.append(callee.getFunctionType().getReturnType().toString());
         }
+        else string.append("void");
         string.append(" @").append(callee.getName()).append("(");
         int it = parameterList.size();
         for (int i = 0; i < it; ++i) {

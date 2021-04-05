@@ -6,6 +6,7 @@ import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.Instruction.IRInst;
+import Mx.Utils.FuncNameDecorator;
 import Mx.Utils.FuncSymbolTable;
 
 import java.util.*;
@@ -73,6 +74,8 @@ public class ASMFunction {
     }
 
     public String getName() {
+        if (FuncNameDecorator.extractPureFuncName(name).equals("main"))
+            return "main";
         return name;
     }
     public int getFuncID() {

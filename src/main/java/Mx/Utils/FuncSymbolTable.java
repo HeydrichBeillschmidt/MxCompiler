@@ -25,16 +25,16 @@ public class FuncSymbolTable {
         if (symbolTable.containsKey(name)) {
             ArrayList<Object> arr = symbolTable.get(name);
             arr.add(obj);
-            objLabel += arr.size();
+            objLabel += "_" + arr.size();
+            if (obj instanceof IRBlock) ((IRBlock)obj).setName(name+objLabel);
+            else if (obj instanceof Parameter) ((Parameter)obj).setName(name+objLabel);
+            else ((Register)obj).setName(name+objLabel);
         }
         else {
             ArrayList<Object> arr = new ArrayList<>();
             arr.add(obj);
             symbolTable.put(name, arr);
         }
-        if (obj instanceof IRBlock) ((IRBlock)obj).setName(name+objLabel);
-        else if (obj instanceof Parameter) ((Parameter)obj).setName(name+objLabel);
-        else ((Register)obj).setName(name+objLabel);
     }
     public void putASMUnique(Object obj) {
         String name;

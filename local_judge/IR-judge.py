@@ -68,7 +68,7 @@ def main():
             print(color_red + "Compilation failed" + color_none)
             continue
 
-        if os.system('clang test.ll ../lib/builtin_function.ll -o test'):
+        if os.system('clang ../test.ll ../builtin/builtin.ll -o test'):
             print(color_red + "Clang compilation failed" + color_none)
             continue
 

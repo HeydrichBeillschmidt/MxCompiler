@@ -75,7 +75,7 @@ Try:                'try';
 Typedef:            'typedef';
 Typeid_:            'typeid';
 Typename_:          'typename';
-Union:              'union';
+//Union:              'union';
 Unsigned:           'unsigned';
 Using:              'using';
 Virtual:            'virtual';

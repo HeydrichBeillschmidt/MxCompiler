@@ -38,11 +38,10 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(IRModule node) {
-        writer.println("; ModuleID = 'code.mx'");
-        writer.println("source_filename = 'code.mx'");
-        writer.println("target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"");
-        writer.println("target triple = \"x86_64-pc-linux-gnu\"");
-        writer.println("");
+        //writer.println("; ModuleID = 'code.mx'");
+        //writer.println("target datalayout = \"e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128\"");
+        //writer.println("target triple = \"x86_64-pc-linux-gnu\"");
+        //writer.println("");
 
         if (node.getStructures().size() > 0) {
             for (var s: node.getStructures().values())
@@ -56,7 +55,7 @@ public class IRPrinter implements IRVisitor {
         }
         if (node.getFunctions().size() > 0) {
             for (var f: node.getFunctions().values()) {
-                writer.println("; Function Attrs: noinline nounwind optnone uwtable");
+                //writer.println("; Function Attrs: noinline nounwind optnone uwtable");
                 f.accept(this);
                 writer.println("");
             }

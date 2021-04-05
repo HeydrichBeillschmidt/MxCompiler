@@ -6,7 +6,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/main/resources/MxParser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\Days\Learning\SJTU\ACM\ComputerSystem\Compiler\Mx-Compiler-TS\src\main\java" />
+          <option name="outputDir" value="C:\Days\Learning\SJTU\ACM\ComputerSystem\Compiler\MxCompiler\src\main\java" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="Mx.Generated" />
