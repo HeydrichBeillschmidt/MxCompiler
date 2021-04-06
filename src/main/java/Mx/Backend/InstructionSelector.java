@@ -198,7 +198,7 @@ public class InstructionSelector implements IRVisitor {
         curFunc.compareAndSetStParmsSz(stackedParasSz);
 
         curBlock.addInst(new CALL(curBlock, callee));
-        if (node.isVoidCall()) {
+        if (!node.isVoidCall()) {
             curBlock.addInst(new MV(curBlock, resolveToVR(node.getDst()),
                     PhysicalReg.argVRs.get(0)) );
         }
