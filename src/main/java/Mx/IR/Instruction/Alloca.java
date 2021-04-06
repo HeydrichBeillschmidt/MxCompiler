@@ -14,11 +14,11 @@ public class Alloca extends IRInst {
         super(block);
         this.dst = dst;
         this.allocType = allocType;
-        dst.setDef(this);
 
         assert (new PointerType(allocType)).equals(dst.getType());
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -31,9 +31,10 @@ public class Alloca extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
     }
+
     @Override
     public String toString() {
         return dst.toString() + " = alloca " + allocType.toString()

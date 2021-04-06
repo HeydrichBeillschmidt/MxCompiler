@@ -1,14 +1,16 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
-import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
-import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.PointerType;
 import Mx.IR.TypeSystem.VoidType;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Ret extends IRInst {
     private final IRType retType;
@@ -21,12 +23,8 @@ public class Ret extends IRInst {
         if (!(retType instanceof VoidType)) {
             assert retType.equals(retValue.getType())
                     || (retValue instanceof Null && retType instanceof PointerType);
-            retValue.addUse(this);
-            addUse(retValue);
         }
-        else {
-            assert retValue==null;
-        }
+        else assert retValue==null;
     }
 
     public IRType getRetType() {
@@ -37,17 +35,18 @@ public class Ret extends IRInst {
     }
 
     @Override
-    public boolean needWriteBack() {
-        return false;
+    public void actuallyWritten() {
+        if (!(retType instanceof VoidType)) retValue.addUse(this);
     }
+
     @Override
-    public Register getDst() {
-        return IRBuilder.pseudoReg;
+    public Set<Operand> getUses() {
+        if (!(retType instanceof VoidType)) {
+            return new HashSet<>(Collections.singletonList(retValue));
+        }
+        return new HashSet<>();
     }
-    @Override
-    public boolean isTerminalInst() {
-        return true;
-    }
+
     @Override
     public String toString() {
         if (retType instanceof VoidType)

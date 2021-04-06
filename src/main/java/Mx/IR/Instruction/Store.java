@@ -1,12 +1,13 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
-import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
-import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.PointerType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class Store extends IRInst {
     private final Operand value;
@@ -16,10 +17,6 @@ public class Store extends IRInst {
         super(block);
         this.value = value;
         this.addr = addr;
-        value.addUse(this);
-        addr.addUse(this);
-        addUse(value);
-        addUse(addr);
 
         assert addr.getType() instanceof PointerType;
         assert ((PointerType)addr.getType()).getBaseType().equals(value.getType())
@@ -34,17 +31,19 @@ public class Store extends IRInst {
     }
 
     @Override
-    public boolean needWriteBack() {
-        return false;
+    public void actuallyWritten() {
+        value.addUse(this);
+        addr.addUse(this);
     }
+
     @Override
-    public Register getDst() {
-        return IRBuilder.pseudoReg;
+    public Set<Operand> getUses() {
+        Set<Operand> ans = new HashSet<>();
+        ans.add(value);
+        ans.add(addr);
+        return ans;
     }
-    @Override
-    public boolean isTerminalInst() {
-        return false;
-    }
+
     @Override
     public String toString() {
         return "store " + ((PointerType)addr.getType()).getBaseType().toString() + " "

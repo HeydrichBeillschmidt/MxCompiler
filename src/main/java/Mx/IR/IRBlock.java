@@ -46,12 +46,15 @@ public class IRBlock {
         this.tailInst = tailInst;
     }
     public void addInst(IRInst inst) {
+        boolean actuallyWritten = true;
         if (headInst==null) headInst = tailInst = inst;
-        else {
+        else if (tailInst.isNotTerminalInst()) {
             tailInst.setNextInst(inst);
             inst.setPrevInst(tailInst);
             tailInst = inst;
         }
+        else actuallyWritten = false;
+        if (actuallyWritten) inst.actuallyWritten();
     }
     public void addInstAtHead(IRInst inst) {
         if (headInst==null) headInst = tailInst = inst;
@@ -60,6 +63,7 @@ public class IRBlock {
             inst.setNextInst(headInst);
             headInst = inst;
         }
+        inst.actuallyWritten();
     }
     public void addPrevInst(IRInst target, IRInst instToAdd) {
         if (target.getPrevInst()==null) headInst = instToAdd;
@@ -69,6 +73,7 @@ public class IRBlock {
         }
         target.setPrevInst(instToAdd);
         instToAdd.setNextInst(target);
+        instToAdd.actuallyWritten();
     }
     public void addNextInst(IRInst target, IRInst instToAdd) {
         assert target.getNextInst()!=null;
@@ -76,6 +81,7 @@ public class IRBlock {
         instToAdd.setNextInst(target.getNextInst());
         target.setNextInst(instToAdd);
         instToAdd.setPrevInst(target);
+        instToAdd.actuallyWritten();
     }
     public ArrayList<IRInst> getAllInst() {
         ArrayList<IRInst> ans = new ArrayList<>();
@@ -87,7 +93,7 @@ public class IRBlock {
         return ans;
     }
     public boolean endWithNonTerminalInst() {
-        return tailInst == null || !tailInst.isTerminalInst();
+        return tailInst == null || tailInst.isNotTerminalInst();
     }
 
     public IRBlock getPrevBlock() {

@@ -6,6 +6,10 @@ import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class BitCast extends IRInst {
     private final Register dst;
     private final Operand src;
@@ -16,11 +20,9 @@ public class BitCast extends IRInst {
         this.dst = dst;
         this.src = src;
         this.castType = castType;
-        src.addUse(this);
-        dst.setDef(this);
-        addUse(src);
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -36,9 +38,16 @@ public class BitCast extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        src.addUse(this);
+        dst.setDef(this);
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        return new HashSet<>(Collections.singletonList(src));
+    }
+
     @Override
     public String toString() {
         return dst.toString() + " = bitcast "

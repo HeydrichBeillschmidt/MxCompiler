@@ -5,19 +5,19 @@ import Mx.IR.IRVisitor;
 import Mx.IR.Operand.*;
 import Mx.IR.TypeSystem.PointerType;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Move extends IRInst {
     private final Register dst;
     private final Operand src;
 
-    public Move(IRBlock block, Register dst, Operand src, boolean doAddUse) {
+    public Move(IRBlock block, Register dst, Operand src) {
         super(block);
         this.dst = dst;
         this.src = src;
-        if (doAddUse) {
-            src.addUse(this);
-            dst.setDef(this);
-        }
-        addUse(src);
+
         assert src.getType().equals(dst.getType())
                 || (dst.getType() instanceof PointerType
                     && src instanceof Null);
@@ -26,6 +26,7 @@ public class Move extends IRInst {
                 || src instanceof Constant;
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -38,9 +39,16 @@ public class Move extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
+        src.addUse(this);
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        return new HashSet<>(Collections.singletonList(src));
+    }
+
     @Override
     public String toString() {
         return "move " + dst.toString() + " " + src.toString();

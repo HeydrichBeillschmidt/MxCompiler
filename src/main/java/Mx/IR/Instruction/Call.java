@@ -10,6 +10,8 @@ import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.VoidType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Call extends IRInst {
     private final Register dst;
@@ -31,7 +33,6 @@ public class Call extends IRInst {
         else {
             assert dst.getType().equals(callee.getFunctionType().getReturnType());
             this.voidCall = false;
-            dst.setDef(this);
         }
         assert parameterList.size()==callee.getParameterList().size();
         for (int i = 0, it = parameterList.size(); i < it; ++i) {
@@ -40,12 +41,11 @@ public class Call extends IRInst {
             else {
                 assert parameterList.get(i).getType().equals(
                         callee.getFunctionType().getParameterTypes().get(i) );
-                parameterList.get(i).addUse(this);
             }
         }
-        addUses(parameterList);
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -64,9 +64,16 @@ public class Call extends IRInst {
         return dst!=IRBuilder.pseudoReg;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        if (!voidCall) dst.setDef(this);
+        parameterList.forEach(p -> p.addUse(this));
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        return new HashSet<>(parameterList);
+    }
+
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();

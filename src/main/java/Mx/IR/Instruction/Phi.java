@@ -8,6 +8,8 @@ import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Phi extends IRInst {
     private final Register dst;
@@ -20,9 +22,6 @@ public class Phi extends IRInst {
         this.dst = dst;
         this.values = values;
         this.blocks = blocks;
-        for (var v: values) v.addUse(this);
-        dst.setDef(this);
-        addUses(values);
 
         assert values.size() == blocks.size();
         for (var v: values) {
@@ -31,6 +30,7 @@ public class Phi extends IRInst {
         }
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -50,9 +50,16 @@ public class Phi extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
+        values.forEach(v -> v.addUse(this));
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        return new HashSet<>(values);
+    }
+
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder(dst.toString());

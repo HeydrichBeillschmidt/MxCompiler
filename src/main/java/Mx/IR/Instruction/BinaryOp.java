@@ -5,6 +5,9 @@ import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class BinaryOp extends IRInst {
     public enum BinaryOpName {
         add, sub, mul, sdiv, srem,
@@ -26,16 +29,12 @@ public class BinaryOp extends IRInst {
         this.commutable = opName==BinaryOpName.add || opName==BinaryOpName.mul
                 || opName==BinaryOpName.and || opName==BinaryOpName.or
                 || opName==BinaryOpName.xor;
-        op1.addUse(this);
-        op2.addUse(this);
-        dst.setDef(this);
-        addUse(op1);
-        addUse(op2);
 
         assert op1.getType().equals(dst.getType());
         assert op2.getType().equals(dst.getType());
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -57,9 +56,20 @@ public class BinaryOp extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
+        op1.addUse(this);
+        op2.addUse(this);
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        Set<Operand> ans = new HashSet<>();
+        ans.add(op1);
+        ans.add(op2);
+        return ans;
+    }
+
     @Override
     public String toString() {
         return dst.toString() + " = " + opName.toString() + " " + dst.getType().toString()

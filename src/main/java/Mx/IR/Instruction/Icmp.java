@@ -9,6 +9,9 @@ import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.IntegerType;
 import Mx.IR.TypeSystem.PointerType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Icmp extends IRInst {
     public enum IcmpOpName {
         eq, ne, slt, sge, sle, sgt
@@ -27,11 +30,6 @@ public class Icmp extends IRInst {
         this.type = type;
         this.op1 = op1;
         this.op2 = op2;
-        op1.addUse(this);
-        op2.addUse(this);
-        dst.setDef(this);
-        addUse(op1);
-        addUse(op2);
 
         assert type.equals(op1.getType())
                 || (op1 instanceof Null && type instanceof PointerType);
@@ -40,6 +38,7 @@ public class Icmp extends IRInst {
         assert dst.getType().equals(new IntegerType(1));
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -61,9 +60,20 @@ public class Icmp extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
+        op1.addUse(this);
+        op2.addUse(this);
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        Set<Operand> ans = new HashSet<>();
+        ans.add(op1);
+        ans.add(op2);
+        return ans;
+    }
+
     @Override
     public String toString() {
         return dst.toString() +" = icmp " + opName.toString() +" " + type.toString()

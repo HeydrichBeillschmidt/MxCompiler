@@ -1,10 +1,12 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
-import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
-import Mx.IR.Operand.Register;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Br extends IRInst {
     private final Operand condition;
@@ -17,8 +19,6 @@ public class Br extends IRInst {
         this.condition = condition;
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
-
-        linkControlFlow();
     }
 
     public Operand getCondition() {
@@ -31,30 +31,22 @@ public class Br extends IRInst {
         return thenBlock;
     }
 
-    public void linkControlFlow() {
-        getBlock().getSuccessors().add(thenBlock);
-        thenBlock.getPredecessors().add(getBlock());
+    @Override
+    public void actuallyWritten() {
+        getBlock().addSuccessor(thenBlock);
+        thenBlock.addPredecessor(getBlock());
         if (condition!=null) {
-            getBlock().getSuccessors().add(elseBlock);
-            elseBlock.getPredecessors().add(getBlock());
+            getBlock().addSuccessor(elseBlock);
+            elseBlock.addPredecessor(getBlock());
 
             condition.addUse(this);
-            addUse(condition);
         }
     }
+    @Override
+    public Set<Operand> getUses() {
+        return new HashSet<>(Collections.singletonList(condition));
+    }
 
-    @Override
-    public boolean needWriteBack() {
-        return false;
-    }
-    @Override
-    public Register getDst() {
-        return IRBuilder.pseudoReg;
-    }
-    @Override
-    public boolean isTerminalInst() {
-        return true;
-    }
     @Override
     public String toString() {
         if (condition!=null)

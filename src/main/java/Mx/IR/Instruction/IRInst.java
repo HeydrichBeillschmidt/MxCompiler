@@ -1,11 +1,11 @@
 package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
+import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,12 +14,8 @@ abstract public class IRInst {
     private IRInst prevInst;
     private IRInst nextInst;
 
-    private final Set<Operand> uses;
-
     public IRInst(IRBlock block) {
         this.block = block;
-
-        this.uses = new HashSet<>();
     }
 
     public IRBlock getBlock() {
@@ -47,20 +43,21 @@ abstract public class IRInst {
         else nextInst.setPrevInst(prevInst);
     }
 
+    public Register getDst() {
+        return IRBuilder.pseudoReg;
+    }
+    public boolean needWriteBack() {
+        return false;
+    }
+    public boolean isNotTerminalInst() {
+        return !(this instanceof Br || this instanceof Ret);
+    }
+    abstract public void actuallyWritten();
+
     public Set<Operand> getUses() {
-        return uses;
-    }
-    public void addUse(Operand opr) {
-        if (opr!=null)
-            uses.add(opr);
-    }
-    public void addUses(ArrayList<Operand> oprs) {
-        uses.addAll(oprs);
+        return new HashSet<>();
     }
 
-    abstract public Register getDst();
-    abstract public boolean needWriteBack();
-    abstract public boolean isTerminalInst();
     abstract public String toString();
     abstract public void accept(IRVisitor visitor);
 }

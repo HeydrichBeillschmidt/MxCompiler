@@ -8,6 +8,8 @@ import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GetElementPtr extends IRInst {
     private final Register dst;
@@ -21,17 +23,13 @@ public class GetElementPtr extends IRInst {
         this.dst = dst;
         this.ptr = ptr;
         this.index = index;
-        ptr.addUse(this);
-        for (var i: index) i.addUse(this);
-        dst.setDef(this);
-        addUse(ptr);
-        addUses(index);
 
         assert ptr.getType() instanceof PointerType;
         assert dst.getType() instanceof PointerType;
         this.type = ((PointerType)ptr.getType()).getBaseType();
     }
 
+    @Override
     public Register getDst() {
         return dst;
     }
@@ -50,9 +48,19 @@ public class GetElementPtr extends IRInst {
         return true;
     }
     @Override
-    public boolean isTerminalInst() {
-        return false;
+    public void actuallyWritten() {
+        dst.setDef(this);
+        ptr.addUse(this);
+        index.forEach(i -> i.addUse(this));
     }
+
+    @Override
+    public Set<Operand> getUses() {
+        Set<Operand> ans = new HashSet<>(index);
+        ans.add(ptr);
+        return ans;
+    }
+
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder(dst.toString());
