@@ -36,7 +36,7 @@ public class RegisterAllocator {
             return "Edge{" + u.toString() + ", " + v.toString() + "}";
         }
     }
-/*
+
     private Edge es1;
     private Edge es2;
     private int cnt = 0;
@@ -56,7 +56,7 @@ public class RegisterAllocator {
         }
         System.out.println(msg+": "+cnt);
     }
-*/
+
     //  Data structures.
     //  --  node work lists, sets, and stacks. always mutually disjoint.
     //      -- machine registers, preassigned a color
@@ -163,11 +163,7 @@ public class RegisterAllocator {
 
         stackLen += f.getStackedParmsSize();
         if (stackLen % 16 != 0) stackLen = (stackLen/16+1) * 16;
-        for (var b: f.getBlocks().values()) {
-            for (var i: b.getAllInst()) {
-                i.countStackLen(stackLen);
-            }
-        }
+        f.countStackLen(stackLen);
         f.removeRedundantMV();
     }
 

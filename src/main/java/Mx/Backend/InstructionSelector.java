@@ -58,6 +58,7 @@ public class InstructionSelector implements IRVisitor {
         }
         for (var f: node.getFunctions().values()) {
             String name = f.getName();
+            if (name.equals("___init__$$YGXXZ")) continue;
             ASMFunction af = new ASMFunction(name,
                     asmModule.getFunctions().size(), f);
             asmModule.getFunctions().put(name, af);
@@ -70,6 +71,7 @@ public class InstructionSelector implements IRVisitor {
     @Override
     public void visit(Function node) {
         String funcName = node.getName();
+        if (funcName.equals("___init__$$YGXXZ")) return;
         curFunc = asmModule.getFunction(funcName);
         curBlock = curFunc.getEntranceBlock();
 
@@ -177,6 +179,9 @@ public class InstructionSelector implements IRVisitor {
 
     @Override
     public void visit(Call node) {
+        ASMFunction callee = asmModule.getFunction(node.getCallee().getName());
+        if (callee==null) return;
+
         // move first 8 parameters to a0-a7, then save the rest
         ArrayList<Operand> irParameters = node.getParameterList();
         for (int i = 0, it = Integer.min(8, irParameters.size()); i < it; ++i) {
@@ -192,7 +197,6 @@ public class InstructionSelector implements IRVisitor {
         }
         curFunc.compareAndSetStParmsSz(stackedParasSz);
 
-        ASMFunction callee = asmModule.getFunction(node.getCallee().getName());
         curBlock.addInst(new CALL(curBlock, callee));
         if (node.isVoidCall()) {
             curBlock.addInst(new MV(curBlock, resolveToVR(node.getDst()),
@@ -349,7 +353,7 @@ public class InstructionSelector implements IRVisitor {
             curBlock.addInst(new MV(curBlock, vr, savedVR));
         }
         savedVR = curFunc.getSymbol(PhysicalReg.raVR.getName() + ".save");
-        curBlock.addInst(new MV(curBlock, savedVR, PhysicalReg.raVR));
+        curBlock.addInst(new MV(curBlock, PhysicalReg.raVR, savedVR));
 
         curBlock.addInst(new IAL(curBlock, PhysicalReg.spVR,
                 IAL.OpName.addi, PhysicalReg.spVR, new StackPtr(0) ) );

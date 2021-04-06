@@ -188,7 +188,8 @@ public class ASMFunction {
     public void performLvnAnalysis() {
         for (var b: blocks.values()) b.solveUsesAndDefs();
 
-        ArrayList<ASMBlock> rOrder = getReversedDFSOrder();
+        ArrayList<ASMBlock> rOrder = getDFSOrder();
+        Collections.reverse(rOrder);
         boolean changed = true;
         while (changed) {
             changed = false;
@@ -208,6 +209,13 @@ public class ASMFunction {
         }
     }
 
+    public void countStackLen(int stackLen) {
+        for (var b: blocks.values()) {
+            for (var i: b.getAllInst()) {
+                i.countStackLen(stackLen);
+            }
+        }
+    }
     public void removeRedundantMV() {
         for (var b: blocks.values()) {
             for (var i: b.getAllInst()) {

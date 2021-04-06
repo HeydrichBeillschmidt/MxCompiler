@@ -113,7 +113,7 @@ def main():
                 os.system('mv ../test.s ../test.ll')
                 os.system(llc_cmd + ' --march=riscv32 -mattr=+m -o ../test.s ../test.ll')
 
-            if os.system('%s --oj-mode < test.in 1>ravel.out 2>/dev/null'
+            if os.system('%s --input-file=test.in --output-file=test.out output.s builtin.s  < test.in'
                          % ravel_path):
                 print(color_red + "Runtime error" + color_none)
                 continue

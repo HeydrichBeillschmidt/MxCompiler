@@ -102,7 +102,7 @@ public class VirtualReg extends Reg {
 
     @Override
     public String emitCode() {
-        assert color!=null;
-        return color.getName();
+        if (color!=null) return color.getName();
+        return getName();
     }
 }

@@ -40,24 +40,24 @@ public class CodeEmitter implements ASMVisitor {
 
     @Override
     public void visit(ASMModule node) {
-        writer.println("\t.text");
+        writer.println("\t.text\n");
         node.getFunctions().values().forEach(f -> f.accept(this));
+        writer.println("\n\t.section\t.sdata,\"aw\",@progbits");
         node.getGlobalVars().values().forEach(g -> g.accept(this));
     }
 
     @Override
     public void visit(ASMFunction node) {
-        writer.print("\t.global\t" + node.getName());
+        writer.print("\t.globl\t" + node.getName());
         writer.print(" ".repeat(Integer.max(1, 24-node.getName().length())));
-        writer.println("# -- Begin function" + node.getName());
+        writer.println("# -- Begin function " + node.getName());
         writer.println("\t.p2align\t2");
-        writer.println("\t.type\t" + node.getName() + ",@function");
         writer.print(node.getName() + ":");
         writer.print(" ".repeat(Integer.max(1, 39-node.getName().length())));
         writer.println("# @" + node.getName());
         node.getLiteralOrder().forEach(b -> b.accept(this));
         writer.print(" ".repeat(40));
-        writer.println("# -- End function");
+        writer.println("# -- End function\n");
     }
 
     @Override
@@ -72,19 +72,13 @@ public class CodeEmitter implements ASMVisitor {
 
     @Override
     public void visit(GlobalVar node) {
-        writer.println("\t.type\t" + node.getName() + ",@object");
-        if (node.isString()) {
-            writer.println("\t.section\t.sdata");
-            writer.println("\t.global\t" + node.getName());
-        }
-        else {
-            writer.println("\t.section\t.bss");
-            writer.println("\t.global\t" + node.getName());
+        writer.println("\t.globl\t" + node.getName());
+        if (!node.isString()) {
             writer.println("\t.p2align\t2");
         }
         writer.println(node.getName() + ":");
         writer.println(node.emitCode());
-        writer.println("\t.size\t" + node.getName() + ", " + node.getSize() + "\n");
+        writer.println("");
     }
 
     @Override
