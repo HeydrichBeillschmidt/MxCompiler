@@ -58,7 +58,6 @@ public class InstructionSelector implements IRVisitor {
         }
         for (var f: node.getFunctions().values()) {
             String name = f.getName();
-            if (name.equals("___init__$$YGXXZ")) continue;
             ASMFunction af = new ASMFunction(name,
                     asmModule.getFunctions().size(), f);
             asmModule.getFunctions().put(name, af);
@@ -71,7 +70,6 @@ public class InstructionSelector implements IRVisitor {
     @Override
     public void visit(Function node) {
         String funcName = node.getName();
-        if (funcName.equals("___init__$$YGXXZ")) return;
         curFunc = asmModule.getFunction(funcName);
         curBlock = curFunc.getEntranceBlock();
 
