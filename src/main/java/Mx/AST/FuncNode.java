@@ -1,5 +1,6 @@
 package Mx.AST;
 
+import Mx.ASM.Operand.Reg;
 import Mx.AST.Specifiers.*;
 import Mx.AST.Statements.CompoundStmtNode;
 import Mx.Entities.*;
@@ -7,7 +8,11 @@ import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
 import Mx.IR.Instruction.Alloca;
+import Mx.IR.Instruction.BitCast;
+import Mx.IR.Instruction.Call;
 import Mx.IR.Instruction.Store;
+import Mx.IR.Operand.ConstInt;
+import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
@@ -90,7 +95,7 @@ public class FuncNode extends DeclarationNode {
             parameterList.add(new Parameter(module.getIRType(astTypeTable.getType(
                     ep.getSpecifier() ) ), ep.getName()));
         }
-        Function func = new Function(retType, decoratedName, parameterList);
+        Function func = new Function(module, retType, decoratedName, parameterList);
         // parameter allocation
         IRBlock curBlock = func.getEntranceBlock();
         int offset = 0;
@@ -101,7 +106,15 @@ public class FuncNode extends DeclarationNode {
                     "this.addr");
             func.setClassPtr(ptrThis);
             func.addSymbol(ptrThis);
-            curBlock.addInst(new Alloca(curBlock, ptrThis, parThis.getType()));
+            //eliminate alloca
+            Register dst = new Register(IRModule.stringT, "malloc");
+            func.addSymbol(dst);
+            ArrayList<Operand> parameters = new ArrayList<>();
+            parameters.add(new ConstInt(parThis.getType().size(), 32));
+            Function mallocFunc = module.getExternalFunction("malloc");
+            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
+            curBlock.addInst(new BitCast(curBlock, ptrThis, dst, new PointerType(parThis.getType())));
+            //curBlock.addInst(new Alloca(curBlock, ptrThis, parThis.getType()));
             curBlock.addInst(new Store(curBlock, parThis, ptrThis));
         }
         for (int i = 0, it = entityParameterList.size(); i < it; ++i) {
@@ -109,7 +122,15 @@ public class FuncNode extends DeclarationNode {
             Register ptrTmp = new Register(new PointerType(parTmp.getType()),
                     parTmp.getName() + ".addr");
             func.addSymbol(ptrTmp);
-            curBlock.addInst(new Alloca(curBlock, ptrTmp, parTmp.getType()));
+            //eliminate alloca
+            Register dst = new Register(IRModule.stringT, "malloc");
+            func.addSymbol(dst);
+            ArrayList<Operand> parameters = new ArrayList<>();
+            parameters.add(new ConstInt(parTmp.getType().size(), 32));
+            Function mallocFunc = module.getExternalFunction("malloc");
+            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
+            curBlock.addInst(new BitCast(curBlock, ptrTmp, dst, new PointerType(parTmp.getType())));
+            //curBlock.addInst(new Alloca(curBlock, ptrTmp, parTmp.getType()));
             curBlock.addInst(new Store(curBlock, parTmp, ptrTmp));
             entityParameterList.get(i).setAllocatedAddr(ptrTmp);
         }

@@ -36,7 +36,7 @@ public class IRBuilder implements ASTVisitor {
         this.globalScope = globalScope;
         this.astTypeTable = astTypeTable;
         this.exceptionHandler = exceptionHandler;
-        this.initializer = new Function(new VoidType(),
+        this.initializer = new Function(module, new VoidType(),
                 "___init__$$YGXXZ", new ArrayList<>());
         module.addFunction(initializer);
         curBlock = null;
@@ -508,8 +508,16 @@ public class IRBuilder implements ASTVisitor {
             // store arrayHead somewhere;
             Register ptrTmp = new Register(new PointerType(irType), "ptrIntoArray");
             curFunc.addSymbol(ptrTmp);
-            curFunc.getEntranceBlock().addInstAtHead(new Alloca(
-                    curFunc.getEntranceBlock(), ptrTmp, irType) );
+            //eliminate alloca
+            dst = new Register(IRModule.stringT, "malloc");
+            curFunc.addSymbol(dst);
+            parameters = new ArrayList<>();
+            parameters.add(new ConstInt(irType.size(), 32));
+            curFunc.getEntranceBlock().addInstAtHead(new BitCast(curFunc.getEntranceBlock(),
+                    ptrTmp, dst, new PointerType(irType)));
+            curFunc.getEntranceBlock().addInstAtHead(new Call(curFunc.getEntranceBlock(),
+                    dst, func, parameters));
+            //curFunc.getEntranceBlock().addInstAtHead(new Alloca(curFunc.getEntranceBlock(), ptrTmp, irType) );
             curBlock.addInst(new Store(curBlock, arrayHeadPtr, ptrTmp));
 
             // iteratively malloc lower dimensions
@@ -946,7 +954,15 @@ public class IRBuilder implements ASTVisitor {
             // to avoid phi
             Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
             curFunc.addSymbol(tmp);
-            curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
+            //eliminate alloca
+            Register dst = new Register(IRModule.stringT, "malloc");
+            curFunc.addSymbol(dst);
+            ArrayList<Operand> parameters = new ArrayList<>();
+            parameters.add(new ConstInt(IRModule.boolT.size(), 32));
+            Function mallocFunc = module.getExternalFunction("malloc");
+            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
+            curBlock.addInst(new BitCast(curBlock, tmp, dst, new PointerType(IRModule.boolT)));
+            //curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
             curBlock.addInst(new Store(curBlock, value, tmp));
 
             //ArrayList<Operand> values = new ArrayList<>();
@@ -988,7 +1004,7 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addInst(new Br(curBlock, null, endBlock, null));
 
             curBlock = endBlock;
-            Register dst = new Register(IRModule.boolT, "logical_and");
+            /*Register*/ dst = new Register(IRModule.boolT, "logical_and");
             curFunc.addSymbol(dst);
             //curBlock.addInst(new Phi(curBlock, dst, values, blocks));
             // to avoid phi
@@ -1013,7 +1029,15 @@ public class IRBuilder implements ASTVisitor {
             // to avoid phi
             Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
             curFunc.addSymbol(tmp);
-            curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
+            //eliminate alloca
+            Register dst = new Register(IRModule.stringT, "malloc");
+            curFunc.addSymbol(dst);
+            ArrayList<Operand> parameters = new ArrayList<>();
+            parameters.add(new ConstInt(IRModule.boolT.size(), 32));
+            Function mallocFunc = module.getExternalFunction("malloc");
+            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
+            curBlock.addInst(new BitCast(curBlock, tmp, dst, new PointerType(IRModule.boolT)));
+            //curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
             curBlock.addInst(new Store(curBlock, value, tmp));
 
             //ArrayList<Operand> values = new ArrayList<>();
@@ -1055,7 +1079,7 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addInst(new Br(curBlock, null, endBlock, null));
 
             curBlock = endBlock;
-            Register dst = new Register(IRModule.boolT, "logical_or");
+            /*Register*/ dst = new Register(IRModule.boolT, "logical_or");
             curFunc.addSymbol(dst);
             //curBlock.addInst(new Phi(curBlock, dst, values, blocks));
             // to avoid phi
@@ -1449,9 +1473,7 @@ public class IRBuilder implements ASTVisitor {
                         init = astType.getDefaultValue();
                     }
                 }
-                else {
-                    init = astType.getDefaultValue();
-                }
+                else init = astType.getDefaultValue();
                 globalVar.setInit(init);
                 varEntity.setAllocatedAddr(globalVar);
                 module.addGlobalVariable(globalVar);
@@ -1461,7 +1483,16 @@ public class IRBuilder implements ASTVisitor {
                 curFunc.addSymbol(ptrTmp);
                 varEntity.setAllocatedAddr(ptrTmp);
                 IRBlock entranceBlock = curFunc.getEntranceBlock();
-                entranceBlock.addInstAtHead(new Alloca(entranceBlock, ptrTmp, irType));
+                //eliminate alloca
+                Register dst = new Register(IRModule.stringT, "malloc");
+                curFunc.addSymbol(dst);
+                ArrayList<Operand> parameters = new ArrayList<>();
+                parameters.add(new ConstInt(irType.size(), 32));
+                Function mallocFunc = module.getExternalFunction("malloc");
+                entranceBlock.addInstAtHead(new BitCast(entranceBlock, ptrTmp, dst,
+                        new PointerType(irType) ) );
+                entranceBlock.addInstAtHead(new Call(entranceBlock, dst, mallocFunc, parameters));
+                //entranceBlock.addInstAtHead(new Alloca(entranceBlock, ptrTmp, irType));
                 if (node.hasInitializer()) {
                     node.getInitializer().accept(this);
                     Operand init = node.getInitializer().getResult();

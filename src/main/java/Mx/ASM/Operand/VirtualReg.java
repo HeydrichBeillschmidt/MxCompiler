@@ -21,10 +21,6 @@ public class VirtualReg extends Reg {
     // todo: calculate spill cost after performing loop analysis
     private double spillCost;
 
-    // before opt Allocas still block in
-    // VRs as Rds of Allocas must be spilled to stack
-    private boolean mustBeSpilled;
-
     public VirtualReg(int size, String name) {
         super(name);
 
@@ -38,8 +34,6 @@ public class VirtualReg extends Reg {
         color = null;
         colorFixed = false;
         spillCost = 0;
-
-        mustBeSpilled = false;
     }
 
     public int getSize() {
@@ -104,13 +98,6 @@ public class VirtualReg extends Reg {
         degree = 0x3f3f3f3f;
         moveList.clear();
         alias = null;
-    }
-
-    public boolean mustBeSpilled() {
-        return mustBeSpilled;
-    }
-    public void forceSpilled() {
-        mustBeSpilled = true;
     }
 
     @Override

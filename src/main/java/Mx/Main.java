@@ -35,7 +35,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/codegen/e8.mx";
+        //String filename = "testcases/codegen/t8.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -113,8 +113,14 @@ public class Main {
 
             ASMModule asmModule = instructionSelector.getAsmModule();
 
+            //CodeEmitter naiveEmitter = new CodeEmitter("naive.s");
+            //naiveEmitter.run(asmModule);
+
             RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
             registerAllocator.run();
+
+            Peephole peephole = new Peephole(asmModule);
+            peephole.run();
 
             CodeEmitter codeEmitter = new CodeEmitter("output.s");
             codeEmitter.run(asmModule);

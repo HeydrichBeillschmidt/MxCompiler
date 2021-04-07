@@ -46,11 +46,9 @@ public class ASMFunction {
         }
         for (var b: irBlocks) {
             ASMBlock block = blocks.get(b.getName());
-            ArrayList<ASMBlock> predecessors = block.getPredecessors();
-            ArrayList<ASMBlock> successors = block.getSuccessors();
 
-            for (var p: b.getPredecessors()) predecessors.add(blocks.get(p.getName()));
-            for (var s: b.getSuccessors()) successors.add(blocks.get(s.getName()));
+            for (var p: b.getPredecessors()) block.addPredecessor(blocks.get(p.getName()));
+            for (var s: b.getSuccessors()) block.addSuccessor(blocks.get(s.getName()));
         }
         this.entranceBlock = blocks.get(irBlocks.get(0).getName());
         this.exitBlock = blocks.get(irBlocks.get(irBlocks.size()-1).getName());

@@ -118,10 +118,7 @@ public class InstructionSelector implements IRVisitor {
 
     @Override
     public void visit(Alloca node) {
-        // before opt Allocas still block in
-        // VRs as Rds of Allocas must be spilled to stack
-        VirtualReg rd = resolveToVR(node.getDst());
-        rd.forceSpilled();
+
     }
 
     @Override

@@ -1,8 +1,8 @@
 package Mx.IR;
 
-import Mx.IR.Instruction.Alloca;
-import Mx.IR.Instruction.Load;
-import Mx.IR.Instruction.Ret;
+import Mx.IR.Instruction.*;
+import Mx.IR.Operand.ConstInt;
+import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.FunctionType;
@@ -17,6 +17,8 @@ import Mx.Utils.FuncSymbolTable;
 import java.util.ArrayList;
 
 public class Function {
+    private final IRModule module;
+
     private final String name;
     private final FunctionType functionType;
     private final ArrayList<Parameter> parameterList;
@@ -28,7 +30,8 @@ public class Function {
     private final FuncSymbolTable symbolTable;
     private boolean sideEffect;
 
-    public Function(IRType retType, String name, ArrayList<Parameter> parameterList) {
+    public Function(IRModule module, IRType retType, String name, ArrayList<Parameter> parameterList) {
+        this.module = module;
         this.name = name;
         this.symbolTable = new FuncSymbolTable();
         this.parameterList = parameterList;
@@ -52,7 +55,15 @@ public class Function {
         else {
             retVal = new Register(new PointerType(retType),
                     "retval");
-            entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
+            //eliminate alloca
+            Register dst = new Register(IRModule.stringT, "malloc");
+            addSymbol(dst);
+            ArrayList<Operand> parameters = new ArrayList<>();
+            parameters.add(new ConstInt(retType.size(), 32));
+            Function mallocFunc = module.getExternalFunction("malloc");
+            entranceBlock.addInst(new Call(entranceBlock, dst, mallocFunc, parameters));
+            entranceBlock.addInst(new BitCast(entranceBlock, retVal, dst, new PointerType(retType)));
+            //entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
             Register returnValue = new Register(retType, "returnValue");
             returnBlock.addInst(new Load(returnBlock, returnValue, retType, retVal));
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));
@@ -61,6 +72,9 @@ public class Function {
         }
     }
 
+    public IRModule getModule() {
+        return module;
+    }
     public String getName() {
         return name;
     }
