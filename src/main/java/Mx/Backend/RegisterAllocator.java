@@ -204,22 +204,39 @@ public class RegisterAllocator {
         for (var b: curFunc.getBlocks().values()) {
             Set<VirtualReg> curLive = b.getLiveOut();
             for (ASMInst i = b.getTailInst(); i != null; i = i.getPrevInst()) {
+                Set<VirtualReg> spilledUses = getSpilledUses(i);
                 if (i instanceof MV) {
                     curLive.removeAll(i.getUses());
-                    Set<VirtualReg> toMove = i.getUses();
+                    Set<VirtualReg> toMove = getActualUses(i, spilledUses);
                     toMove.addAll(i.getDefs());
                     for (var n: toMove) n.getMoveList().add((MV) i);
                     worklistMoves.add((MV) i);
                 }
+                else curLive.removeAll(spilledUses);
                 curLive.add(PhysicalReg.zeroVR);
                 curLive.addAll(i.getDefs());
                 for (var d: i.getDefs()) {
                     for (var l : curLive) addEdge(l, d);
                 }
                 curLive.removeAll(i.getDefs());
-                curLive.addAll(i.getUses());
+                curLive.addAll(getActualUses(i, spilledUses));
+
+                initial.removeAll(spilledUses);
+                spilledNodes.addAll(spilledUses);
             }
         }
+    }
+    // before opt Allocas still block in
+    // VRs as Rds of Allocas must be spilled to stack
+    private Set<VirtualReg> getActualUses(ASMInst i, Set<VirtualReg> spilledUses) {
+        Set<VirtualReg> ans = i.getUses();
+        ans.removeAll(spilledUses);
+        return ans;
+    }
+    private Set<VirtualReg> getSpilledUses(ASMInst i) {
+        Set<VirtualReg> ans = new HashSet<>();
+        i.getUses().forEach(u -> {if (u.mustBeSpilled()) ans.add(u);});
+        return ans;
     }
     // add edge to the interference graph
     private void addEdge(VirtualReg u, VirtualReg v) {
