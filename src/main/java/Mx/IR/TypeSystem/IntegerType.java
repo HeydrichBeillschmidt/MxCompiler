@@ -10,10 +10,10 @@ public class IntegerType extends IRType {
 
     @Override
     public int size() {
-        return Math.max(size, 8);
+        return Math.max(size, 1);
     }
     @Override
     public String toString() {
-        return "i" + size;
+        return "i" + size*8;
     }
 }

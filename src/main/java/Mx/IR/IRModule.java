@@ -5,6 +5,7 @@ import Mx.IR.Operand.ConstString;
 import Mx.IR.Operand.GlobalVariable;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.TypeSystem.*;
+import Mx.IR.TypeSystem.BoolType;
 import Mx.IR.TypeSystem.VoidType;
 import Mx.Types.*;
 import Mx.Types.ArrayType;
@@ -21,9 +22,9 @@ public class IRModule {
     private final Map<String, GlobalVariable> globalVariables;
     private final Map<String, GlobalVariable> constStrings;
     private final Map<String, StructureType> structures;
-    public static IRType stringT = new PointerType(new IntegerType(8)),
-            charT = new IntegerType(8), voidT = new VoidType(),
-            int32T = new IntegerType(32), boolT = new IntegerType(1);
+    public static IRType stringT = new PointerType(new IntegerType(1)),
+            charT = new IntegerType(1), voidT = new VoidType(),
+            int32T = new IntegerType(4), boolT = new BoolType();
 
     public IRModule(TypeTable astTypeTable) {
         this.externalFunctions = new HashMap<>();
@@ -274,7 +275,7 @@ public class IRModule {
     }
     public IRType getIRType(Type ty) {
         if (ty instanceof IntType) return int32T;
-        else if (ty instanceof BoolType) return boolT;
+        else if (ty instanceof Mx.Types.BoolType) return boolT;
         else if (ty instanceof StringType) return stringT;
         else if (ty instanceof Mx.Types.VoidType) return voidT;
         else if (ty instanceof Mx.Types.ArrayType) {

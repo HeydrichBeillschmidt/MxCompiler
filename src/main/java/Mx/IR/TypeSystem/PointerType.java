@@ -20,7 +20,7 @@ public class PointerType extends IRType {
 
     @Override
     public int size() {
-        return 32;
+        return 4;
     }
     @Override
     public String toString() {

@@ -9,7 +9,7 @@ public class ConstString extends Constant {
 
     public ConstString(String value) {
         super(new PointerType(new ArrayType(value.length(),
-                new IntegerType(8)) ) );
+                new IntegerType(1)) ) );
         this.value = value;
     }
 

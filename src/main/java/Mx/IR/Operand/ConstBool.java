@@ -1,12 +1,12 @@
 package Mx.IR.Operand;
 
-import Mx.IR.TypeSystem.IntegerType;
+import Mx.IR.TypeSystem.BoolType;
 
 public class ConstBool extends Constant {
     private final boolean value;
 
     public ConstBool(boolean value) {
-        super(new IntegerType(1));
+        super(new BoolType());
         this.value = value;
     }
 

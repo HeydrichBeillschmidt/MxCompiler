@@ -33,7 +33,7 @@ public class InstructionSelector implements IRVisitor {
     public void visit(IRModule node) {
         for (var gv: node.getGlobalVariables().values()) {
             GlobalVar asmGv = new GlobalVar(gv.getName(),
-                    ((PointerType)gv.getType()).getBaseType().size()/8);
+                    ((PointerType)gv.getType()).getBaseType().size());
             asmModule.getGlobalVars().put(gv.getName(), asmGv);
 
             IRType type = ((PointerType)gv.getType()).getBaseType();
@@ -99,7 +99,7 @@ public class InstructionSelector implements IRVisitor {
             Parameter p = node.getParameterList().get(i);
             VirtualReg vr = curFunc.getParameters().get(i);
             StackPtr stackPtr = new StackPtr(paraOffset);
-            curBlock.addInst(new LD(curBlock, p.getType().size()/8,
+            curBlock.addInst(new LD(curBlock, p.getType().size(),
                     vr, new Address(PhysicalReg.spVR, stackPtr)) );
             paraOffset += 4;
         }
@@ -189,7 +189,7 @@ public class InstructionSelector implements IRVisitor {
         int stackedParasSz = 0;
         for (int i = 8, it = irParameters.size(); i < it; ++i) {
             Operand p = irParameters.get(i);
-            curBlock.addInst(new ST(curBlock, p.getType().size()/8, resolveToVR(p),
+            curBlock.addInst(new ST(curBlock, p.getType().size(), resolveToVR(p),
                     new Address(PhysicalReg.spVR, new Immediate(stackedParasSz)) ) );
             stackedParasSz += 4;
         }
@@ -211,18 +211,18 @@ public class InstructionSelector implements IRVisitor {
         }
         else if (node.getIndex().size()==1) { // array
             Operand idx = node.getIndex().get(0);
-            int typeSize = node.getType().size() / 8;
+            int typeSize = node.getType().size();
             if (idx instanceof Constant) {
                 int offset = ((ConstInt)idx).getValue() * typeSize;
                 addBinaryInst(rd, BinaryOp.BinaryOpName.add, node.getPtr(),
-                        new ConstInt(offset, 32), true);
+                        new ConstInt(offset, 4), true);
             }
             else {
                 VirtualReg ptr = resolveToVR(node.getPtr());
                 VirtualReg rTmp = new VirtualReg(4, "mul");
                 curFunc.addSymbolMultiple(rTmp);
                 addBinaryInst(rTmp, BinaryOp.BinaryOpName.mul,
-                        idx, new ConstInt(typeSize, 32), true);
+                        idx, new ConstInt(typeSize, 4), true);
                 curBlock.addInst(new RAL(curBlock, rd, RAL.OpName.add, ptr, rTmp));
             }
         }
@@ -235,10 +235,10 @@ public class InstructionSelector implements IRVisitor {
                 StructureType structT = (StructureType)
                         ((PointerType)node.getPtr().getType()).getBaseType();
                 int idx = ((ConstInt)node.getIndex().get(1)).getValue();
-                int offset = structT.calcOffset(idx)/8;
+                int offset = structT.calcOffset(idx);
                 if (structT.getMemberTypes().get(idx) instanceof PointerType) {
                     addBinaryInst(rd, BinaryOp.BinaryOpName.add, node.getPtr(),
-                            new ConstInt(offset, 32), true);
+                            new ConstInt(offset, 4), true);
                 }
                 else {
                     VirtualReg ptr = resolveToVR(node.getPtr());
@@ -301,7 +301,7 @@ public class InstructionSelector implements IRVisitor {
     public void visit(Load node) {
         VirtualReg rd = resolveToVR(node.getDst());
         VirtualReg addr = resolveToVR(node.getAddr());
-        int size = node.getLoadType().size() / 8;
+        int size = node.getLoadType().size();
         if (addr instanceof GlobalVar) {
             VirtualReg lui = new VirtualReg(4, "lui");
             curFunc.addSymbolMultiple(lui);
@@ -363,7 +363,7 @@ public class InstructionSelector implements IRVisitor {
     public void visit(Store node) {
         VirtualReg addr = resolveToVR(node.getAddr());
         VirtualReg value = resolveToVR(node.getValue());
-        int size = node.getValue().getType().size() / 8;
+        int size = node.getValue().getType().size();
         if (addr instanceof GlobalVar) {
             VirtualReg lui = new VirtualReg(4, "lui");
             curFunc.addSymbolMultiple(lui);

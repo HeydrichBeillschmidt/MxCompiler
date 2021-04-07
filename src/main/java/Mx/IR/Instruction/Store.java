@@ -49,7 +49,7 @@ public class Store extends IRInst {
         return "store " + ((PointerType)addr.getType()).getBaseType().toString() + " "
                 + value.toString() + ", "
                 + addr.getType().toString() + " " + addr.toString()
-                + ", align " + value.getType().size()/8;
+                + ", align " + value.getType().size();
     }
     @Override
     public void accept(IRVisitor visitor) {

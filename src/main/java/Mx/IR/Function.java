@@ -59,7 +59,7 @@ public class Function {
             Register dst = new Register(IRModule.stringT, "malloc");
             addSymbol(dst);
             ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(retType.size(), 32));
+            parameters.add(new ConstInt(retType.size(), 4));
             Function mallocFunc = module.getExternalFunction("malloc");
             entranceBlock.addInst(new Call(entranceBlock, dst, mallocFunc, parameters));
             entranceBlock.addInst(new BitCast(entranceBlock, retVal, dst, new PointerType(retType)));

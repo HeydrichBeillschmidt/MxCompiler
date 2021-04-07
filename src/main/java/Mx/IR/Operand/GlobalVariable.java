@@ -34,7 +34,7 @@ public class GlobalVariable extends Operand {
             return "@" + name + " = global "
                     + ((PointerType) getType()).getBaseType().toString()
                     + " " + init.toString()
-                    + ", align " + getType().size() / 8;
+                    + ", align " + getType().size();
         }
     }
 

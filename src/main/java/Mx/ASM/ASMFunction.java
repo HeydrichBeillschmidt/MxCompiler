@@ -55,14 +55,14 @@ public class ASMFunction {
 
         // deal with regs
         for (var p: irFunc.getParameterList()) {
-            VirtualReg vr = new VirtualReg(p.getType().size()/8, p.getName());
+            VirtualReg vr = new VirtualReg(p.getType().size(), p.getName());
             parameters.add(vr);
             symbolTable.putASMUnique(vr);
         }
         for (var b: irBlocks) {
             for (IRInst instIte = b.getHeadInst(); instIte!=null; instIte = instIte.getNextInst()) {
                 if (instIte.needWriteBack()) {
-                    int dstSize = instIte.getDst().getType().size()/8;
+                    int dstSize = instIte.getDst().getType().size();
                     String dstName = instIte.getDst().getName();
                     if (!symbolTable.contains(dstName))
                         symbolTable.putASMUnique(new VirtualReg(dstSize, dstName));

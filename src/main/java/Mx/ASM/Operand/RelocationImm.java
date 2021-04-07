@@ -1,8 +1,8 @@
 package Mx.ASM.Operand;
 
 public class RelocationImm extends Immediate {
-    private boolean atHi;
-    private GlobalVar relocated;
+    private final boolean atHi;
+    private final GlobalVar relocated;
 
     public RelocationImm(GlobalVar relocated, boolean atHi) {
         super(0);
