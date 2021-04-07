@@ -1,9 +1,3 @@
-@r = global i32 0, align 4
-@c = global i32 0, align 4
-@i = global i32 0, align 4
-@j = global i32 0, align 4
-@n = global i32 0, align 4
-
 define void @___init__$$YGXXZ() {
 entry:
 	br label %return
@@ -12,26 +6,66 @@ return:
 	ret void
 }
 
-define i32 @_abs$$YGHH$Z(i32 %c) {
+define i32 @_qpow$$YGHHHH$Z(i32 %a, i32 %p, i32 %mod) {
 entry:
+	%malloc_6 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%y.addr = bitcast i8* %malloc_6 to i32*
+	%malloc_5 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%t.addr = bitcast i8* %malloc_5 to i32*
 	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
 	%retval = bitcast i8* %malloc to i32*
 	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 4)
-	%c.addr = bitcast i8* %malloc_2 to i32*
-	store i32 %c, i32* %c.addr, align 4
-	%c_2 = load i32, i32* %c.addr, align 4
-	%sgt = icmp sgt i32 %c_2, 0
-	br i1 %sgt, label %if.then, label %if.end
+	%a.addr = bitcast i8* %malloc_2 to i32*
+	store i32 %a, i32* %a.addr, align 4
+	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%p.addr = bitcast i8* %malloc_3 to i32*
+	store i32 %p, i32* %p.addr, align 4
+	%malloc_4 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%mod.addr = bitcast i8* %malloc_4 to i32*
+	store i32 %mod, i32* %mod.addr, align 4
+	store i32 1, i32* %t.addr, align 4
+	%a_2 = load i32, i32* %a.addr, align 4
+	store i32 %a_2, i32* %y.addr, align 4
+	br label %while.cond
+
+while.cond:
+	%p_2 = load i32, i32* %p.addr, align 4
+	%sgt = icmp sgt i32 %p_2, 0
+	br i1 %sgt, label %while.body, label %while.end
 
 if.then:
-	%c_3 = load i32, i32* %c.addr, align 4
-	store i32 %c_3, i32* %retval, align 4
-	br label %return
+	%t = load i32, i32* %t.addr, align 4
+	%t_2 = load i32, i32* %t.addr, align 4
+	%y = load i32, i32* %y.addr, align 4
+	%mul = mul i32 %t_2, %y
+	%mod_2 = load i32, i32* %mod.addr, align 4
+	%srem = srem i32 %mul, %mod_2
+	store i32 %srem, i32* %t.addr, align 4
+	br label %if.end
 
 if.end:
-	%c_4 = load i32, i32* %c.addr, align 4
-	%prefix_neg = sub i32 0, %c_4
-	store i32 %prefix_neg, i32* %retval, align 4
+	%y_2 = load i32, i32* %y.addr, align 4
+	%y_3 = load i32, i32* %y.addr, align 4
+	%y_4 = load i32, i32* %y.addr, align 4
+	%mul_2 = mul i32 %y_3, %y_4
+	%mod_3 = load i32, i32* %mod.addr, align 4
+	%srem_2 = srem i32 %mul_2, %mod_3
+	store i32 %srem_2, i32* %y.addr, align 4
+	%p_4 = load i32, i32* %p.addr, align 4
+	%p_5 = load i32, i32* %p.addr, align 4
+	%sdiv = sdiv i32 %p_5, 2
+	store i32 %sdiv, i32* %p.addr, align 4
+	br label %while.cond
+
+while.body:
+	%p_3 = load i32, i32* %p.addr, align 4
+	%bitwise_and = and i32 %p_3, 1
+	%eq = icmp eq i32 %bitwise_and, 1
+	br i1 %eq, label %if.then, label %if.end
+
+while.end:
+	%t_3 = load i32, i32* %t.addr, align 4
+	store i32 %t_3, i32* %retval, align 4
 	br label %return
 
 return:
@@ -44,69 +78,9 @@ entry:
 	call void @___init__$$YGXXZ()
 	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
 	%retval = bitcast i8* %malloc to i32*
-	%i = load i32, i32* @i, align 4
-	store i32 0, i32* @i, align 4
-	br label %for.cond
-
-for.cond:
-	%i_2 = load i32, i32* @i, align 4
-	%slt = icmp slt i32 %i_2, 5
-	br i1 %slt, label %for.body_2, label %for.end_2
-
-for.cond_2:
-	%j_2 = load i32, i32* @j, align 4
-	%slt_2 = icmp slt i32 %j_2, 5
-	br i1 %slt_2, label %for.body, label %for.end
-
-if.then:
-	%r = load i32, i32* @r, align 4
-	%i_3 = load i32, i32* @i, align 4
-	store i32 %i_3, i32* @r, align 4
-	%c = load i32, i32* @c, align 4
-	%j_3 = load i32, i32* @j, align 4
-	store i32 %j_3, i32* @c, align 4
-	br label %if.end
-
-if.end:
-	br label %for.inc
-
-for.body:
-	%n = load i32, i32* @n, align 4
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet, i32* @n, align 4
-	%n_2 = load i32, i32* @n, align 4
-	%eq = icmp eq i32 %n_2, 1
-	br i1 %eq, label %if.then, label %if.end
-
-for.inc:
-	%j_4 = load i32, i32* @j, align 4
-	%postfix_inc = add i32 %j_4, 1
-	store i32 %postfix_inc, i32* @j, align 4
-	br label %for.cond_2
-
-for.end:
-	br label %for.inc_2
-
-for.body_2:
-	%j = load i32, i32* @j, align 4
-	store i32 0, i32* @j, align 4
-	br label %for.cond_2
-
-for.inc_2:
-	%i_4 = load i32, i32* @i, align 4
-	%postfix_inc_2 = add i32 %i_4, 1
-	store i32 %postfix_inc_2, i32* @i, align 4
-	br label %for.cond
-
-for.end_2:
-	%r_2 = load i32, i32* @r, align 4
-	%sub = sub i32 2, %r_2
-	%funcCallRet_2 = call i32 @_abs$$YGHH$Z(i32 %sub)
-	%c_2 = load i32, i32* @c, align 4
-	%sub_2 = sub i32 2, %c_2
-	%funcCallRet_3 = call i32 @_abs$$YGHH$Z(i32 %sub_2)
-	%add = add i32 %funcCallRet_2, %funcCallRet_3
-	call void @_printInt$$YGXH$Z(i32 %add)
+	%funcCallRet_2 = call i32 @_qpow$$YGHHHH$Z(i32 2, i32 10, i32 10000)
+	%funcCallRet = call i8* @_toString$$YGPADH$Z(i32 %funcCallRet_2)
+	call void @_println$$YGXPAD$Z(i8* %funcCallRet)
 	store i32 0, i32* %retval, align 4
 	br label %return
 

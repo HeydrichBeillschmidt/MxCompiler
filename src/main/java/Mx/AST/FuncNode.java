@@ -110,7 +110,7 @@ public class FuncNode extends DeclarationNode {
             Register dst = new Register(IRModule.stringT, "malloc");
             func.addSymbol(dst);
             ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(parThis.getType().size(), 32));
+            parameters.add(new ConstInt(parThis.getType().size(), 4));
             Function mallocFunc = module.getExternalFunction("malloc");
             curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
             curBlock.addInst(new BitCast(curBlock, ptrThis, dst, new PointerType(parThis.getType())));
@@ -126,7 +126,7 @@ public class FuncNode extends DeclarationNode {
             Register dst = new Register(IRModule.stringT, "malloc");
             func.addSymbol(dst);
             ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(parTmp.getType().size(), 32));
+            parameters.add(new ConstInt(parTmp.getType().size(), 4));
             Function mallocFunc = module.getExternalFunction("malloc");
             curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
             curBlock.addInst(new BitCast(curBlock, ptrTmp, dst, new PointerType(parTmp.getType())));

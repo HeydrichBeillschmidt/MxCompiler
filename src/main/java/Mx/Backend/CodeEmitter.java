@@ -67,7 +67,9 @@ public class CodeEmitter implements ASMVisitor {
                 : node.getAsmName() ) + ":";
         writer.print(blockHead + " ".repeat(Integer.max(1,40-blockHead.length())));
         writer.println("# %" + node.getName());
-        node.getAllInst().forEach(i -> writer.println(i.emitCode()));
+        node.getAllInst().forEach(i -> {
+            if (i.isNotUselessAddSP()) writer.println(i.emitCode());
+        });
     }
 
     @Override

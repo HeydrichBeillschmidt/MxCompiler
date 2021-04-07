@@ -48,12 +48,12 @@ abstract public class ASMInst {
         else block.setHeadInst(nextInst);
     }
 
-    public boolean isUselessAddSP() {
-        if (!(this instanceof IAL)) return false;
+    public boolean isNotUselessAddSP() {
+        if (!(this instanceof IAL)) return true;
         IAL i = (IAL) this;
-        return i.getOpName()==IAL.OpName.addi && i.getImm().getValue()==0
+        return !(i.getOpName()==IAL.OpName.addi && i.getImm().getValue()==0
                 && i.getRd().equals(PhysicalReg.spVR)
-                && i.getRs1().equals(PhysicalReg.spVR);
+                && i.getRs1().equals(PhysicalReg.spVR));
     }
 
     public VirtualReg getRd() {
