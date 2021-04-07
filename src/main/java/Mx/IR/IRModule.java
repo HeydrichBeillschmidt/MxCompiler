@@ -50,7 +50,8 @@ public class IRModule {
                     memberTypes.add(tmp);
                 }
                 String name = "class." + ty.getName();
-                structures.get(name).addMemberTypes(memberTypes);
+                structures.remove(name);
+                addStructure(new StructureType(name, memberTypes));
             }
         }
 
