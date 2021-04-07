@@ -72,7 +72,6 @@ public class InstructionSelector implements IRVisitor {
         String funcName = node.getName();
         curFunc = asmModule.getFunction(funcName);
         curBlock = curFunc.getEntranceBlock();
-        RdsOfLI.clear();
 
         // set sp
         StackPtr stackBase = new StackPtr(0);
@@ -111,6 +110,7 @@ public class InstructionSelector implements IRVisitor {
 
     @Override
     public void visit(IRBlock node) {
+        RdsOfLI.clear();
         curBlock = curFunc.getBlocks().get(node.getName());
         for (var i: node.getAllInst()) {
             i.accept(this);

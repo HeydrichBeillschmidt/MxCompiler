@@ -82,11 +82,13 @@ _solveAge$older$$QEAXXZ:                # @_solveAge$older$$QEAXXZ
 	j	.LBB1_14
 .LBB1_2:                                # %for.cond_2
 	lh	j_2, 0(j.addr)
-	blt	j_2, constInt2, .LBB1_9
+	li	constInt3, 100
+	blt	j_2, constInt3, .LBB1_9
 	j	.LBB1_11
 .LBB1_3:                                # %for.cond_3
 	lh	k_2, 0(k.addr)
-	blt	k_2, constInt2, .LBB1_6
+	li	constInt4, 100
+	blt	k_2, constInt4, .LBB1_6
 	j	.LBB1_8
 .LBB1_4:                                # %if.then
 	lh	this_2, 0(this.addr)
@@ -109,10 +111,11 @@ _solveAge$older$$QEAXXZ:                # @_solveAge$older$$QEAXXZ
 	lh	k_9, 0(k.addr)
 	add	add_14, sub_6, k_9
 	lh	i_11, 0(i.addr)
-	mul	mul_4, constInt2, i_11
+	li	constInt5, 100
+	mul	mul_4, constInt5, i_11
 	lh	j_11, 0(j.addr)
-	li	constInt3, 10
-	mul	mul_5, constInt3, j_11
+	li	constInt6, 10
+	mul	mul_5, constInt6, j_11
 	add	add_15, mul_4, mul_5
 	lh	k_10, 0(k.addr)
 	add	add_16, add_15, k_10
@@ -140,15 +143,17 @@ _solveAge$older$$QEAXXZ:                # @_solveAge$older$$QEAXXZ
 	lh	k_5, 0(k.addr)
 	add	add_7, sub_3, k_5
 	lh	i_7, 0(i.addr)
-	mul	mul, constInt2, i_7
+	li	constInt7, 100
+	mul	mul, constInt7, i_7
 	lh	j_7, 0(j.addr)
-	mul	mul_2, constInt3, j_7
+	li	constInt8, 10
+	mul	mul_2, constInt8, j_7
 	add	add_8, mul, mul_2
 	lh	k_6, 0(k.addr)
 	add	add_9, add_8, k_6
 	mul	mul_3, add_7, add_9
-	li	constInt4, 1926
-	rem	srem, mul_3, constInt4
+	li	constInt9, 1926
+	rem	srem, mul_3, constInt9
 	beq	srem, zero, .LBB1_4
 	j	.LBB1_5
 .LBB1_7:                                # %for.inc
@@ -238,8 +243,12 @@ main:                                   # @main
 	call	_solveAge$older$$QEAXXZ
 	lh	mrJiang_2, 0(mrJiang.addr)
 	lh	older.age, 0(mrJiang_2)
+	mv	a0, older.age
+	call	_printlnInt$$YGXH$Z
+	lh	mrJiang_3, 0(mrJiang.addr)
+	lh	older.age_2, 0(mrJiang_3)
 	li	constInt1, 10000
-	bgt	older.age, constInt1, .LBB2_1
+	bgt	older.age_2, constInt1, .LBB2_1
 	j	.LBB2_2
 .LBB2_1:                                # %if.then
 	la	__const.main.str0, __const.main.str0

@@ -164,6 +164,9 @@ main:                                   # @main
 	call	_solveAge$older$$QEAXXZ
 	lw	a0, 0(s1)
 	lw	a0, 0(a0)
+	call	_printlnInt$$YGXH$Z
+	lw	a0, 0(s1)
+	lw	a0, 0(a0)
 	lui	a1, 2
 	addi	a1, a1, 1809
 	blt	a0, a1, .LBB2_2
