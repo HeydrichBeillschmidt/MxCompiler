@@ -11,73 +11,130 @@ ___init__$$YGXXZ:                       # @"___init__$$YGXXZ"
 	.size	___init__$$YGXXZ, .Lfunc_end0-___init__$$YGXXZ
 	.cfi_endproc
                                         # -- End function
-	.globl	_work$$YGXPADUTA$$$Z    # -- Begin function _work$$YGXPADUTA$$$Z
+	.globl	_solveAge$older$$QEAXXZ # -- Begin function _solveAge$older$$QEAXXZ
 	.p2align	2
-	.type	_work$$YGXPADUTA$$$Z,@function
-_work$$YGXPADUTA$$$Z:                   # @"_work$$YGXPADUTA$$$Z"
+	.type	_solveAge$older$$QEAXXZ,@function
+_solveAge$older$$QEAXXZ:                # @"_solveAge$older$$QEAXXZ"
 	.cfi_startproc
 # %bb.0:                                # %entry
-	addi	sp, sp, -16
-	.cfi_def_cfa_offset 16
-	sw	ra, 12(sp)
-	sw	s0, 8(sp)
-	sw	s1, 4(sp)
-	sw	s2, 0(sp)
+	addi	sp, sp, -32
+	.cfi_def_cfa_offset 32
+	sw	ra, 28(sp)
+	sw	s0, 24(sp)
+	sw	s1, 20(sp)
+	sw	s2, 16(sp)
+	sw	s3, 12(sp)
 	.cfi_offset ra, -4
 	.cfi_offset s0, -8
 	.cfi_offset s1, -12
 	.cfi_offset s2, -16
-	mv	s0, a1
-	mv	s2, a0
+	.cfi_offset s3, -20
+	mv	s3, a0
+	addi	a0, zero, 4
+	call	_malloc$$YGPADH$Z
+	mv	s0, a0
 	addi	a0, zero, 4
 	call	_malloc$$YGPADH$Z
 	mv	s1, a0
-	sw	s2, 0(a0)
 	addi	a0, zero, 4
 	call	_malloc$$YGPADH$Z
 	mv	s2, a0
-	sw	s0, 0(a0)
-	lw	a0, 4(s0)
-	addi	a1, zero, 100
-	blt	a1, a0, .LBB1_2
-# %bb.1:                                # %if.then
-	lw	a0, 0(s1)
-	lui	a1, %hi(.L__const._work$$YGXPADUTA$$$Z.str0)
-	addi	a1, a1, %lo(.L__const._work$$YGXPADUTA$$$Z.str0)
-	call	_strcat$$YGPADPADPAD$Z
+	addi	a0, zero, 4
+	call	_malloc$$YGPADH$Z
+	sw	s3, 0(a0)
+	addi	a1, zero, 1
+	sw	a1, 0(s2)
+	addi	t1, zero, 100
+	addi	a7, zero, 10
+	lui	a3, 278749
+	addi	t0, a3, 719
+	addi	a6, zero, 1926
+	j	.LBB1_2
+.LBB1_1:                                # %for.end_2
+                                        #   in Loop: Header=BB1_2 Depth=1
 	lw	a1, 0(s2)
-	lw	a1, 0(a1)
-	call	_strcat$$YGPADPADPAD$Z
-	lui	a1, %hi(.L__const._work$$YGXPADUTA$$$Z.str1)
-	addi	a1, a1, %lo(.L__const._work$$YGXPADUTA$$$Z.str1)
-	j	.LBB1_3
-.LBB1_2:                                # %if.else
-	lw	a0, 0(s1)
-	lui	a1, %hi(.L__const._work$$YGXPADUTA$$$Z.str0)
-	addi	a1, a1, %lo(.L__const._work$$YGXPADUTA$$$Z.str0)
-	call	_strcat$$YGPADPADPAD$Z
+	addi	a1, a1, 1
+	sw	a1, 0(s2)
+.LBB1_2:                                # %for.cond
+                                        # =>This Loop Header: Depth=1
+                                        #     Child Loop BB1_5 Depth 2
+                                        #       Child Loop BB1_8 Depth 3
+	lw	a5, 0(s2)
+	bge	a5, t1, .LBB1_11
+# %bb.3:                                # %for.body_3
+                                        #   in Loop: Header=BB1_2 Depth=1
 	lw	a1, 0(s2)
-	lw	a1, 0(a1)
-	call	_strcat$$YGPADPADPAD$Z
-	lui	a1, %hi(.L__const._work$$YGXPADUTA$$$Z.str2)
-	addi	a1, a1, %lo(.L__const._work$$YGXPADUTA$$$Z.str2)
-.LBB1_3:                                # %if.end
-	call	_strcat$$YGPADPADPAD$Z
-	call	_println$$YGXPAD$Z
-	lw	a0, 0(s2)
-	lw	a1, 4(a0)
-	lui	a2, %hi(work_anger)
-	lw	a2, %lo(work_anger)(a2)
+	j	.LBB1_5
+.LBB1_4:                                # %for.end
+                                        #   in Loop: Header=BB1_5 Depth=2
+	lw	a1, 0(s1)
+.LBB1_5:                                # %for.cond_2
+                                        #   Parent Loop BB1_2 Depth=1
+                                        # =>  This Loop Header: Depth=2
+                                        #       Child Loop BB1_8 Depth 3
+	addi	a1, a1, 1
+	sw	a1, 0(s1)
+	lw	a5, 0(s1)
+	bge	a5, t1, .LBB1_1
+# %bb.6:                                # %for.body_2
+                                        #   in Loop: Header=BB1_5 Depth=2
+	lw	a1, 0(s1)
+	j	.LBB1_8
+.LBB1_7:                                # %if.end
+                                        #   in Loop: Header=BB1_8 Depth=3
+	lw	a1, 0(s0)
+.LBB1_8:                                # %for.cond_3
+                                        #   Parent Loop BB1_2 Depth=1
+                                        #     Parent Loop BB1_5 Depth=2
+                                        # =>    This Inner Loop Header: Depth=3
+	addi	a1, a1, 1
+	sw	a1, 0(s0)
+	lw	a5, 0(s0)
+	bge	a5, t1, .LBB1_4
+# %bb.9:                                # %for.body
+                                        #   in Loop: Header=BB1_8 Depth=3
+	lw	a1, 0(s2)
+	lw	a2, 0(s1)
+	lw	a3, 0(s0)
+	add	a4, a1, a2
+	add	a4, a4, a3
+	mul	a1, a1, t1
+	mul	a2, a2, a7
 	add	a1, a1, a2
-	sw	a1, 4(a0)
-	lw	s2, 0(sp)
-	lw	s1, 4(sp)
-	lw	s0, 8(sp)
-	lw	ra, 12(sp)
-	addi	sp, sp, 16
+	add	a1, a1, a3
+	mul	a1, a4, a1
+	mulh	a2, a1, t0
+	srli	a3, a2, 31
+	srai	a2, a2, 9
+	add	a2, a2, a3
+	mul	a2, a2, a6
+	sub	a1, a1, a2
+	bnez	a1, .LBB1_7
+# %bb.10:                               # %if.then
+                                        #   in Loop: Header=BB1_8 Depth=3
+	lw	a5, 0(s2)
+	lw	a4, 0(s1)
+	lw	a2, 0(s0)
+	lw	a3, 0(a0)
+	add	a1, a5, a4
+	add	a1, a1, a2
+	mul	a5, a5, t1
+	mul	a4, a4, a7
+	add	a4, a5, a4
+	add	a2, a4, a2
+	mul	a1, a1, a2
+	sw	a1, 0(a3)
+	j	.LBB1_7
+.LBB1_11:                               # %for.end_3
+	lw	s3, 12(sp)
+	lw	s2, 16(sp)
+	lw	s1, 20(sp)
+	lw	s0, 24(sp)
+	lw	ra, 28(sp)
+	addi	sp, sp, 32
 	ret
 .Lfunc_end1:
-	.size	_work$$YGXPADUTA$$$Z, .Lfunc_end1-_work$$YGXPADUTA$$$Z
+	.size	_solveAge$older$$QEAXXZ, .Lfunc_end1-_solveAge$older$$QEAXXZ
 	.cfi_endproc
                                         # -- End function
 	.globl	main                    # -- Begin function main
@@ -91,54 +148,32 @@ main:                                   # @main
 	sw	ra, 12(sp)
 	sw	s0, 8(sp)
 	sw	s1, 4(sp)
-	sw	s2, 0(sp)
 	.cfi_offset ra, -4
 	.cfi_offset s0, -8
 	.cfi_offset s1, -12
-	.cfi_offset s2, -16
 	call	___init__$$YGXXZ
-	addi	a0, zero, 4
-	call	_malloc$$YGPADH$Z
-	mv	s0, a0
 	addi	a0, zero, 4
 	call	_malloc$$YGPADH$Z
 	mv	s1, a0
 	addi	a0, zero, 4
 	call	_malloc$$YGPADH$Z
-	mv	s2, a0
-	addi	a0, zero, 8
+	mv	s0, a0
+	addi	a0, zero, 4
 	call	_malloc$$YGPADH$Z
 	sw	a0, 0(s1)
-	lui	a1, %hi(.L__const.main.str3)
-	addi	a1, a1, %lo(.L__const.main.str3)
-	sw	a1, 0(a0)
+	call	_solveAge$older$$QEAXXZ
 	lw	a0, 0(s1)
-	sw	zero, 4(a0)
-	addi	a0, zero, 8
-	call	_malloc$$YGPADH$Z
-	sw	a0, 0(s0)
-	lui	a1, %hi(.L__const.main.str4)
-	addi	a1, a1, %lo(.L__const.main.str4)
-	sw	a1, 0(a0)
-	lw	a0, 0(s0)
-	lui	a1, %hi(init_anger)
-	lw	a1, %lo(init_anger)(a1)
-	sw	a1, 4(a0)
-	lw	a1, 0(s1)
-	lui	a0, %hi(.L__const.main.str5)
-	addi	a0, a0, %lo(.L__const.main.str5)
-	call	_work$$YGXPADUTA$$$Z
-	lw	a1, 0(s0)
-	lui	a0, %hi(.L__const.main.str6)
-	addi	s1, a0, %lo(.L__const.main.str6)
-	mv	a0, s1
-	call	_work$$YGXPADUTA$$$Z
-	lw	a1, 0(s0)
-	mv	a0, s1
-	call	_work$$YGXPADUTA$$$Z
-	sw	zero, 0(s2)
+	lw	a0, 0(a0)
+	lui	a1, 2
+	addi	a1, a1, 1809
+	blt	a0, a1, .LBB2_2
+# %bb.1:                                # %if.then
+	lui	a0, %hi(.L__const.main.str0)
+	addi	a0, a0, %lo(.L__const.main.str0)
+	call	_println$$YGXPAD$Z
+.LBB2_2:                                # %if.end
+	sw	zero, 0(s0)
 	mv	a0, zero
-	lw	s2, 0(sp)
 	lw	s1, 4(sp)
 	lw	s0, 8(sp)
 	lw	ra, 12(sp)
@@ -148,57 +183,10 @@ main:                                   # @main
 	.size	main, .Lfunc_end2-main
 	.cfi_endproc
                                         # -- End function
-	.type	init_anger,@object      # @init_anger
-	.section	.sdata,"aw",@progbits
-	.globl	init_anger
-	.p2align	2
-init_anger:
-	.word	100                     # 0x64
-	.size	init_anger, 4
-
-	.type	.L__const._work$$YGXPADUTA$$$Z.str0,@object # @"__const._work$$YGXPADUTA$$$Z.str0"
+	.type	.L__const.main.str0,@object # @__const.main.str0
 	.section	.rodata.str1.1,"aMS",@progbits,1
-.L__const._work$$YGXPADUTA$$$Z.str0:
-	.asciz	", "
-	.size	.L__const._work$$YGXPADUTA$$$Z.str0, 3
-
-	.type	.L__const._work$$YGXPADUTA$$$Z.str1,@object # @"__const._work$$YGXPADUTA$$$Z.str1"
-.L__const._work$$YGXPADUTA$$$Z.str1:
-	.asciz	" enjoys this work. XD"
-	.size	.L__const._work$$YGXPADUTA$$$Z.str1, 22
-
-	.type	.L__const.main.str6,@object # @__const.main.str6
-.L__const.main.str6:
-	.asciz	"Mars"
-	.size	.L__const.main.str6, 5
-
-	.type	.L__const._work$$YGXPADUTA$$$Z.str2,@object # @"__const._work$$YGXPADUTA$$$Z.str2"
-.L__const._work$$YGXPADUTA$$$Z.str2:
-	.asciz	" wants to give up!!!!!"
-	.size	.L__const._work$$YGXPADUTA$$$Z.str2, 23
-
-	.type	.L__const.main.str5,@object # @__const.main.str5
-.L__const.main.str5:
-	.asciz	"MR"
-	.size	.L__const.main.str5, 3
-
-	.type	work_anger,@object      # @work_anger
-	.section	.sdata,"aw",@progbits
-	.globl	work_anger
-	.p2align	2
-work_anger:
-	.word	10                      # 0xa
-	.size	work_anger, 4
-
-	.type	.L__const.main.str4,@object # @__const.main.str4
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.L__const.main.str4:
-	.asciz	"the striking TA"
-	.size	.L__const.main.str4, 16
-
-	.type	.L__const.main.str3,@object # @__const.main.str3
-.L__const.main.str3:
-	.asciz	"the leading TA"
-	.size	.L__const.main.str3, 15
+.L__const.main.str0:
+	.asciz	"eternal!"
+	.size	.L__const.main.str0, 9
 
 	.section	".note.GNU-stack","",@progbits

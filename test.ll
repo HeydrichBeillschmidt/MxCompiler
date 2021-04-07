@@ -1,14 +1,6 @@
-%class.TA = type { i8*, i32 }
+%class.older = type { i32 }
 
-@init_anger = global i32 100, align 4
-@__const._work$$YGXPADUTA$$$Z.str0 = private unnamed_addr constant [3 x i8] c", \00", align 1
-@__const._work$$YGXPADUTA$$$Z.str1 = private unnamed_addr constant [22 x i8] c" enjoys this work. XD\00", align 1
-@__const.main.str6 = private unnamed_addr constant [5 x i8] c"Mars\00", align 1
-@__const._work$$YGXPADUTA$$$Z.str2 = private unnamed_addr constant [23 x i8] c" wants to give up!!!!!\00", align 1
-@__const.main.str5 = private unnamed_addr constant [3 x i8] c"MR\00", align 1
-@work_anger = global i32 10, align 4
-@__const.main.str4 = private unnamed_addr constant [16 x i8] c"the striking TA\00", align 1
-@__const.main.str3 = private unnamed_addr constant [15 x i8] c"the leading TA\00", align 1
+@__const.main.str0 = private unnamed_addr constant [9 x i8] c"eternal!\00", align 1
 
 define void @___init__$$YGXXZ() {
 entry:
@@ -18,56 +10,140 @@ return:
 	ret void
 }
 
-define void @_work$$YGXPADUTA$$$Z(i8* %st, %class.TA* %ta) {
+define void @_solveAge$older$$QEAXXZ(%class.older* %this) {
 entry:
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
-	%st.addr = bitcast i8* %malloc to i8**
-	store i8* %st, i8** %st.addr, align 4
+	%malloc_4 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%k.addr = bitcast i8* %malloc_4 to i32*
+	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%j.addr = bitcast i8* %malloc_3 to i32*
 	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 4)
-	%ta.addr = bitcast i8* %malloc_2 to %class.TA**
-	store %class.TA* %ta, %class.TA** %ta.addr, align 4
-	%ta_2 = load %class.TA*, %class.TA** %ta.addr, align 4
-	%TA.anger.addr = getelementptr %class.TA, %class.TA* %ta_2, i32 0, i32 1
-	%TA.anger = load i32, i32* %TA.anger.addr, align 4
-	%sle = icmp sle i32 %TA.anger, 100
-	br i1 %sle, label %if.then, label %if.else
+	%i.addr = bitcast i8* %malloc_2 to i32*
+	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%this.addr = bitcast i8* %malloc to %class.older**
+	store %class.older* %this, %class.older** %this.addr, align 4
+	%i = load i32, i32* %i.addr, align 4
+	store i32 1, i32* %i.addr, align 4
+	br label %for.cond
+
+for.cond:
+	%i_2 = load i32, i32* %i.addr, align 4
+	%slt = icmp slt i32 %i_2, 100
+	br i1 %slt, label %for.body_3, label %for.end_3
+
+for.cond_2:
+	%j_2 = load i32, i32* %j.addr, align 4
+	%slt_2 = icmp slt i32 %j_2, 100
+	br i1 %slt_2, label %for.body_2, label %for.end_2
+
+for.cond_3:
+	%k_2 = load i32, i32* %k.addr, align 4
+	%slt_3 = icmp slt i32 %k_2, 100
+	br i1 %slt_3, label %for.body, label %for.end
 
 if.then:
-	%st_2 = load i8*, i8** %st.addr, align 4
-	%__const._work$$YGXPADUTA$$$Z.str0 = getelementptr [3 x i8], [3 x i8]* @__const._work$$YGXPADUTA$$$Z.str0, i32 0, i32 0
-	%add = call i8* @_strcat$$YGPADPADPAD$Z(i8* %st_2, i8* %__const._work$$YGXPADUTA$$$Z.str0)
-	%ta_3 = load %class.TA*, %class.TA** %ta.addr, align 4
-	%TA.state.addr = getelementptr %class.TA, %class.TA* %ta_3, i32 0, i32 0
-	%TA.state = load i8*, i8** %TA.state.addr, align 4
-	%add_2 = call i8* @_strcat$$YGPADPADPAD$Z(i8* %add, i8* %TA.state)
-	%__const._work$$YGXPADUTA$$$Z.str1 = getelementptr [22 x i8], [22 x i8]* @__const._work$$YGXPADUTA$$$Z.str1, i32 0, i32 0
-	%add_3 = call i8* @_strcat$$YGPADPADPAD$Z(i8* %add_2, i8* %__const._work$$YGXPADUTA$$$Z.str1)
-	call void @_println$$YGXPAD$Z(i8* %add_3)
-	br label %if.end
-
-if.else:
-	%st_3 = load i8*, i8** %st.addr, align 4
-	%__const._work$$YGXPADUTA$$$Z.str2 = getelementptr [3 x i8], [3 x i8]* @__const._work$$YGXPADUTA$$$Z.str0, i32 0, i32 0
-	%add_4 = call i8* @_strcat$$YGPADPADPAD$Z(i8* %st_3, i8* %__const._work$$YGXPADUTA$$$Z.str2)
-	%ta_4 = load %class.TA*, %class.TA** %ta.addr, align 4
-	%TA.state.addr_2 = getelementptr %class.TA, %class.TA* %ta_4, i32 0, i32 0
-	%TA.state_2 = load i8*, i8** %TA.state.addr_2, align 4
-	%add_5 = call i8* @_strcat$$YGPADPADPAD$Z(i8* %add_4, i8* %TA.state_2)
-	%__const._work$$YGXPADUTA$$$Z.str2_2 = getelementptr [23 x i8], [23 x i8]* @__const._work$$YGXPADUTA$$$Z.str2, i32 0, i32 0
-	%add_6 = call i8* @_strcat$$YGPADPADPAD$Z(i8* %add_5, i8* %__const._work$$YGXPADUTA$$$Z.str2_2)
-	call void @_println$$YGXPAD$Z(i8* %add_6)
+	%this_2 = load %class.older*, %class.older** %this.addr, align 4
+	%older.age.addr = getelementptr %class.older, %class.older* %this_2, i32 0, i32 0
+	%older.age = load i32, i32* %older.age.addr, align 4
+	%i_8 = load i32, i32* %i.addr, align 4
+	%i_9 = load i32, i32* %i.addr, align 4
+	%sub_4 = sub i32 %i_8, %i_9
+	%i_10 = load i32, i32* %i.addr, align 4
+	%add_10 = add i32 %sub_4, %i_10
+	%j_8 = load i32, i32* %j.addr, align 4
+	%add_11 = add i32 %add_10, %j_8
+	%j_9 = load i32, i32* %j.addr, align 4
+	%sub_5 = sub i32 %add_11, %j_9
+	%j_10 = load i32, i32* %j.addr, align 4
+	%add_12 = add i32 %sub_5, %j_10
+	%k_7 = load i32, i32* %k.addr, align 4
+	%add_13 = add i32 %add_12, %k_7
+	%k_8 = load i32, i32* %k.addr, align 4
+	%sub_6 = sub i32 %add_13, %k_8
+	%k_9 = load i32, i32* %k.addr, align 4
+	%add_14 = add i32 %sub_6, %k_9
+	%i_11 = load i32, i32* %i.addr, align 4
+	%mul_4 = mul i32 100, %i_11
+	%j_11 = load i32, i32* %j.addr, align 4
+	%mul_5 = mul i32 10, %j_11
+	%add_15 = add i32 %mul_4, %mul_5
+	%k_10 = load i32, i32* %k.addr, align 4
+	%add_16 = add i32 %add_15, %k_10
+	%mul_6 = mul i32 %add_14, %add_16
+	store i32 %mul_6, i32* %older.age.addr, align 4
 	br label %if.end
 
 if.end:
-	%ta_5 = load %class.TA*, %class.TA** %ta.addr, align 4
-	%TA.anger.addr_2 = getelementptr %class.TA, %class.TA* %ta_5, i32 0, i32 1
-	%TA.anger_2 = load i32, i32* %TA.anger.addr_2, align 4
-	%ta_6 = load %class.TA*, %class.TA** %ta.addr, align 4
-	%TA.anger.addr_3 = getelementptr %class.TA, %class.TA* %ta_6, i32 0, i32 1
-	%TA.anger_3 = load i32, i32* %TA.anger.addr_3, align 4
-	%work_anger = load i32, i32* @work_anger, align 4
-	%add_7 = add i32 %TA.anger_3, %work_anger
-	store i32 %add_7, i32* %TA.anger.addr_2, align 4
+	br label %for.inc
+
+for.body:
+	%i_4 = load i32, i32* %i.addr, align 4
+	%i_5 = load i32, i32* %i.addr, align 4
+	%sub = sub i32 %i_4, %i_5
+	%i_6 = load i32, i32* %i.addr, align 4
+	%add_3 = add i32 %sub, %i_6
+	%j_4 = load i32, i32* %j.addr, align 4
+	%add_4 = add i32 %add_3, %j_4
+	%j_5 = load i32, i32* %j.addr, align 4
+	%sub_2 = sub i32 %add_4, %j_5
+	%j_6 = load i32, i32* %j.addr, align 4
+	%add_5 = add i32 %sub_2, %j_6
+	%k_3 = load i32, i32* %k.addr, align 4
+	%add_6 = add i32 %add_5, %k_3
+	%k_4 = load i32, i32* %k.addr, align 4
+	%sub_3 = sub i32 %add_6, %k_4
+	%k_5 = load i32, i32* %k.addr, align 4
+	%add_7 = add i32 %sub_3, %k_5
+	%i_7 = load i32, i32* %i.addr, align 4
+	%mul = mul i32 100, %i_7
+	%j_7 = load i32, i32* %j.addr, align 4
+	%mul_2 = mul i32 10, %j_7
+	%add_8 = add i32 %mul, %mul_2
+	%k_6 = load i32, i32* %k.addr, align 4
+	%add_9 = add i32 %add_8, %k_6
+	%mul_3 = mul i32 %add_7, %add_9
+	%srem = srem i32 %mul_3, 1926
+	%eq = icmp eq i32 %srem, 0
+	br i1 %eq, label %if.then, label %if.end
+
+for.inc:
+	%k_11 = load i32, i32* %k.addr, align 4
+	%postfix_inc = add i32 %k_11, 1
+	store i32 %postfix_inc, i32* %k.addr, align 4
+	br label %for.cond_3
+
+for.end:
+	br label %for.inc_2
+
+for.body_2:
+	%k = load i32, i32* %k.addr, align 4
+	%j_3 = load i32, i32* %j.addr, align 4
+	%add_2 = add i32 %j_3, 1
+	store i32 %add_2, i32* %k.addr, align 4
+	br label %for.cond_3
+
+for.inc_2:
+	%j_12 = load i32, i32* %j.addr, align 4
+	%postfix_inc_2 = add i32 %j_12, 1
+	store i32 %postfix_inc_2, i32* %j.addr, align 4
+	br label %for.cond_2
+
+for.end_2:
+	br label %for.inc_3
+
+for.body_3:
+	%j = load i32, i32* %j.addr, align 4
+	%i_3 = load i32, i32* %i.addr, align 4
+	%add = add i32 %i_3, 1
+	store i32 %add, i32* %j.addr, align 4
+	br label %for.cond_2
+
+for.inc_3:
+	%i_12 = load i32, i32* %i.addr, align 4
+	%postfix_inc_3 = add i32 %i_12, 1
+	store i32 %postfix_inc_3, i32* %i.addr, align 4
+	br label %for.cond
+
+for.end_3:
 	br label %return
 
 return:
@@ -77,48 +153,27 @@ return:
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
-	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 4)
-	%mars.addr = bitcast i8* %malloc_3 to %class.TA**
 	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 4)
-	%mr.addr = bitcast i8* %malloc_2 to %class.TA**
+	%mrJiang.addr = bitcast i8* %malloc_2 to %class.older**
 	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
 	%retval = bitcast i8* %malloc to i32*
-	%mr = load %class.TA*, %class.TA** %mr.addr, align 4
-	%malloc_4 = call i8* @_malloc$$YGPADH$Z(i32 8)
-	%castToClassPtr = bitcast i8* %malloc_4 to %class.TA*
-	store %class.TA* %castToClassPtr, %class.TA** %mr.addr, align 4
-	%mr_2 = load %class.TA*, %class.TA** %mr.addr, align 4
-	%TA.state.addr = getelementptr %class.TA, %class.TA* %mr_2, i32 0, i32 0
-	%TA.state = load i8*, i8** %TA.state.addr, align 4
-	%__const.main.str3 = getelementptr [15 x i8], [15 x i8]* @__const.main.str3, i32 0, i32 0
-	store i8* %__const.main.str3, i8** %TA.state.addr, align 4
-	%mr_3 = load %class.TA*, %class.TA** %mr.addr, align 4
-	%TA.anger.addr = getelementptr %class.TA, %class.TA* %mr_3, i32 0, i32 1
-	%TA.anger = load i32, i32* %TA.anger.addr, align 4
-	store i32 0, i32* %TA.anger.addr, align 4
-	%mars = load %class.TA*, %class.TA** %mars.addr, align 4
-	%malloc_5 = call i8* @_malloc$$YGPADH$Z(i32 8)
-	%castToClassPtr_2 = bitcast i8* %malloc_5 to %class.TA*
-	store %class.TA* %castToClassPtr_2, %class.TA** %mars.addr, align 4
-	%mars_2 = load %class.TA*, %class.TA** %mars.addr, align 4
-	%TA.state.addr_2 = getelementptr %class.TA, %class.TA* %mars_2, i32 0, i32 0
-	%TA.state_2 = load i8*, i8** %TA.state.addr_2, align 4
-	%__const.main.str4 = getelementptr [16 x i8], [16 x i8]* @__const.main.str4, i32 0, i32 0
-	store i8* %__const.main.str4, i8** %TA.state.addr_2, align 4
-	%mars_3 = load %class.TA*, %class.TA** %mars.addr, align 4
-	%TA.anger.addr_2 = getelementptr %class.TA, %class.TA* %mars_3, i32 0, i32 1
-	%TA.anger_2 = load i32, i32* %TA.anger.addr_2, align 4
-	%init_anger = load i32, i32* @init_anger, align 4
-	store i32 %init_anger, i32* %TA.anger.addr_2, align 4
-	%__const.main.str5 = getelementptr [3 x i8], [3 x i8]* @__const.main.str5, i32 0, i32 0
-	%mr_4 = load %class.TA*, %class.TA** %mr.addr, align 4
-	call void @_work$$YGXPADUTA$$$Z(i8* %__const.main.str5, %class.TA* %mr_4)
-	%__const.main.str6 = getelementptr [5 x i8], [5 x i8]* @__const.main.str6, i32 0, i32 0
-	%mars_4 = load %class.TA*, %class.TA** %mars.addr, align 4
-	call void @_work$$YGXPADUTA$$$Z(i8* %__const.main.str6, %class.TA* %mars_4)
-	%__const.main.str7 = getelementptr [5 x i8], [5 x i8]* @__const.main.str6, i32 0, i32 0
-	%mars_5 = load %class.TA*, %class.TA** %mars.addr, align 4
-	call void @_work$$YGXPADUTA$$$Z(i8* %__const.main.str7, %class.TA* %mars_5)
+	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%castToClassPtr = bitcast i8* %malloc_3 to %class.older*
+	store %class.older* %castToClassPtr, %class.older** %mrJiang.addr, align 4
+	%mrJiang = load %class.older*, %class.older** %mrJiang.addr, align 4
+	call void @_solveAge$older$$QEAXXZ(%class.older* %mrJiang)
+	%mrJiang_2 = load %class.older*, %class.older** %mrJiang.addr, align 4
+	%older.age.addr = getelementptr %class.older, %class.older* %mrJiang_2, i32 0, i32 0
+	%older.age = load i32, i32* %older.age.addr, align 4
+	%sgt = icmp sgt i32 %older.age, 10000
+	br i1 %sgt, label %if.then, label %if.end
+
+if.then:
+	%__const.main.str0 = getelementptr [9 x i8], [9 x i8]* @__const.main.str0, i32 0, i32 0
+	call void @_println$$YGXPAD$Z(i8* %__const.main.str0)
+	br label %if.end
+
+if.end:
 	store i32 0, i32* %retval, align 4
 	br label %return
 

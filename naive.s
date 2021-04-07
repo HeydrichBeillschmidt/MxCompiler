@@ -35,9 +35,9 @@ ___init__$$YGXXZ:                       # @___init__$$YGXXZ
 	ret
                                         # -- End function
 
-	.globl	_work$$YGXPADUTA$$$Z    # -- Begin function _work$$YGXPADUTA$$$Z
+	.globl	_solveAge$older$$QEAXXZ # -- Begin function _solveAge$older$$QEAXXZ
 	.p2align	2
-_work$$YGXPADUTA$$$Z:                   # @_work$$YGXPADUTA$$$Z
+_solveAge$older$$QEAXXZ:                # @_solveAge$older$$QEAXXZ
 # %bb.0:                                # %entry
 	mv	.ra.save, ra
 	mv	.s0.save, s0
@@ -52,79 +52,139 @@ _work$$YGXPADUTA$$$Z:                   # @_work$$YGXPADUTA$$$Z
 	mv	.s9.save, s9
 	mv	.s10.save, s10
 	mv	.s11.save, s11
-	mv	st, a0
-	mv	ta, a1
+	mv	this, a0
 	li	constInt, 4
 	mv	a0, constInt
 	call	_malloc$$YGPADH$Z
-	mv	malloc, a0
-	mv	st.addr, malloc
-	sw	st, 0(st.addr)
+	mv	malloc_4, a0
+	mv	k.addr, malloc_4
+	mv	a0, constInt
+	call	_malloc$$YGPADH$Z
+	mv	malloc_3, a0
+	mv	j.addr, malloc_3
 	mv	a0, constInt
 	call	_malloc$$YGPADH$Z
 	mv	malloc_2, a0
-	mv	ta.addr, malloc_2
-	sw	ta, 0(ta.addr)
-	lh	ta_2, 0(ta.addr)
-	lh	TA.anger, 4(ta_2)
-	li	constInt1, 100
-	ble	TA.anger, constInt1, .LBB1_1
+	mv	i.addr, malloc_2
+	mv	a0, constInt
+	call	_malloc$$YGPADH$Z
+	mv	malloc, a0
+	mv	this.addr, malloc
+	sw	this, 0(this.addr)
+	lh	i, 0(i.addr)
+	li	constInt1, 1
+	sw	constInt1, 0(i.addr)
+	j	.LBB1_1
+.LBB1_1:                                # %for.cond
+	lh	i_2, 0(i.addr)
+	li	constInt2, 100
+	blt	i_2, constInt2, .LBB1_12
+	j	.LBB1_14
+.LBB1_2:                                # %for.cond_2
+	lh	j_2, 0(j.addr)
+	blt	j_2, constInt2, .LBB1_9
+	j	.LBB1_11
+.LBB1_3:                                # %for.cond_3
+	lh	k_2, 0(k.addr)
+	blt	k_2, constInt2, .LBB1_6
+	j	.LBB1_8
+.LBB1_4:                                # %if.then
+	lh	this_2, 0(this.addr)
+	lh	older.age, 0(this_2)
+	lh	i_8, 0(i.addr)
+	lh	i_9, 0(i.addr)
+	sub	sub_4, i_8, i_9
+	lh	i_10, 0(i.addr)
+	add	add_10, sub_4, i_10
+	lh	j_8, 0(j.addr)
+	add	add_11, add_10, j_8
+	lh	j_9, 0(j.addr)
+	sub	sub_5, add_11, j_9
+	lh	j_10, 0(j.addr)
+	add	add_12, sub_5, j_10
+	lh	k_7, 0(k.addr)
+	add	add_13, add_12, k_7
+	lh	k_8, 0(k.addr)
+	sub	sub_6, add_13, k_8
+	lh	k_9, 0(k.addr)
+	add	add_14, sub_6, k_9
+	lh	i_11, 0(i.addr)
+	mul	mul_4, constInt2, i_11
+	lh	j_11, 0(j.addr)
+	li	constInt3, 10
+	mul	mul_5, constInt3, j_11
+	add	add_15, mul_4, mul_5
+	lh	k_10, 0(k.addr)
+	add	add_16, add_15, k_10
+	mul	mul_6, add_14, add_16
+	sw	mul_6, 0(this_2)
+	j	.LBB1_5
+.LBB1_5:                                # %if.end
+	j	.LBB1_7
+.LBB1_6:                                # %for.body
+	lh	i_4, 0(i.addr)
+	lh	i_5, 0(i.addr)
+	sub	sub, i_4, i_5
+	lh	i_6, 0(i.addr)
+	add	add_3, sub, i_6
+	lh	j_4, 0(j.addr)
+	add	add_4, add_3, j_4
+	lh	j_5, 0(j.addr)
+	sub	sub_2, add_4, j_5
+	lh	j_6, 0(j.addr)
+	add	add_5, sub_2, j_6
+	lh	k_3, 0(k.addr)
+	add	add_6, add_5, k_3
+	lh	k_4, 0(k.addr)
+	sub	sub_3, add_6, k_4
+	lh	k_5, 0(k.addr)
+	add	add_7, sub_3, k_5
+	lh	i_7, 0(i.addr)
+	mul	mul, constInt2, i_7
+	lh	j_7, 0(j.addr)
+	mul	mul_2, constInt3, j_7
+	add	add_8, mul, mul_2
+	lh	k_6, 0(k.addr)
+	add	add_9, add_8, k_6
+	mul	mul_3, add_7, add_9
+	li	constInt4, 1926
+	rem	srem, mul_3, constInt4
+	beq	srem, zero, .LBB1_4
+	j	.LBB1_5
+.LBB1_7:                                # %for.inc
+	lh	k_11, 0(k.addr)
+	addi	postfix_inc, k_11, 1
+	sw	postfix_inc, 0(k.addr)
+	j	.LBB1_3
+.LBB1_8:                                # %for.end
+	j	.LBB1_10
+.LBB1_9:                                # %for.body_2
+	lh	k, 0(k.addr)
+	lh	j_3, 0(j.addr)
+	addi	add_2, j_3, 1
+	sw	add_2, 0(k.addr)
+	j	.LBB1_3
+.LBB1_10:                               # %for.inc_2
+	lh	j_12, 0(j.addr)
+	addi	postfix_inc_2, j_12, 1
+	sw	postfix_inc_2, 0(j.addr)
 	j	.LBB1_2
-.LBB1_1:                                # %if.then
-	lh	st_2, 0(st.addr)
-	la	__const._work$$YGXPADUTA$$$Z.str0, __const._work$$YGXPADUTA$$$Z.str0
-	mv	a0, st_2
-	mv	a1, __const._work$$YGXPADUTA$$$Z.str0
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add, a0
-	lh	ta_3, 0(ta.addr)
-	addi	TA.state.addr, ta_3, 0
-	lh	TA.state, 0(TA.state.addr)
-	mv	a0, add
-	mv	a1, TA.state
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add_2, a0
-	la	__const._work$$YGXPADUTA$$$Z.str1, __const._work$$YGXPADUTA$$$Z.str1
-	mv	a0, add_2
-	mv	a1, __const._work$$YGXPADUTA$$$Z.str1
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add_3, a0
-	mv	a0, add_3
-	call	_println$$YGXPAD$Z
-	j	.LBB1_3
-.LBB1_2:                                # %if.else
-	lh	st_3, 0(st.addr)
-	la	__const._work$$YGXPADUTA$$$Z.str2, __const._work$$YGXPADUTA$$$Z.str0
-	mv	a0, st_3
-	mv	a1, __const._work$$YGXPADUTA$$$Z.str2
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add_4, a0
-	lh	ta_4, 0(ta.addr)
-	addi	TA.state.addr_2, ta_4, 0
-	lh	TA.state_2, 0(TA.state.addr_2)
-	mv	a0, add_4
-	mv	a1, TA.state_2
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add_5, a0
-	la	__const._work$$YGXPADUTA$$$Z.str2_2, __const._work$$YGXPADUTA$$$Z.str2
-	mv	a0, add_5
-	mv	a1, __const._work$$YGXPADUTA$$$Z.str2_2
-	call	_strcat$$YGPADPADPAD$Z
-	mv	add_6, a0
-	mv	a0, add_6
-	call	_println$$YGXPAD$Z
-	j	.LBB1_3
-.LBB1_3:                                # %if.end
-	lh	ta_5, 0(ta.addr)
-	lh	TA.anger_2, 4(ta_5)
-	lh	ta_6, 0(ta.addr)
-	lh	TA.anger_3, 4(ta_6)
-	lui	lui, %hi(work_anger)
-	lh	work_anger, %lo(work_anger)(lui)
-	add	add_7, TA.anger_3, work_anger
-	sw	add_7, 4(ta_5)
-	j	.LBB1_4
-.LBB1_4:                                # %return
+.LBB1_11:                               # %for.end_2
+	j	.LBB1_13
+.LBB1_12:                               # %for.body_3
+	lh	j, 0(j.addr)
+	lh	i_3, 0(i.addr)
+	addi	add, i_3, 1
+	sw	add, 0(j.addr)
+	j	.LBB1_2
+.LBB1_13:                               # %for.inc_3
+	lh	i_12, 0(i.addr)
+	addi	postfix_inc_3, i_12, 1
+	sw	postfix_inc_3, 0(i.addr)
+	j	.LBB1_1
+.LBB1_14:                               # %for.end_3
+	j	.LBB1_15
+.LBB1_15:                               # %return
 	mv	s0, .s0.save
 	mv	s1, .s1.save
 	mv	s2, .s2.save
@@ -162,65 +222,34 @@ main:                                   # @main
 	li	constInt, 4
 	mv	a0, constInt
 	call	_malloc$$YGPADH$Z
-	mv	malloc_3, a0
-	mv	mars.addr, malloc_3
-	mv	a0, constInt
-	call	_malloc$$YGPADH$Z
 	mv	malloc_2, a0
-	mv	mr.addr, malloc_2
+	mv	mrJiang.addr, malloc_2
 	mv	a0, constInt
 	call	_malloc$$YGPADH$Z
 	mv	malloc, a0
 	mv	retval, malloc
-	lh	mr, 0(mr.addr)
-	li	constInt1, 8
-	mv	a0, constInt1
+	mv	a0, constInt
 	call	_malloc$$YGPADH$Z
-	mv	malloc_4, a0
-	mv	castToClassPtr, malloc_4
-	sw	castToClassPtr, 0(mr.addr)
-	lh	mr_2, 0(mr.addr)
-	addi	TA.state.addr, mr_2, 0
-	lh	TA.state, 0(TA.state.addr)
-	la	__const.main.str3, __const.main.str3
-	sw	__const.main.str3, 0(TA.state.addr)
-	lh	mr_3, 0(mr.addr)
-	lh	TA.anger, 4(mr_3)
-	sw	zero, 4(mr_3)
-	lh	mars, 0(mars.addr)
-	mv	a0, constInt1
-	call	_malloc$$YGPADH$Z
-	mv	malloc_5, a0
-	mv	castToClassPtr_2, malloc_5
-	sw	castToClassPtr_2, 0(mars.addr)
-	lh	mars_2, 0(mars.addr)
-	addi	TA.state.addr_2, mars_2, 0
-	lh	TA.state_2, 0(TA.state.addr_2)
-	la	__const.main.str4, __const.main.str4
-	sw	__const.main.str4, 0(TA.state.addr_2)
-	lh	mars_3, 0(mars.addr)
-	lh	TA.anger_2, 4(mars_3)
-	lui	lui, %hi(init_anger)
-	lh	init_anger, %lo(init_anger)(lui)
-	sw	init_anger, 4(mars_3)
-	la	__const.main.str5, __const.main.str5
-	lh	mr_4, 0(mr.addr)
-	mv	a0, __const.main.str5
-	mv	a1, mr_4
-	call	_work$$YGXPADUTA$$$Z
-	la	__const.main.str6, __const.main.str6
-	lh	mars_4, 0(mars.addr)
-	mv	a0, __const.main.str6
-	mv	a1, mars_4
-	call	_work$$YGXPADUTA$$$Z
-	la	__const.main.str7, __const.main.str6
-	lh	mars_5, 0(mars.addr)
-	mv	a0, __const.main.str7
-	mv	a1, mars_5
-	call	_work$$YGXPADUTA$$$Z
+	mv	malloc_3, a0
+	mv	castToClassPtr, malloc_3
+	sw	castToClassPtr, 0(mrJiang.addr)
+	lh	mrJiang, 0(mrJiang.addr)
+	mv	a0, mrJiang
+	call	_solveAge$older$$QEAXXZ
+	lh	mrJiang_2, 0(mrJiang.addr)
+	lh	older.age, 0(mrJiang_2)
+	li	constInt1, 10000
+	bgt	older.age, constInt1, .LBB2_1
+	j	.LBB2_2
+.LBB2_1:                                # %if.then
+	la	__const.main.str0, __const.main.str0
+	mv	a0, __const.main.str0
+	call	_println$$YGXPAD$Z
+	j	.LBB2_2
+.LBB2_2:                                # %if.end
 	sw	zero, 0(retval)
-	j	.LBB2_1
-.LBB2_1:                                # %return
+	j	.LBB2_3
+.LBB2_3:                                # %return
 	lh	returnValue, 0(retval)
 	mv	a0, returnValue
 	mv	s0, .s0.save
@@ -241,41 +270,7 @@ main:                                   # @main
 
 
 	.section	.sdata,"aw",@progbits
-	.globl	init_anger
-	.p2align	2
-init_anger:
-	.word	100                     # 100
-
-	.globl	__const._work$$YGXPADUTA$$$Z.str0
-__const._work$$YGXPADUTA$$$Z.str0:
-	.asciz	", "
-
-	.globl	__const._work$$YGXPADUTA$$$Z.str1
-__const._work$$YGXPADUTA$$$Z.str1:
-	.asciz	" enjoys this work. XD"
-
-	.globl	__const.main.str6
-__const.main.str6:
-	.asciz	"Mars"
-
-	.globl	__const._work$$YGXPADUTA$$$Z.str2
-__const._work$$YGXPADUTA$$$Z.str2:
-	.asciz	" wants to give up!!!!!"
-
-	.globl	__const.main.str5
-__const.main.str5:
-	.asciz	"MR"
-
-	.globl	work_anger
-	.p2align	2
-work_anger:
-	.word	10                      # 10
-
-	.globl	__const.main.str4
-__const.main.str4:
-	.asciz	"the striking TA"
-
-	.globl	__const.main.str3
-__const.main.str3:
-	.asciz	"the leading TA"
+	.globl	__const.main.str0
+__const.main.str0:
+	.asciz	"eternal!"
 
