@@ -60,12 +60,12 @@ public class LD extends ASMInst {
     }
     @Override
     public String emitCode() {
-        return "\tl"+((size==1)?"b":((size==4)?"h":"w"))+"\t"
+        return "\tl"+((size==1)?"b":((size==4)?"w":"h"))+"\t"
                 + rd.emitCode() + ", " + addr.emitCode();
     }
     @Override
     public String toString() {
-        return "l"+((size==1)?"b":((size==4)?"h":"w"))+" "
+        return "l"+((size==1)?"b":((size==4)?"w":"h"))+" "
                 + rd.toString() + ", " + addr.toString();
     }
     @Override

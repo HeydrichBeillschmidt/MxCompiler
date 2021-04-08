@@ -165,11 +165,7 @@ entry:
 	%mrJiang_2 = load %class.older*, %class.older** %mrJiang.addr, align 4
 	%older.age.addr = getelementptr %class.older, %class.older* %mrJiang_2, i32 0, i32 0
 	%older.age = load i32, i32* %older.age.addr, align 4
-	call void @_printlnInt$$YGXH$Z(i32 %older.age)
-	%mrJiang_3 = load %class.older*, %class.older** %mrJiang.addr, align 4
-	%older.age.addr_2 = getelementptr %class.older, %class.older* %mrJiang_3, i32 0, i32 0
-	%older.age_2 = load i32, i32* %older.age.addr_2, align 4
-	%sgt = icmp sgt i32 %older.age_2, 10000
+	%sgt = icmp sgt i32 %older.age, 10000
 	br i1 %sgt, label %if.then, label %if.end
 
 if.then:
