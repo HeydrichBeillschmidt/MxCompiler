@@ -49,6 +49,11 @@ public class Peephole {
                                 break;
                             }
                         }
+                        if (replace instanceof ST
+                                && sameAddr( ((LD)i).getAddr(),
+                                    ((ST)replace).getAddr() ) ) {
+                            interrupt = true;
+                        }
                         if (interrupt) break;
                     }
                 }
@@ -71,6 +76,11 @@ public class Peephole {
                                 interrupt = true;
                                 break;
                             }
+                        }
+                        if (replace instanceof ST
+                                && sameAddr( ((ST)i).getAddr(),
+                                    ((ST)replace).getAddr() ) ) {
+                            interrupt = true;
                         }
                         if (interrupt) break;
                     }
