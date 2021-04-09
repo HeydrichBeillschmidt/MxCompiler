@@ -77,7 +77,7 @@ public class RegisterAllocator {
     //      -- nodes successfully colored
     private final Set<VirtualReg> coloredNodes;
     //      -- stack containing temporaries removed from the graph
-    private final Stack<VirtualReg> selectStack;
+    private final Set<VirtualReg> selectStack;
 
     //  --  move sets. mutually disjoint.
     //      (will, the first 3 sets just collect useless moves)
@@ -122,7 +122,7 @@ public class RegisterAllocator {
         spilledNodes = new HashSet<>();
         coalescedNodes = new HashSet<>();
         coloredNodes = new HashSet<>();
-        selectStack = new Stack<>();
+        selectStack = new LinkedHashSet<>();
 
         coalescedMoves = new HashSet<>();
         constrainedMoves = new HashSet<>();
@@ -199,7 +199,8 @@ public class RegisterAllocator {
     }
 
     // build interference graph and init workistMoves by static liveness analysis
-    // interference graph is instance of graph<VR, MV>
+    // interference graph describes interference between all VRs living simultaneously
+    //     i.e. graph of {{VR}, {Edge}}
     private void build() {
         for (var b: curFunc.getBlocks().values()) {
             Set<VirtualReg> curLive = b.getLiveOut();
@@ -262,7 +263,7 @@ public class RegisterAllocator {
     private void simplify() {
         VirtualReg n = simplifyWorklist.iterator().next();
         simplifyWorklist.remove(n);
-        selectStack.push(n);
+        selectStack.add(n);
         for (var m: adjacent(n)) decrementDegree(m);
     }
     // get adjacent nodes of n
@@ -419,9 +420,10 @@ public class RegisterAllocator {
     }
 
     private void assignColors() {
-        //detect("at assign");
-        while (!selectStack.isEmpty()) {
-            VirtualReg n = selectStack.pop();
+        Stack<VirtualReg> stack = new Stack<>();
+        selectStack.forEach(stack::push);
+        while (!stack.isEmpty()) {
+            VirtualReg n = stack.pop();
             ArrayList<PhysicalReg> okColors = new ArrayList<>(PhysicalReg.assignablePhyRegs);
             Set<VirtualReg> colored = new HashSet<>(coloredNodes);
             colored.addAll(precolored);
