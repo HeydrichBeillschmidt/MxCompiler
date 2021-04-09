@@ -32,6 +32,7 @@ public class Peephole {
                 if (i instanceof LD) {
                     PhysicalReg rd = i.getRd().getColor();
                     PhysicalReg addr = ((LD) i).getAddr().getBase().getColor();
+                    if (rd==addr) continue;
                     for (ASMInst replace = i.getNextInst();
                          replace!=null; replace = replace.getNextInst()) {
                         if (replace instanceof LD

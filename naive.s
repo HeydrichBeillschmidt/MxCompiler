@@ -269,216 +269,185 @@ main:                                   # @main
 	sw	postfix_inc_4, %lo(i)(lui28)
 	j	.LBB2_13
 .LBB2_16:                               # %for.end_4
-	lui	lui29, %hi(i)
-	lw	i_14, %lo(i)(lui29)
+	lui	lui29, %hi(a)
+	lw	a_3, %lo(a)(lui29)
+	addi	elementPtr_6, a_3, 12
+	lw	arrayElement_6, 0(elementPtr_6)
+	addi	elementPtr_7, arrayElement_6, 36
+	lw	arrayElement_7, 0(elementPtr_7)
+	mv	a0, arrayElement_7
+	call	_printNum$$YGXH$Z
 	lui	lui30, %hi(i)
-	sw	zero, %lo(i)(lui30)
+	lw	i_14, %lo(i)(lui30)
+	lui	lui31, %hi(i)
+	sw	zero, %lo(i)(lui31)
 	j	.LBB2_17
 .LBB2_17:                               # %for.cond_5
-	lui	lui31, %hi(i)
-	lw	i_15, %lo(i)(lui31)
-	li	constInt8, 5
-	blt	i_15, constInt8, .LBB2_18
-	j	.LBB2_20
-.LBB2_18:                               # %for.body_5
-	lui	lui32, %hi(b)
-	lw	b_3, %lo(b)(lui32)
-	lui	lui33, %hi(i)
-	lw	i_16, %lo(i)(lui33)
-	slli	mul6, i_16, 2
-	add	elementPtr_6, b_3, mul6
-	lw	arrayElement_6, 0(elementPtr_6)
-	lw	rec.num_2, 0(arrayElement_6)
-	mv	a0, rec.num_2
-	call	_printNum$$YGXH$Z
-	j	.LBB2_19
-.LBB2_19:                               # %for.inc_5
-	lui	lui34, %hi(i)
-	lw	i_17, %lo(i)(lui34)
-	addi	postfix_inc_5, i_17, 1
-	lui	lui35, %hi(i)
-	sw	postfix_inc_5, %lo(i)(lui35)
-	j	.LBB2_17
-.LBB2_20:                               # %for.end_5
-	lui	lui36, %hi(a)
-	lw	a_3, %lo(a)(lui36)
-	addi	elementPtr_7, a_3, 12
-	lw	arrayElement_7, 0(elementPtr_7)
-	addi	elementPtr_8, arrayElement_7, 36
-	lw	arrayElement_8, 0(elementPtr_8)
-	mv	a0, arrayElement_8
-	call	_printNum$$YGXH$Z
-	lui	lui37, %hi(i)
-	lw	i_18, %lo(i)(lui37)
-	lui	lui38, %hi(i)
-	sw	zero, %lo(i)(lui38)
-	j	.LBB2_21
-.LBB2_21:                               # %for.cond_6
-	lui	lui39, %hi(i)
-	lw	i_19, %lo(i)(lui39)
-	li	constInt9, 3
-	ble	i_19, constInt9, .LBB2_26
-	j	.LBB2_28
-.LBB2_22:                               # %for.cond_7
-	lui	lui40, %hi(j)
-	lw	j_6, %lo(j)(lui40)
-	li	constInt10, 9
-	ble	j_6, constInt10, .LBB2_23
-	j	.LBB2_25
-.LBB2_23:                               # %for.body_6
-	lui	lui41, %hi(a)
-	lw	a_4, %lo(a)(lui41)
-	lui	lui42, %hi(i)
-	lw	i_20, %lo(i)(lui42)
-	slli	mul7, i_20, 2
-	add	elementPtr_9, a_4, mul7
-	lw	arrayElement_9, 0(elementPtr_9)
-	lui	lui43, %hi(j)
-	lw	j_7, %lo(j)(lui43)
-	slli	mul8, j_7, 2
-	add	elementPtr_10, arrayElement_9, mul8
-	lw	arrayElement_10, 0(elementPtr_10)
-	lui	lui44, %hi(i)
-	lw	i_21, %lo(i)(lui44)
-	li	constInt11, 10
-	mul	mul, i_21, constInt11
-	lui	lui45, %hi(j)
-	lw	j_8, %lo(j)(lui45)
-	add	add, mul, j_8
-	sw	add, 0(elementPtr_10)
+	lui	lui32, %hi(i)
+	lw	i_15, %lo(i)(lui32)
+	li	constInt8, 3
+	ble	i_15, constInt8, .LBB2_22
 	j	.LBB2_24
-.LBB2_24:                               # %for.inc_6
-	lui	lui46, %hi(j)
-	lw	j_9, %lo(j)(lui46)
-	addi	postfix_inc_6, j_9, 1
-	lui	lui47, %hi(j)
-	sw	postfix_inc_6, %lo(j)(lui47)
-	j	.LBB2_22
-.LBB2_25:                               # %for.end_6
-	j	.LBB2_27
-.LBB2_26:                               # %for.body_7
-	lui	lui48, %hi(j)
-	lw	j_5, %lo(j)(lui48)
-	lui	lui49, %hi(j)
-	sw	zero, %lo(j)(lui49)
-	j	.LBB2_22
-.LBB2_27:                               # %for.inc_7
-	lui	lui50, %hi(i)
-	lw	i_22, %lo(i)(lui50)
-	addi	postfix_inc_7, i_22, 1
-	lui	lui51, %hi(i)
-	sw	postfix_inc_7, %lo(i)(lui51)
+.LBB2_18:                               # %for.cond_6
+	lui	lui33, %hi(j)
+	lw	j_6, %lo(j)(lui33)
+	li	constInt9, 9
+	ble	j_6, constInt9, .LBB2_19
 	j	.LBB2_21
-.LBB2_28:                               # %for.end_7
-	lui	lui52, %hi(i)
-	lw	i_23, %lo(i)(lui52)
-	lui	lui53, %hi(i)
-	sw	zero, %lo(i)(lui53)
-	j	.LBB2_29
-.LBB2_29:                               # %for.cond_8
-	lui	lui54, %hi(i)
-	lw	i_24, %lo(i)(lui54)
-	li	constInt12, 3
-	ble	i_24, constInt12, .LBB2_34
-	j	.LBB2_36
-.LBB2_30:                               # %for.cond_9
-	lui	lui55, %hi(j)
-	lw	j_11, %lo(j)(lui55)
-	li	constInt13, 9
-	ble	j_11, constInt13, .LBB2_31
-	j	.LBB2_33
-.LBB2_31:                               # %for.body_8
-	lui	lui56, %hi(a)
-	lw	a_5, %lo(a)(lui56)
-	lui	lui57, %hi(i)
-	lw	i_25, %lo(i)(lui57)
-	slli	mul9, i_25, 2
-	add	elementPtr_11, a_5, mul9
-	lw	arrayElement_11, 0(elementPtr_11)
-	lui	lui58, %hi(j)
-	lw	j_12, %lo(j)(lui58)
-	slli	mul10, j_12, 2
-	add	elementPtr_12, arrayElement_11, mul10
-	lw	arrayElement_12, 0(elementPtr_12)
-	mv	a0, arrayElement_12
-	call	_printNum$$YGXH$Z
+.LBB2_19:                               # %for.body_5
+	lui	lui34, %hi(a)
+	lw	a_4, %lo(a)(lui34)
+	lui	lui35, %hi(i)
+	lw	i_16, %lo(i)(lui35)
+	slli	mul6, i_16, 2
+	add	elementPtr_8, a_4, mul6
+	lw	arrayElement_8, 0(elementPtr_8)
+	lui	lui36, %hi(j)
+	lw	j_7, %lo(j)(lui36)
+	slli	mul7, j_7, 2
+	add	elementPtr_9, arrayElement_8, mul7
+	lw	arrayElement_9, 0(elementPtr_9)
+	lui	lui37, %hi(i)
+	lw	i_17, %lo(i)(lui37)
+	li	constInt10, 10
+	mul	mul, i_17, constInt10
+	lui	lui38, %hi(j)
+	lw	j_8, %lo(j)(lui38)
+	add	add, mul, j_8
+	sw	add, 0(elementPtr_9)
+	j	.LBB2_20
+.LBB2_20:                               # %for.inc_5
+	lui	lui39, %hi(j)
+	lw	j_9, %lo(j)(lui39)
+	addi	postfix_inc_5, j_9, 1
+	lui	lui40, %hi(j)
+	sw	postfix_inc_5, %lo(j)(lui40)
+	j	.LBB2_18
+.LBB2_21:                               # %for.end_5
+	j	.LBB2_23
+.LBB2_22:                               # %for.body_6
+	lui	lui41, %hi(j)
+	lw	j_5, %lo(j)(lui41)
+	lui	lui42, %hi(j)
+	sw	zero, %lo(j)(lui42)
+	j	.LBB2_18
+.LBB2_23:                               # %for.inc_6
+	lui	lui43, %hi(i)
+	lw	i_18, %lo(i)(lui43)
+	addi	postfix_inc_6, i_18, 1
+	lui	lui44, %hi(i)
+	sw	postfix_inc_6, %lo(i)(lui44)
+	j	.LBB2_17
+.LBB2_24:                               # %for.end_6
+	lui	lui45, %hi(i)
+	lw	i_19, %lo(i)(lui45)
+	lui	lui46, %hi(i)
+	sw	zero, %lo(i)(lui46)
+	j	.LBB2_25
+.LBB2_25:                               # %for.cond_7
+	lui	lui47, %hi(i)
+	lw	i_20, %lo(i)(lui47)
+	li	constInt11, 3
+	ble	i_20, constInt11, .LBB2_30
 	j	.LBB2_32
-.LBB2_32:                               # %for.inc_8
-	lui	lui59, %hi(j)
-	lw	j_13, %lo(j)(lui59)
-	addi	postfix_inc_8, j_13, 1
-	lui	lui60, %hi(j)
-	sw	postfix_inc_8, %lo(j)(lui60)
-	j	.LBB2_30
-.LBB2_33:                               # %for.end_8
-	j	.LBB2_35
-.LBB2_34:                               # %for.body_9
-	lui	lui61, %hi(j)
-	lw	j_10, %lo(j)(lui61)
-	lui	lui62, %hi(j)
-	sw	zero, %lo(j)(lui62)
-	j	.LBB2_30
-.LBB2_35:                               # %for.inc_9
-	lui	lui63, %hi(i)
-	lw	i_26, %lo(i)(lui63)
-	addi	postfix_inc_9, i_26, 1
-	lui	lui64, %hi(i)
-	sw	postfix_inc_9, %lo(i)(lui64)
+.LBB2_26:                               # %for.cond_8
+	lui	lui48, %hi(j)
+	lw	j_11, %lo(j)(lui48)
+	li	constInt12, 9
+	ble	j_11, constInt12, .LBB2_27
 	j	.LBB2_29
-.LBB2_36:                               # %for.end_9
-	lui	lui65, %hi(a)
-	lw	a_6, %lo(a)(lui65)
-	addi	elementPtr_13, a_6, 8
-	lw	arrayElement_13, 0(elementPtr_13)
-	addi	elementPtr_14, arrayElement_13, 40
-	lw	arrayElement_14, 0(elementPtr_14)
-	sw	zero, 0(elementPtr_14)
-	lui	lui66, %hi(a)
-	lw	a_7, %lo(a)(lui66)
-	addi	elementPtr_15, a_7, 8
-	lw	arrayElement_15, 0(elementPtr_15)
-	addi	elementPtr_16, arrayElement_15, 40
-	lw	arrayElement_16, 0(elementPtr_16)
-	mv	a0, arrayElement_16
+.LBB2_27:                               # %for.body_7
+	lui	lui49, %hi(a)
+	lw	a_5, %lo(a)(lui49)
+	lui	lui50, %hi(i)
+	lw	i_21, %lo(i)(lui50)
+	slli	mul8, i_21, 2
+	add	elementPtr_10, a_5, mul8
+	lw	arrayElement_10, 0(elementPtr_10)
+	lui	lui51, %hi(j)
+	lw	j_12, %lo(j)(lui51)
+	slli	mul9, j_12, 2
+	add	elementPtr_11, arrayElement_10, mul9
+	lw	arrayElement_11, 0(elementPtr_11)
+	mv	a0, arrayElement_11
 	call	_printNum$$YGXH$Z
-	lui	lui67, %hi(b)
-	lw	b_4, %lo(b)(lui67)
-	addi	elementPtr_17, b_4, 0
-	lw	arrayElement_17, 0(elementPtr_17)
-	lw	rec.num_3, 0(arrayElement_17)
+	j	.LBB2_28
+.LBB2_28:                               # %for.inc_7
+	lui	lui52, %hi(j)
+	lw	j_13, %lo(j)(lui52)
+	addi	postfix_inc_7, j_13, 1
+	lui	lui53, %hi(j)
+	sw	postfix_inc_7, %lo(j)(lui53)
+	j	.LBB2_26
+.LBB2_29:                               # %for.end_7
+	j	.LBB2_31
+.LBB2_30:                               # %for.body_8
+	lui	lui54, %hi(j)
+	lw	j_10, %lo(j)(lui54)
+	lui	lui55, %hi(j)
+	sw	zero, %lo(j)(lui55)
+	j	.LBB2_26
+.LBB2_31:                               # %for.inc_8
+	lui	lui56, %hi(i)
+	lw	i_22, %lo(i)(lui56)
+	addi	postfix_inc_8, i_22, 1
+	lui	lui57, %hi(i)
+	sw	postfix_inc_8, %lo(i)(lui57)
+	j	.LBB2_25
+.LBB2_32:                               # %for.end_8
+	lui	lui58, %hi(a)
+	lw	a_6, %lo(a)(lui58)
+	addi	elementPtr_12, a_6, 8
+	lw	arrayElement_12, 0(elementPtr_12)
+	addi	elementPtr_13, arrayElement_12, 40
+	lw	arrayElement_13, 0(elementPtr_13)
+	sw	zero, 0(elementPtr_13)
+	lui	lui59, %hi(a)
+	lw	a_7, %lo(a)(lui59)
+	addi	elementPtr_14, a_7, 8
+	lw	arrayElement_14, 0(elementPtr_14)
+	addi	elementPtr_15, arrayElement_14, 40
+	lw	arrayElement_15, 0(elementPtr_15)
+	mv	a0, arrayElement_15
+	call	_printNum$$YGXH$Z
+	lui	lui60, %hi(b)
+	lw	b_3, %lo(b)(lui60)
+	addi	elementPtr_16, b_3, 0
+	lw	arrayElement_16, 0(elementPtr_16)
+	lw	rec.num_2, 0(arrayElement_16)
 	addi	prefix_neg_2, zero, -2
-	sw	prefix_neg_2, 0(arrayElement_17)
-	lui	lui68, %hi(b)
-	lw	b_5, %lo(b)(lui68)
-	lui	lui69, %hi(a)
-	lw	a_8, %lo(a)(lui69)
-	addi	elementPtr_18, a_8, 8
+	sw	prefix_neg_2, 0(arrayElement_16)
+	lui	lui61, %hi(b)
+	lw	b_4, %lo(b)(lui61)
+	lui	lui62, %hi(a)
+	lw	a_8, %lo(a)(lui62)
+	addi	elementPtr_17, a_8, 8
+	lw	arrayElement_17, 0(elementPtr_17)
+	addi	elementPtr_18, arrayElement_17, 40
 	lw	arrayElement_18, 0(elementPtr_18)
-	addi	elementPtr_19, arrayElement_18, 40
+	slli	mul10, arrayElement_18, 2
+	add	elementPtr_19, b_4, mul10
 	lw	arrayElement_19, 0(elementPtr_19)
-	slli	mul11, arrayElement_19, 2
-	add	elementPtr_20, b_5, mul11
+	lw	rec.num_3, 0(arrayElement_19)
+	addi	prefix_neg_3, zero, -10
+	sw	prefix_neg_3, 0(arrayElement_19)
+	lui	lui63, %hi(b)
+	lw	b_5, %lo(b)(lui63)
+	addi	elementPtr_20, b_5, 0
 	lw	arrayElement_20, 0(elementPtr_20)
 	lw	rec.num_4, 0(arrayElement_20)
-	addi	prefix_neg_3, zero, -10
-	sw	prefix_neg_3, 0(arrayElement_20)
-	lui	lui70, %hi(b)
-	lw	b_6, %lo(b)(lui70)
-	addi	elementPtr_21, b_6, 0
+	mv	a0, rec.num_4
+	call	_printNum$$YGXH$Z
+	lui	lui64, %hi(b)
+	lw	b_6, %lo(b)(lui64)
+	addi	elementPtr_21, b_6, 4
 	lw	arrayElement_21, 0(elementPtr_21)
 	lw	rec.num_5, 0(arrayElement_21)
 	mv	a0, rec.num_5
 	call	_printNum$$YGXH$Z
-	lui	lui71, %hi(b)
-	lw	b_7, %lo(b)(lui71)
-	addi	elementPtr_22, b_7, 4
-	lw	arrayElement_22, 0(elementPtr_22)
-	lw	rec.num_6, 0(arrayElement_22)
-	mv	a0, rec.num_6
-	call	_printNum$$YGXH$Z
 	sw	zero, 0(retval)
-	j	.LBB2_37
-.LBB2_37:                               # %return
+	j	.LBB2_33
+.LBB2_33:                               # %return
 	lw	returnValue, 0(retval)
 	mv	a0, returnValue
 	mv	s0, .s0.save
