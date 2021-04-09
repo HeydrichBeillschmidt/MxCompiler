@@ -119,8 +119,8 @@ public class Main {
             RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
             registerAllocator.run();
 
-            Peephole peephole = new Peephole(asmModule);
-            peephole.run();
+            //Peephole peephole = new Peephole(asmModule);
+            //peephole.run();
 
             CodeEmitter codeEmitter = new CodeEmitter("output.s");
             codeEmitter.run(asmModule);
