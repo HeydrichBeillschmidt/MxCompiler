@@ -9,6 +9,8 @@ import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
+import Mx.Optimize.SSAConstructor;
+import Mx.Optimize.SSADestructor;
 import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
@@ -104,26 +106,26 @@ public class Main {
                 throw new RuntimeException();
             }
 
+            IRModule irModule = irBuilder.getModule();
+
+            new SSAConstructor(irModule).run();
+
             if (emitLL) new IRPrinter("test.ll").run(irBuilder.getModule());
 
-            IRModule irModule = irBuilder.getModule();
+            new SSADestructor(irModule).run();
 
             InstructionSelector instructionSelector = new InstructionSelector();
             irModule.accept(instructionSelector);
 
             ASMModule asmModule = instructionSelector.getAsmModule();
 
-            //CodeEmitter naiveEmitter = new CodeEmitter("naive.s");
-            //naiveEmitter.run(asmModule);
+            //new CodeEmitter("naive.s").run(asmModule);
 
-            RegisterAllocator registerAllocator = new RegisterAllocator(asmModule);
-            registerAllocator.run();
+            new RegisterAllocator(asmModule).run();
 
-            //Peephole peephole = new Peephole(asmModule);
-            //peephole.run();
+            new Peephole(asmModule).run();
 
-            CodeEmitter codeEmitter = new CodeEmitter("output.s");
-            codeEmitter.run(asmModule);
+            new CodeEmitter("output.s").run(asmModule);
         }
     }
 }
