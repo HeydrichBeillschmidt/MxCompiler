@@ -422,11 +422,11 @@ public class RegisterAllocator {
     private void assignColors() {
         Stack<VirtualReg> stack = new Stack<>();
         selectStack.forEach(stack::push);
+        Set<VirtualReg> colored = new HashSet<>(coloredNodes);
+        colored.addAll(precolored);
         while (!stack.isEmpty()) {
             VirtualReg n = stack.pop();
             ArrayList<PhysicalReg> okColors = new ArrayList<>(PhysicalReg.assignablePhyRegs);
-            Set<VirtualReg> colored = new HashSet<>(coloredNodes);
-            colored.addAll(precolored);
             for (var w: n.getAdjList()) {
                 VirtualReg wAliasRoot = getAlias(w);
                 if (colored.contains(wAliasRoot)) okColors.remove(wAliasRoot.getColor());
@@ -434,6 +434,7 @@ public class RegisterAllocator {
             if (okColors.isEmpty()) spilledNodes.add(n);
             else {
                 coloredNodes.add(n);
+                colored.add(n);
                 n.setColor(okColors.get(0));
             }
         }
