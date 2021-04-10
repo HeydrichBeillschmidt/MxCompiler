@@ -1,5 +1,8 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Null;
+import Mx.IR.Operand.Operand;
+
 public class PointerType extends IRType {
     private final IRType baseType;
     private final int dim;
@@ -25,5 +28,10 @@ public class PointerType extends IRType {
     @Override
     public String toString() {
         return baseType.toString() + "*";
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return new Null();
     }
 }

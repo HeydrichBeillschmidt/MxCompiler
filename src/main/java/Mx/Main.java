@@ -9,6 +9,7 @@ import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
+import Mx.Optimize.DominanceAnalysis;
 import Mx.Optimize.SSAConstructor;
 import Mx.Optimize.SSADestructor;
 import Mx.Utils.Errors.*;
@@ -108,6 +109,7 @@ public class Main {
 
             IRModule irModule = irBuilder.getModule();
 
+            new DominanceAnalysis(irModule).run();
             new SSAConstructor(irModule).run();
 
             if (emitLL) new IRPrinter("test.ll").run(irBuilder.getModule());

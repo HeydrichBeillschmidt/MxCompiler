@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class BitCast extends IRInst {
     private final Register dst;
-    private final Operand src;
+    private Operand src;
     private final IRType castType;
 
     public BitCast(IRBlock block, Register dst, Operand src, IRType castType) {
@@ -46,6 +46,14 @@ public class BitCast extends IRInst {
     @Override
     public Set<Operand> getUses() {
         return new HashSet<>(Collections.singletonList(src));
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (src==oldUse) {
+            src.removeUse(this);
+            src = newUse;
+            src.addUse(this);
+        }
     }
 
     @Override

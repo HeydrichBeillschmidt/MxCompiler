@@ -35,6 +35,10 @@ abstract public class Operand {
     public void removeUse(IRInst inst) {
         uses.remove(inst);
     }
+    public void replaceUse(Operand newUse) {
+        uses.forEach(u -> u.replaceUse(this, newUse));
+        uses.clear();
+    }
 
     abstract public boolean isConstant();
     abstract public String toString();

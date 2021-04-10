@@ -14,7 +14,7 @@ import Mx.Utils.ExceptionHandler;
 import Mx.Utils.FuncNameDecorator;
 import Mx.Utils.FuncSymbolTable;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Function {
     private final IRModule module;
@@ -54,8 +54,8 @@ public class Function {
         }
         else {
             retVal = new Register(new PointerType(retType),
-                    "retval");
-            //eliminate alloca
+                    "retval$addr");
+            /*//eliminate alloca
             Register dst = new Register(IRModule.stringT, "malloc");
             addSymbol(dst);
             ArrayList<Operand> parameters = new ArrayList<>();
@@ -63,8 +63,8 @@ public class Function {
             Function mallocFunc = module.getExternalFunction("malloc");
             entranceBlock.addInst(new Call(entranceBlock, dst, mallocFunc, parameters));
             entranceBlock.addInst(new BitCast(entranceBlock, retVal, dst, new PointerType(retType)));
-            //entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
-            Register returnValue = new Register(retType, "returnValue");
+            */entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
+            Register returnValue = new Register(retType, "retval");
             returnBlock.addInst(new Load(returnBlock, returnValue, retType, retVal));
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));
             symbolTable.putIR(retVal);
@@ -142,6 +142,94 @@ public class Function {
     }
     public void setSideEffect(boolean sideEffect) {
         this.sideEffect = sideEffect;
+    }
+
+    // for dominance analysis
+    // reverse post-order
+    public ArrayList<IRBlock> getRPO() {
+        Set<IRBlock> visited = new HashSet<>();
+        ArrayList<IRBlock> order = new ArrayList<>();
+        _dfsRecursive(entranceBlock, order, visited);
+        Collections.reverse(order);
+        return order;
+    }
+    private void _dfsRecursive(IRBlock block, ArrayList<IRBlock> order,
+                               Set<IRBlock> visited) {
+        visited.add(block);
+        for (var s: block.getSuccessors()) {
+            if (!visited.contains(s)) {
+                _dfsRecursive(s, order, visited);
+            }
+        }
+        order.add(block);
+    }
+    public void solveDominance() {
+        ArrayList<IRBlock> RPO = getRPO();
+        ArrayList<IRBlock> literalOrder = getAllBlocks();
+        int cnt = 0;
+        for (var b: literalOrder) b.setBlockCnt(cnt++);
+        RPO.forEach(IRBlock::initDomInfo);
+        entranceBlock.setIDom(entranceBlock);
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (var b: RPO) {
+                if (b==entranceBlock) continue;
+                IRBlock newIDom = null;
+                for (var p: b.getPredecessors()) {
+                    if (p.getIDom()!=null) {
+                        newIDom = p;
+                        break;
+                    }
+                }
+                for (var p: b.getPredecessors()) {
+                    if (p==newIDom) continue;
+                    if (p.getIDom()!=null) {
+                        newIDom = intersect(newIDom, p);
+                    }
+                }
+                if (b.getIDom()!=newIDom) {
+                    b.setIDom(newIDom);
+                    changed = true;
+                }
+            }
+        }
+    }
+    // find the LCA of b1 & b2 in dominance tree
+    private IRBlock intersect(IRBlock b1, IRBlock b2) {
+        IRBlock finger1 = b1;
+        IRBlock finger2 = b2;
+        while (finger1 != finger2) {
+            while (finger1.getBlockCnt() < finger2.getBlockCnt()) {
+                finger1 = finger1.getIDom();
+            }
+            while (finger2.getBlockCnt() < finger1.getBlockCnt()) {
+                finger2 = finger2.getIDom();
+            }
+        }
+        return finger1;
+    }
+    public void solveDF() {
+        for (var b: getAllBlocks()) {
+            if (b.getPredecessors().size() >= 2) {
+                for (var p: b.getPredecessors()) {
+                    IRBlock runner = p;
+                    while (runner!= b.getIDom()) {
+                        runner.addDF(b);
+                        runner = runner.getIDom();
+                    }
+                }
+            }
+        }
+    }
+
+    // for SSA
+    public ArrayList<Alloca> getAllocas() {
+        ArrayList<Alloca> ans = new ArrayList<>();
+        entranceBlock.getAllInst().stream()
+                .filter(i -> i instanceof Alloca)
+                .forEach(i -> ans.add((Alloca) i));
+        return ans;
     }
 
     public String declareToString() {

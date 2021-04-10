@@ -1,5 +1,7 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Operand;
+
 import java.util.ArrayList;
 
 public class FunctionType extends IRType {
@@ -33,5 +35,10 @@ public class FunctionType extends IRType {
         }
         string.append(")\n");
         return string.toString();
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return null;
     }
 }

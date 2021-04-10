@@ -1,5 +1,8 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.ConstInt;
+import Mx.IR.Operand.Operand;
+
 public class IntegerType extends IRType {
     private final int size;
 
@@ -15,5 +18,10 @@ public class IntegerType extends IRType {
     @Override
     public String toString() {
         return "i" + size*8;
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return new ConstInt(0, size);
     }
 }

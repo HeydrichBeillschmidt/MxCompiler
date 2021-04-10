@@ -15,8 +15,8 @@ public class BinaryOp extends IRInst {
     }
     private final Register dst;
     private final BinaryOpName opName;
-    private final Operand op1;
-    private final Operand op2;
+    private Operand op1;
+    private Operand op2;
     private final boolean commutable;
 
     public BinaryOp(IRBlock block, Register dst, BinaryOpName opName,
@@ -68,6 +68,19 @@ public class BinaryOp extends IRInst {
         ans.add(op1);
         ans.add(op2);
         return ans;
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (op1==oldUse) {
+            op1.removeUse(this);
+            op1 = newUse;
+            op1.addUse(this);
+        }
+        if (op2==oldUse) {
+            op1.removeUse(this);
+            op2 = newUse;
+            op2.addUse(this);
+        }
     }
 
     @Override

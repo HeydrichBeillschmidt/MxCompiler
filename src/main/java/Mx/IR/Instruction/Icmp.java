@@ -19,8 +19,8 @@ public class Icmp extends IRInst {
     private final Register dst;
     private final IcmpOpName opName;
     private final IRType type;
-    private final Operand op1;
-    private final Operand op2;
+    private Operand op1;
+    private Operand op2;
 
     public Icmp(IRBlock block, Register dst, IcmpOpName opName,
                     IRType type, Operand op1, Operand op2) {
@@ -72,6 +72,19 @@ public class Icmp extends IRInst {
         ans.add(op1);
         ans.add(op2);
         return ans;
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (op1==oldUse) {
+            op1.removeUse(this);
+            op1 = newUse;
+            op1.addUse(this);
+        }
+        if (op2==oldUse) {
+            op2.removeUse(this);
+            op2 = newUse;
+            op2.addUse(this);
+        }
     }
 
     @Override

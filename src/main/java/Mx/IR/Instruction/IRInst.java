@@ -57,6 +57,7 @@ abstract public class IRInst {
     public Set<Operand> getUses() {
         return new HashSet<>();
     }
+    public void replaceUse(Operand oldUse, Operand newUse) {}
 
     abstract public String toString();
     abstract public void accept(IRVisitor visitor);

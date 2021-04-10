@@ -73,6 +73,17 @@ public class Call extends IRInst {
     public Set<Operand> getUses() {
         return new HashSet<>(parameterList);
     }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        for (int i = 0, it = parameterList.size(); i < it; ++i) {
+            Operand p = parameterList.get(i);
+            if (p==oldUse) {
+                p.removeUse(this);
+                parameterList.set(i, newUse);
+                parameterList.get(i).addUse(this);
+            }
+        }
+    }
 
     @Override
     public String toString() {

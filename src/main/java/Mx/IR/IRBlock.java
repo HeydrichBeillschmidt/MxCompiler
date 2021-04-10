@@ -1,8 +1,11 @@
 package Mx.IR;
 
+import Mx.IR.Instruction.Alloca;
 import Mx.IR.Instruction.IRInst;
+import Mx.IR.Instruction.Phi;
+import Mx.IR.Operand.Operand;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class IRBlock {
     private String name;
@@ -15,6 +18,16 @@ public class IRBlock {
 
     private final ArrayList<IRBlock> predecessors;
     private final ArrayList<IRBlock> successors;
+
+    // for dominance analysis
+    private int blockCnt;
+    //     -- dominance frontier
+    private Set<IRBlock> DF;
+    //     -- immediate dominator
+    private IRBlock iDom;
+    // for SSA
+    private Map<Alloca, Phi> phiMap;
+    private Map<Alloca, Operand> renameTable;
 
     public IRBlock(String name) {
         this.name = name;
@@ -131,6 +144,63 @@ public class IRBlock {
     }
     public void addSuccessor(IRBlock successor) {
         successors.add(successor);
+    }
+
+    // for dominance analysis
+    public int getBlockCnt() {
+        return blockCnt;
+    }
+    public void setBlockCnt(int blockCnt) {
+        this.blockCnt = blockCnt;
+    }
+    public void initDomInfo() {
+        DF = new HashSet<>();
+        iDom = null;
+    }
+    public Set<IRBlock> getDF() {
+        return DF;
+    }
+    public void addDF(IRBlock df) {
+        DF.add(df);
+    }
+    public IRBlock getIDom() {
+        return iDom;
+    }
+    public void setIDom(IRBlock iDom) {
+        this.iDom = iDom;
+    }
+
+    // for SSA
+    public void initSSA() {
+        phiMap = new HashMap<>();
+        renameTable = new HashMap<>();
+    }
+    public Set<Alloca> getPseudoDefs() {
+        return phiMap.keySet();
+    }
+    public boolean hasPseudoDef(Alloca a) {
+        return phiMap.containsKey(a);
+    }
+    public void addPhi(Alloca a, Phi p) {
+        phiMap.put(a, p);
+    }
+    public Phi getPhi(Alloca a) {
+        return phiMap.get(a);
+    }
+    public boolean hasRename(Alloca a) {
+        return renameTable.containsKey(a);
+    }
+    public void addRename(Alloca a, Operand n) {
+        renameTable.put(a, n);
+    }
+    public Operand getRename(Alloca a) {
+        return renameTable.get(a);
+    }
+    public void replaceRename(Alloca a, Operand n) {
+        renameTable.replace(a, n);
+    }
+    public void instantiatePhi() {
+        phiMap.values().forEach(this::addInstAtHead);
     }
 
     @Override

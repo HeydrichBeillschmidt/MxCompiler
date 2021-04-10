@@ -14,7 +14,7 @@ import java.util.Set;
 public class GetElementPtr extends IRInst {
     private final Register dst;
     private final IRType type;
-    private final Operand ptr;
+    private Operand ptr;
     private final ArrayList<Operand> index;
 
     public GetElementPtr(IRBlock block, Register dst,
@@ -59,6 +59,22 @@ public class GetElementPtr extends IRInst {
         Set<Operand> ans = new HashSet<>(index);
         ans.add(ptr);
         return ans;
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (ptr==oldUse) {
+            ptr.removeUse(this);
+            ptr = newUse;
+            ptr.addUse(this);
+        }
+        for (int i = 0, it = index.size(); i < it; ++i) {
+            Operand id = index.get(i);
+            if (id==oldUse) {
+                id.removeUse(this);
+                index.set(i, newUse);
+                index.get(i).addUse(this);
+            }
+        }
     }
 
     @Override

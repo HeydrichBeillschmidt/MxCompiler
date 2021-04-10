@@ -59,6 +59,17 @@ public class Phi extends IRInst {
     public Set<Operand> getUses() {
         return new HashSet<>(values);
     }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        for (int i = 0, it = values.size(); i < it; ++i) {
+            Operand v = values.get(i);
+            if (v==oldUse) {
+                v.removeUse(this);
+                values.set(i, newUse);
+                values.get(i).addUse(this);
+            }
+        }
+    }
 
     @Override
     public String toString() {

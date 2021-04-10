@@ -1,5 +1,7 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Operand;
+
 abstract public class IRType {
     public IRType() {}
 
@@ -14,4 +16,6 @@ abstract public class IRType {
             return toString().equals(obj.toString());
         return false;
     }
+
+    abstract public Operand getDefaultValue();
 }

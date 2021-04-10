@@ -1,5 +1,7 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Operand;
+
 public class ArrayType extends IRType {
     private final int len;
     private final IRType type;
@@ -24,5 +26,9 @@ public class ArrayType extends IRType {
     @Override
     public String toString() {
         return "[" + len + " x " + type.toString() + "]";
+    }
+    @Override
+    public Operand getDefaultValue() {
+        return null;
     }
 }

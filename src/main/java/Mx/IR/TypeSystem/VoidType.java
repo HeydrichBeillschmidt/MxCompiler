@@ -1,5 +1,7 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Operand;
+
 public class VoidType extends IRType {
     public VoidType() {
         super();
@@ -12,5 +14,10 @@ public class VoidType extends IRType {
     @Override
     public String toString() {
         return "void";
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return null;
     }
 }

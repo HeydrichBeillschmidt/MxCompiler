@@ -14,7 +14,7 @@ import java.util.Set;
 public class Load extends IRInst {
     private final Register dst;
     private final IRType loadType;
-    private final Operand addr;
+    private Operand addr;
 
     public Load(IRBlock block, Register dst,
                 IRType loadType, Operand addr) {
@@ -52,6 +52,14 @@ public class Load extends IRInst {
     @Override
     public Set<Operand> getUses() {
         return new HashSet<>(Collections.singletonList(addr));
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (addr==oldUse) {
+            addr.removeUse(this);
+            addr = newUse;
+            addr.addUse(this);
+        }
     }
 
     @Override

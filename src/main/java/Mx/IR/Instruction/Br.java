@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Br extends IRInst {
-    private final Operand condition;
+    private Operand condition;
     private final IRBlock thenBlock;
     private final IRBlock elseBlock;
 
@@ -45,6 +45,14 @@ public class Br extends IRInst {
     @Override
     public Set<Operand> getUses() {
         return new HashSet<>(Collections.singletonList(condition));
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (condition==oldUse) {
+            condition.removeUse(this);
+            condition = newUse;
+            condition.addUse(this);
+        }
     }
 
     @Override

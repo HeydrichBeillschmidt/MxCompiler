@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Store extends IRInst {
-    private final Operand value;
-    private final Operand addr;
+    private Operand value;
+    private Operand addr;
 
     public Store(IRBlock block, Operand value, Operand addr) {
         super(block);
@@ -42,6 +42,19 @@ public class Store extends IRInst {
         ans.add(value);
         ans.add(addr);
         return ans;
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (value==oldUse) {
+            value.removeUse(this);
+            value = newUse;
+            value.addUse(this);
+        }
+        if (addr==oldUse) {
+            addr.removeUse(this);
+            addr = newUse;
+            addr.addUse(this);
+        }
     }
 
     @Override

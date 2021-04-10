@@ -1,5 +1,7 @@
 package Mx.IR.TypeSystem;
 
+import Mx.IR.Operand.Operand;
+
 import java.util.ArrayList;
 
 public class StructureType extends IRType {
@@ -50,5 +52,10 @@ public class StructureType extends IRType {
     @Override
     public String toString() {
         return "%" + name;
+    }
+
+    @Override
+    public Operand getDefaultValue() {
+        return null;
     }
 }

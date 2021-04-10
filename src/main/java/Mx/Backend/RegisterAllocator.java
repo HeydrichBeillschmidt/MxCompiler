@@ -36,27 +36,7 @@ public class RegisterAllocator {
             return "Edge{" + u.toString() + ", " + v.toString() + "}";
         }
     }
-/*
-    private Edge es1;
-    private Edge es2;
-    private int cnt = 0;
-    private void detect(String msg) {
-        es1 = new Edge(curFunc.getSymbol(".s1.save"), curFunc.getSymbol(".s0.save"));
-        es2 = new Edge(curFunc.getSymbol(".s0.save"), curFunc.getSymbol(".s1.save"));
-        cnt = 0;
-        for (var e: adjSet) {
-            if (es1.equals(e)) {
-                ++cnt;
-                if (cnt>=2) break;
-            }
-            if (es2.equals(e)) {
-                ++cnt;
-                if (cnt>=2) break;
-            }
-        }
-        System.out.println(msg+": "+cnt);
-    }
-*/
+
     //  Data structures.
     //  --  node work lists, sets, and stacks. always mutually disjoint.
     //      -- machine registers, preassigned a color
@@ -145,7 +125,6 @@ public class RegisterAllocator {
             initDS();
             new LivenessAnalysis(module).run();
             build();
-            //detect("after build");
             makeWorkList();
 
             while (!(simplifyWorklist.isEmpty() && worklistMoves.isEmpty()
@@ -278,7 +257,7 @@ public class RegisterAllocator {
         m.setDegree(d - 1);
         if (d == K) {
             // re-classify m
-            Set<VirtualReg> nodes = new HashSet<>(adjacent(m));
+            Set<VirtualReg> nodes = adjacent(m);
             nodes.add(m);
             enableMoves(nodes);
             spillWorklist.remove(m);
@@ -361,7 +340,7 @@ public class RegisterAllocator {
     }
     // get coset of adjacent(u) and adjacent(v)
     private Set<VirtualReg> adjacent(VirtualReg u, VirtualReg v) {
-        Set<VirtualReg> nodes = new HashSet<>(adjacent(u));
+        Set<VirtualReg> nodes = adjacent(u);
         nodes.addAll(adjacent(v));
         return nodes;
     }

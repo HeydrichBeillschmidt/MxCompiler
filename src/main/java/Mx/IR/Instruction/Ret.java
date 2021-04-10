@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Ret extends IRInst {
     private final IRType retType;
-    private final Operand retValue;
+    private Operand retValue;
 
     public Ret(IRBlock block, IRType retType, Operand retValue) {
         super(block);
@@ -45,6 +45,14 @@ public class Ret extends IRInst {
             return new HashSet<>(Collections.singletonList(retValue));
         }
         return new HashSet<>();
+    }
+    @Override
+    public void replaceUse(Operand oldUse, Operand newUse) {
+        if (retValue!=null && retValue==oldUse) {
+            retValue.removeUse(this);
+            retValue = newUse;
+            retValue.addUse(this);
+        }
     }
 
     @Override
