@@ -34,6 +34,7 @@ public class SSAConstructor extends Pass {
         LTable = new HashMap<>();
         STable = new HashMap<>();
 
+        // phi-function insertion
         for (var a: pseudoDefs) {
             ArrayList<Store> STs = new ArrayList<>();
             for (var u: a.getDst().getUses()) {
@@ -43,25 +44,29 @@ public class SSAConstructor extends Pass {
                     STable.put(((Store) u), a);
                 }
             }
-            Queue<IRBlock> queue = new LinkedList<>();
-            Set<IRBlock> visit = new HashSet<>();
-            Set<IRBlock> phiEquipped = new HashSet<>();
+
+            // set of basic blocks where phi is added
+            Set<IRBlock> F = new HashSet<>();
+            // set of basic blocks that contain definitions of a
+            Queue<IRBlock> W = new LinkedList<>();
+            Set<IRBlock> Defs = new HashSet<>();
             for (var s: STs) {
-                queue.offer(s.getBlock());
-                visit.add(s.getBlock());
+                W.offer(s.getBlock());
+                Defs.add(s.getBlock());
             }
-            while (!queue.isEmpty()) {
-                IRBlock block = queue.poll();
+            while (!W.isEmpty()) {
+                IRBlock block = W.poll();
                 for (var DF: block.getDF()) {
-                    if (!phiEquipped.contains(DF)) {
+                    if (!F.contains(DF)) {
                         String name = a.getDst().getName().split("\\$")[0];
                         Register result = new Register(a.getAllocType(), name);
-                        DF.addPhi(a, new Phi(DF, result, new ArrayList<>(), new ArrayList<>()));
                         f.addSymbol(result);
-                        phiEquipped.add(DF);
-                        if (!visit.contains(DF)) {
-                            queue.offer(DF);
-                            visit.add(DF);
+                        // add result at entry of DF after renaming
+                        DF.addPhi(a, new Phi(DF, result, new ArrayList<>(), new ArrayList<>()));
+                        F.add(DF);
+                        if (!Defs.contains(DF)) {
+                            W.offer(DF);
+                            Defs.add(DF);
                         }
                     }
                 }
@@ -69,14 +74,7 @@ public class SSAConstructor extends Pass {
             a.removeFromBlock();
         }
 
-        for (var b: f.getAllBlocks()) {
-            for (var i: b.getAllInst()) {
-                if (i instanceof Load && i.getDst().getUses().isEmpty()) {
-                    i.removeFromBlock();
-                }
-            }
-        }
-
+        // rename entrance block only, for all allocas (i.e. var defs) are at entrance block
         rename(f.getEntranceBlock(), null, new HashSet<>());
     }
 

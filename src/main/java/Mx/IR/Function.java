@@ -1,8 +1,6 @@
 package Mx.IR;
 
 import Mx.IR.Instruction.*;
-import Mx.IR.Operand.ConstInt;
-import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.FunctionType;
@@ -145,12 +143,11 @@ public class Function {
     }
 
     // for dominance analysis
-    // reverse post-order
-    public ArrayList<IRBlock> getRPO() {
+    // post-order
+    public ArrayList<IRBlock> getPO() {
         Set<IRBlock> visited = new HashSet<>();
         ArrayList<IRBlock> order = new ArrayList<>();
         _dfsRecursive(entranceBlock, order, visited);
-        Collections.reverse(order);
         return order;
     }
     private void _dfsRecursive(IRBlock block, ArrayList<IRBlock> order,
@@ -164,10 +161,12 @@ public class Function {
         order.add(block);
     }
     public void solveDominance() {
-        ArrayList<IRBlock> RPO = getRPO();
-        ArrayList<IRBlock> literalOrder = getAllBlocks();
+        // actually post-order here
+        ArrayList<IRBlock> RPO = getPO();
         int cnt = 0;
-        for (var b: literalOrder) b.setBlockCnt(cnt++);
+        // set block counter by post-order
+        for (var b: RPO) b.setBlockCnt(cnt++);
+        Collections.reverse(RPO);
         RPO.forEach(IRBlock::initDomInfo);
         entranceBlock.setIDom(entranceBlock);
         boolean changed = true;
@@ -223,7 +222,7 @@ public class Function {
         }
     }
 
-    // for SSA
+    // for SSA Construct
     public ArrayList<Alloca> getAllocas() {
         ArrayList<Alloca> ans = new ArrayList<>();
         entranceBlock.getAllInst().stream()

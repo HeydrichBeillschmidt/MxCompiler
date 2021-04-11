@@ -87,6 +87,17 @@ public class IRBuilder implements ASTVisitor {
                 if (decl instanceof FuncNode) decl.accept(this);
             }
         }
+
+        // remove useless loads
+        for (var f: module.getFunctions().values()) {
+            for (var b: f.getAllBlocks()) {
+                for (var i: b.getAllInst()) {
+                    if (i instanceof Load && i.getDst().getUses().isEmpty()) {
+                        i.removeFromBlock();
+                    }
+                }
+            }
+        }
     }
 
     /* expressions */
