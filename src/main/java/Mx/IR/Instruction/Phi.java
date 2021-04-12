@@ -41,8 +41,19 @@ public class Phi extends IRInst {
         return blocks;
     }
     public void addEntry(Operand value, IRBlock block) {
+        value.addUse(this);
         values.add(value);
         blocks.add(block);
+    }
+    public void removeEntry(IRBlock block) {
+        for (int i = 0, it = blocks.size(); i < it; ++i) {
+            if (blocks.get(i)==block) {
+                values.get(i).removeUse(this);
+                values.remove(i);
+                blocks.remove(i);
+                break;
+            }
+        }
     }
 
     @Override
@@ -53,6 +64,10 @@ public class Phi extends IRInst {
     public void actuallyWritten() {
         dst.setDef(this);
         values.forEach(v -> v.addUse(this));
+    }
+    @Override
+    public void severDF() {
+        values.forEach(v -> v.removeUse(this));
     }
 
     @Override

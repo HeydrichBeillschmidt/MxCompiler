@@ -27,14 +27,18 @@ public class SSAConstructor extends Pass {
         module.getFunctions().values().forEach(this::runForFn);
         return true;
     }
-
     private void runForFn(Function f) {
         f.getAllBlocks().forEach(IRBlock::initSSA);
         pseudoDefs = f.getAllocas();
         LTable = new HashMap<>();
         STable = new HashMap<>();
 
-        // phi-function insertion
+        insertPhi(f);
+        // rename entrance block only, for all allocas (i.e. var defs) are at entrance block
+        rename(f.getEntranceBlock(), null, new HashSet<>());
+    }
+
+    private void insertPhi(Function f) {
         for (var a: pseudoDefs) {
             ArrayList<Store> STs = new ArrayList<>();
             for (var u: a.getDst().getUses()) {
@@ -47,7 +51,7 @@ public class SSAConstructor extends Pass {
 
             // set of basic blocks where phi is added
             Set<IRBlock> F = new HashSet<>();
-            // set of basic blocks that contain definitions of a
+            // set of basic blocks that contain definitions of a.dst
             Queue<IRBlock> W = new LinkedList<>();
             Set<IRBlock> Defs = new HashSet<>();
             for (var s: STs) {
@@ -56,33 +60,30 @@ public class SSAConstructor extends Pass {
             }
             while (!W.isEmpty()) {
                 IRBlock block = W.poll();
-                for (var DF: block.getDF()) {
-                    if (!F.contains(DF)) {
+                for (var Y: block.getDF()) {
+                    if (!F.contains(Y)) {
                         String name = a.getDst().getName().split("\\$")[0];
                         Register result = new Register(a.getAllocType(), name);
                         f.addSymbol(result);
                         // add result at entry of DF after renaming
-                        DF.addPhi(a, new Phi(DF, result, new ArrayList<>(), new ArrayList<>()));
-                        F.add(DF);
-                        if (!Defs.contains(DF)) {
-                            W.offer(DF);
-                            Defs.add(DF);
+                        Y.addPhi(a, new Phi(Y, result, new ArrayList<>(), new ArrayList<>()));
+                        F.add(Y);
+                        if (!Defs.contains(Y)) {
+                            W.offer(Y);
+                            Defs.add(Y);
                         }
                     }
                 }
             }
             a.removeFromBlock();
         }
-
-        // rename entrance block only, for all allocas (i.e. var defs) are at entrance block
-        rename(f.getEntranceBlock(), null, new HashSet<>());
     }
 
     private void rename(IRBlock block, IRBlock pred, Set<IRBlock> visit) {
         for (var a: block.getPseudoDefs()) {
             Phi ph = block.getPhi(a);
             Operand value;
-            if (pred==null || !pred.hasRename(a)) {
+            if (pred==null || pred.hasNoRename(a)) {
                 value = a.getAllocType().getDefaultValue();
             }
             else value = pred.getRename(a);
@@ -111,14 +112,16 @@ public class SSAConstructor extends Pass {
             }
             else if (i instanceof Store && STable.containsKey(i)) {
                 Alloca a = STable.get(i);
-                if (!block.hasRename(a)) block.addRename(a, ((Store) i).getValue());
+                if (block.hasNoRename(a)) block.addRename(a, ((Store) i).getValue());
                 else block.replaceRename(a, ((Store) i).getValue());
                 i.removeFromBlock();
             }
         }
+
         for (var s: block.getSuccessors()) {
             rename(s, block, visit);
         }
+
         block.instantiatePhi();
     }
 }

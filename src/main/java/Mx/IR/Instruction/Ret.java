@@ -38,6 +38,10 @@ public class Ret extends IRInst {
     public void actuallyWritten() {
         if (!(retType instanceof VoidType)) retValue.addUse(this);
     }
+    @Override
+    public void severDF() {
+        if (!(retType instanceof VoidType)) retValue.removeUse(this);
+    }
 
     @Override
     public Set<Operand> getUses() {

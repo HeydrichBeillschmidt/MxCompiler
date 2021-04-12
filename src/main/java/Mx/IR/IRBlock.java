@@ -1,6 +1,7 @@
 package Mx.IR;
 
 import Mx.IR.Instruction.Alloca;
+import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.IRInst;
 import Mx.IR.Instruction.Phi;
 import Mx.IR.Operand.Operand;
@@ -108,6 +109,23 @@ public class IRBlock {
     public boolean endWithNonTerminalInst() {
         return tailInst == null || tailInst.isNotTerminalInst();
     }
+    public void replaceInst(IRInst oldInst, IRInst newInst) {
+        if (oldInst.getPrevInst()!=null) {
+            IRInst prev = oldInst.getPrevInst();
+            oldInst.severDF();
+            oldInst.severCF();
+            oldInst.removeFromBlock();
+            if (prev.getNextInst()!=null) addNextInst(prev, newInst);
+            else addInst(newInst);
+        }
+        else {
+            IRInst next = oldInst.getNextInst();
+            oldInst.severDF();
+            oldInst.severCF();
+            oldInst.removeFromBlock();
+            addPrevInst(next, newInst);
+        }
+    }
 
     public IRBlock getPrevBlock() {
         return prevBlock;
@@ -145,6 +163,29 @@ public class IRBlock {
     public void addSuccessor(IRBlock successor) {
         successors.add(successor);
     }
+    public void replaceSuccessor(IRBlock oldSuc, IRBlock newSuc) {
+        assert tailInst instanceof Br;
+        Br oldTail = (Br) tailInst;
+        Br newTail;
+        if (oldTail.getCondition()==null) {
+            newTail = new Br(this, null, newSuc, null);
+        }
+        else {
+            if (oldTail.getThenBlock()==oldSuc) {
+                newTail = new Br(this, oldTail.getCondition(), newSuc, oldTail.getElseBlock());
+            }
+            else {
+                newTail = new Br(this, oldTail.getCondition(), oldTail.getThenBlock(), newSuc);
+            }
+        }
+        replaceInst(oldTail, newTail);
+    }
+    // sever the control flow with a particular successor
+    public void severCF(IRBlock successor) {
+        successor.predecessors.remove(this);
+        successor.getAllPhi().forEach(ph -> ph.removeEntry(this));
+        successors.remove(successor);
+    }
 
     // for dominance analysis
     public int getBlockCnt() {
@@ -171,6 +212,7 @@ public class IRBlock {
     }
 
     // for SSA
+    //     SSA construct
     public void initSSA() {
         phiMap = new HashMap<>();
         renameTable = new HashMap<>();
@@ -187,8 +229,8 @@ public class IRBlock {
     public Phi getPhi(Alloca a) {
         return phiMap.get(a);
     }
-    public boolean hasRename(Alloca a) {
-        return renameTable.containsKey(a);
+    public boolean hasNoRename(Alloca a) {
+        return !renameTable.containsKey(a);
     }
     public void addRename(Alloca a, Operand n) {
         renameTable.put(a, n);
@@ -201,6 +243,23 @@ public class IRBlock {
     }
     public void instantiatePhi() {
         phiMap.values().forEach(this::addInstAtHead);
+    }
+    //     SSA destruct
+    public ArrayList<Phi> getAllPhi() {
+        ArrayList<Phi> ans = new ArrayList<>();
+        IRInst ptr = headInst;
+        while (ptr instanceof Phi) {
+            ans.add((Phi) ptr);
+            ptr = ptr.getNextInst();
+        }
+        return ans;
+    }
+    public void removeAllPhi() {
+        ArrayList<Phi> phiList = getAllPhi();
+        for (var ph: phiList) {
+            ph.severDF();
+            ph.removeFromBlock();
+        }
     }
 
     @Override

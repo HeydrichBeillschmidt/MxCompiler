@@ -43,6 +43,16 @@ public class Br extends IRInst {
         }
     }
     @Override
+    public void severDF() {
+        if (condition!=null) condition.removeUse(this);
+    }
+    @Override
+    public void severCF() {
+        getBlock().severCF(thenBlock);
+        if (condition!=null) getBlock().severCF(elseBlock);
+    }
+
+    @Override
     public Set<Operand> getUses() {
         return new HashSet<>(Collections.singletonList(condition));
     }

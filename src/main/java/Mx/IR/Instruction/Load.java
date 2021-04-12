@@ -48,6 +48,10 @@ public class Load extends IRInst {
         dst.setDef(this);
         addr.addUse(this);
     }
+    @Override
+    public void severDF() {
+        addr.removeUse(this);
+    }
 
     @Override
     public Set<Operand> getUses() {

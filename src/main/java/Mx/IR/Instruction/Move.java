@@ -33,6 +33,9 @@ public class Move extends IRInst {
     public Operand getSrc() {
         return src;
     }
+    public void setSrc(Operand src) {
+        this.src = src;
+    }
 
     @Override
     public boolean needWriteBack() {
@@ -42,6 +45,10 @@ public class Move extends IRInst {
     public void actuallyWritten() {
         dst.setDef(this);
         src.addUse(this);
+    }
+    @Override
+    public void severDF() {
+        src.removeUse(this);
     }
 
     @Override

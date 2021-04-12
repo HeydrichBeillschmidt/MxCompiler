@@ -68,6 +68,10 @@ public class Call extends IRInst {
         if (!voidCall) dst.setDef(this);
         parameterList.forEach(p -> p.addUse(this));
     }
+    @Override
+    public void severDF() {
+        parameterList.forEach(p -> p.removeUse(this));
+    }
 
     @Override
     public Set<Operand> getUses() {

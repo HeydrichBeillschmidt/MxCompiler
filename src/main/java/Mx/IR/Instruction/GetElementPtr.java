@@ -53,6 +53,11 @@ public class GetElementPtr extends IRInst {
         ptr.addUse(this);
         index.forEach(i -> i.addUse(this));
     }
+    @Override
+    public void severDF() {
+        ptr.removeUse(this);
+        index.forEach(i -> i.removeUse(this));
+    }
 
     @Override
     public Set<Operand> getUses() {

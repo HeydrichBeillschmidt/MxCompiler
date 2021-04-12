@@ -323,7 +323,23 @@ public class InstructionSelector implements IRVisitor {
 
     @Override
     public void visit(Move node) {
-        // well, before optimization there's no IR move inst.
+        VirtualReg rd = resolveToVR(node.getDst());
+        if (node.getSrc() instanceof ConstInt) {
+            if (((ConstInt)node.getSrc()).getValue()==0) {
+                curBlock.addInst(new MV(curBlock, rd, PhysicalReg.zeroVR));
+            }
+            else curBlock.addInst(new LI(curBlock, rd, new Immediate(((ConstInt)node.getSrc()).getValue())));
+        }
+        else if (node.getSrc() instanceof ConstBool) {
+            if (((ConstBool)node.getSrc()).getValue()) {
+                curBlock.addInst(new LI(curBlock, rd, new Immediate(1)));
+            }
+            else curBlock.addInst(new MV(curBlock, rd, PhysicalReg.zeroVR));
+        }
+        else if (node.getSrc() instanceof GlobalVariable) {
+            curBlock.addInst(new LA(curBlock, rd, (GlobalVar) resolveToVR(node.getSrc())));
+        }
+        else curBlock.addInst(new MV(curBlock, rd, resolveToVR(node.getSrc())));
     }
 
     @Override

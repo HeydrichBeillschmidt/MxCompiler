@@ -35,6 +35,11 @@ public class Store extends IRInst {
         value.addUse(this);
         addr.addUse(this);
     }
+    @Override
+    public void severDF() {
+        value.removeUse(this);
+        addr.removeUse(this);
+    }
 
     @Override
     public Set<Operand> getUses() {

@@ -42,6 +42,10 @@ public class BitCast extends IRInst {
         src.addUse(this);
         dst.setDef(this);
     }
+    @Override
+    public void severDF() {
+        src.removeUse(this);
+    }
 
     @Override
     public Set<Operand> getUses() {

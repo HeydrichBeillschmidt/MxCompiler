@@ -42,6 +42,9 @@ abstract public class IRInst {
         if (nextInst==null) block.setTailInst(prevInst);
         else nextInst.setPrevInst(prevInst);
     }
+    // sever data / control flow
+    public void severDF() {}
+    public void severCF() {}
 
     public Register getDst() {
         return IRBuilder.pseudoReg;

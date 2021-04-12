@@ -61,6 +61,11 @@ public class BinaryOp extends IRInst {
         op1.addUse(this);
         op2.addUse(this);
     }
+    @Override
+    public void severDF() {
+        op1.removeUse(this);
+        op2.removeUse(this);
+    }
 
     @Override
     public Set<Operand> getUses() {
