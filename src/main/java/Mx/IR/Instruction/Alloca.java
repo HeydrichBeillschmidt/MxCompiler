@@ -38,7 +38,7 @@ public class Alloca extends IRInst {
     @Override
     public String toString() {
         return dst.toString() + " = alloca " + allocType.toString()
-                + ", align " + allocType.size()/8;
+                + ", align " + allocType.size();
     }
     @Override
     public void accept(IRVisitor visitor) {

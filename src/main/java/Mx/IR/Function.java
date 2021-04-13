@@ -54,6 +54,7 @@ public class Function {
             retVal = new Register(new PointerType(retType),
                     "retval$addr");
             entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
+            entranceBlock.addInst(new Store(entranceBlock, retType.getDefaultValue(), retVal));
             Register returnValue = new Register(retType, "retval");
             returnBlock.addInst(new Load(returnBlock, returnValue, retType, retVal));
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));

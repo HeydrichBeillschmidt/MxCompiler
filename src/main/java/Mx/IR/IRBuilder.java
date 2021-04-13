@@ -520,6 +520,8 @@ public class IRBuilder implements ASTVisitor {
             // store arrayHead somewhere;
             Register ptrTmp = new Register(new PointerType(irType), "arrayPtrIte$addr");
             curFunc.addSymbol(ptrTmp);
+            curFunc.getEntranceBlock().addInstAtHead(new Store(
+                    curFunc.getEntranceBlock(), irType.getDefaultValue(), ptrTmp) );
             curFunc.getEntranceBlock().addInstAtHead(new Alloca(
                     curFunc.getEntranceBlock(), ptrTmp, irType) );
             curBlock.addInst(new Store(curBlock, arrayHeadPtr, ptrTmp));
@@ -1447,6 +1449,7 @@ public class IRBuilder implements ASTVisitor {
                 curFunc.addSymbol(ptrTmp);
                 varEntity.setAllocatedAddr(ptrTmp);
                 IRBlock entranceBlock = curFunc.getEntranceBlock();
+                entranceBlock.addInstAtHead(new Store(entranceBlock, irType.getDefaultValue(), ptrTmp));
                 entranceBlock.addInstAtHead(new Alloca(entranceBlock, ptrTmp, irType));
                 if (node.hasInitializer()) {
                     node.getInitializer().accept(this);

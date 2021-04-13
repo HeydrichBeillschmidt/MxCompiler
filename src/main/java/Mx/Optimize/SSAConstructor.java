@@ -34,7 +34,6 @@ public class SSAConstructor extends Pass {
         STable = new HashMap<>();
 
         insertPhi(f);
-        // rename entrance block only, for all allocas (i.e. var defs) are at entrance block
         rename(f.getEntranceBlock(), null, new HashSet<>());
     }
 
@@ -83,7 +82,7 @@ public class SSAConstructor extends Pass {
         for (var a: block.getPseudoDefs()) {
             Phi ph = block.getPhi(a);
             Operand value;
-            if (pred==null || pred.hasNoRename(a)) {
+            if (pred==null || pred.hasNoRename(a) || pred.getRename(a)==null) {
                 value = a.getAllocType().getDefaultValue();
             }
             else value = pred.getRename(a);
@@ -109,12 +108,14 @@ public class SSAConstructor extends Pass {
                 Operand value = block.getRename(a);
                 i.getDst().replaceUse(value);
                 i.removeFromBlock();
+                i.severDF();
             }
             else if (i instanceof Store && STable.containsKey(i)) {
                 Alloca a = STable.get(i);
                 if (block.hasNoRename(a)) block.addRename(a, ((Store) i).getValue());
                 else block.replaceRename(a, ((Store) i).getValue());
                 i.removeFromBlock();
+                i.severDF();
             }
         }
 

@@ -38,7 +38,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/codegen/t55.mx";
+        //String filename = "testcases/codegen/e9.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -112,7 +112,7 @@ public class Main {
             new DominanceAnalysis(irModule).run();
             new SSAConstructor(irModule).run();
 
-            if (emitLL) new IRPrinter("test.ll").run(irBuilder.getModule());
+            if (emitLL) new IRPrinter("test.ll").run(irModule);
 
             new SSADestructor(irModule).run();
 

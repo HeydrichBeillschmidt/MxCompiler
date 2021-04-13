@@ -1,7 +1,12 @@
+@p = global i32 0, align 4
+@q = global i32 0, align 4
 @r = global i32 0, align 4
-@c = global i32 0, align 4
+@x = global i32 0, align 4
+@y = global i32 0, align 4
 @i = global i32 0, align 4
-@j = global i32 0, align 4
+@__const.main.str1 = private unnamed_addr constant [3 x i8] c"NO\00", align 1
+@z = global i32 0, align 4
+@__const.main.str0 = private unnamed_addr constant [4 x i8] c"YES\00", align 1
 @n = global i32 0, align 4
 
 define void @___init__$$YGXXZ() {
@@ -12,84 +17,77 @@ return:
 	ret void
 }
 
-define i32 @_abs$$YGHH$Z(i32 %c) {
-entry:
-	%sgt = icmp sgt i32 %c, 0
-	br i1 %sgt, label %if.then, label %if.end
-
-if.then:
-	br label %return
-
-if.end:
-	%prefix_neg = sub i32 0, %c
-	br label %return
-
-return:
-	%retval_2 = phi i32 [ %c, %if.then ], [ %prefix_neg, %if.end ]
-	ret i32 %retval_2
-}
-
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
+	%funcCallRet = call i32 @_getInt$$YGHXZ()
+	store i32 %funcCallRet, i32* @n, align 4
 	store i32 0, i32* @i, align 4
 	br label %for.cond
 
 for.cond:
 	%i_2 = load i32, i32* @i, align 4
-	%slt = icmp slt i32 %i_2, 5
-	br i1 %slt, label %for.body_2, label %for.end_2
+	%n_2 = load i32, i32* @n, align 4
+	%slt = icmp slt i32 %i_2, %n_2
+	br i1 %slt, label %for.body, label %for.end
 
-for.cond_2:
-	%j_2 = load i32, i32* @j, align 4
-	%slt_2 = icmp slt i32 %j_2, 5
-	br i1 %slt_2, label %for.body, label %for.end
+for.body:
+	%funcCallRet_2 = call i32 @_getInt$$YGHXZ()
+	store i32 %funcCallRet_2, i32* @p, align 4
+	%funcCallRet_3 = call i32 @_getInt$$YGHXZ()
+	store i32 %funcCallRet_3, i32* @q, align 4
+	%funcCallRet_4 = call i32 @_getInt$$YGHXZ()
+	store i32 %funcCallRet_4, i32* @r, align 4
+	%x_2 = load i32, i32* @x, align 4
+	%p_2 = load i32, i32* @p, align 4
+	%add = add i32 %x_2, %p_2
+	store i32 %add, i32* @x, align 4
+	%y_2 = load i32, i32* @y, align 4
+	%q_2 = load i32, i32* @q, align 4
+	%add_2 = add i32 %y_2, %q_2
+	store i32 %add_2, i32* @y, align 4
+	%z_2 = load i32, i32* @z, align 4
+	%r_2 = load i32, i32* @r, align 4
+	%add_3 = add i32 %z_2, %r_2
+	store i32 %add_3, i32* @z, align 4
+	br label %for.inc
+
+for.inc:
+	%i_3 = load i32, i32* @i, align 4
+	%postfix_inc = add i32 %i_3, 1
+	store i32 %postfix_inc, i32* @i, align 4
+	br label %for.cond
+
+for.end:
+	%x_3 = load i32, i32* @x, align 4
+	%eq = icmp eq i32 %x_3, 0
+	br i1 %eq, label %logicalAnd_branch, label %logicalAnd_end
+
+logicalAnd_branch:
+	%y_3 = load i32, i32* @y, align 4
+	%eq_2 = icmp eq i32 %y_3, 0
+	br i1 %eq_2, label %logicalAnd_branch2, label %logicalAnd_end
+
+logicalAnd_branch2:
+	%z_3 = load i32, i32* @z, align 4
+	%eq_3 = icmp eq i32 %z_3, 0
+	br label %logicalAnd_end
+
+logicalAnd_end:
+	%logical_and = phi i1 [ 0, %for.end ], [ %eq_2, %logicalAnd_branch ], [ %eq_3, %logicalAnd_branch2 ]
+	br i1 %logical_and, label %if.then, label %if.else
 
 if.then:
-	%i_3 = load i32, i32* @i, align 4
-	store i32 %i_3, i32* @r, align 4
-	%j_3 = load i32, i32* @j, align 4
-	store i32 %j_3, i32* @c, align 4
+	%__const.main.str0 = getelementptr [4 x i8], [4 x i8]* @__const.main.str0, i32 0, i32 0
+	call void @_print$$YGXPAD$Z(i8* %__const.main.str0)
+	br label %if.end
+
+if.else:
+	%__const.main.str1 = getelementptr [3 x i8], [3 x i8]* @__const.main.str1, i32 0, i32 0
+	call void @_print$$YGXPAD$Z(i8* %__const.main.str1)
 	br label %if.end
 
 if.end:
-	br label %for.inc
-
-for.body:
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet, i32* @n, align 4
-	%n_2 = load i32, i32* @n, align 4
-	%eq = icmp eq i32 %n_2, 1
-	br i1 %eq, label %if.then, label %if.end
-
-for.inc:
-	%j_4 = load i32, i32* @j, align 4
-	%postfix_inc = add i32 %j_4, 1
-	store i32 %postfix_inc, i32* @j, align 4
-	br label %for.cond_2
-
-for.end:
-	br label %for.inc_2
-
-for.body_2:
-	store i32 0, i32* @j, align 4
-	br label %for.cond_2
-
-for.inc_2:
-	%i_4 = load i32, i32* @i, align 4
-	%postfix_inc_2 = add i32 %i_4, 1
-	store i32 %postfix_inc_2, i32* @i, align 4
-	br label %for.cond
-
-for.end_2:
-	%r_2 = load i32, i32* @r, align 4
-	%sub = sub i32 2, %r_2
-	%funcCallRet_2 = call i32 @_abs$$YGHH$Z(i32 %sub)
-	%c_2 = load i32, i32* @c, align 4
-	%sub_2 = sub i32 2, %c_2
-	%funcCallRet_3 = call i32 @_abs$$YGHH$Z(i32 %sub_2)
-	%add = add i32 %funcCallRet_2, %funcCallRet_3
-	call void @_printInt$$YGXH$Z(i32 %add)
 	br label %return
 
 return:
