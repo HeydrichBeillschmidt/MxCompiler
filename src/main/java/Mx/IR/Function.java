@@ -136,11 +136,16 @@ public class Function {
     }
 
     // for dominance analysis
-    // post-order
+    // post-order & reversed post-order
     public ArrayList<IRBlock> getPO() {
         Set<IRBlock> visited = new HashSet<>();
         ArrayList<IRBlock> order = new ArrayList<>();
         _dfsRecursive(entranceBlock, order, visited);
+        return order;
+    }
+    public ArrayList<IRBlock> getRPO() {
+        ArrayList<IRBlock> order = getPO();
+        Collections.reverse(order);
         return order;
     }
     private void _dfsRecursive(IRBlock block, ArrayList<IRBlock> order,

@@ -205,7 +205,7 @@ public class RegisterAllocator {
     }
     // add edge to the interference graph
     private void addEdge(VirtualReg u, VirtualReg v) {
-        if (!adjSet.contains(new Edge(u, v)) && u!=v) {
+        if (u!=v && !adjSet.contains(new Edge(u, v))) {
             adjSet.add(new Edge(u, v));
             adjSet.add(new Edge(v, u));
             if (!precolored.contains(u)) {

@@ -166,28 +166,27 @@ public class ASMFunction {
             }
         }
     }
-    public ArrayList<ASMBlock> getReversedDFSOrder() {
+    public ArrayList<ASMBlock> getPostOrder() {
         ArrayList<ASMBlock> order = new ArrayList<>();
-        ArrayList<ASMBlock> visited = new ArrayList<>();
-        _reversedDFSRecursive(exitBlock, order, visited);
+        Set<ASMBlock> visited = new HashSet<>();
+        _postOrderDFSRecursive(entranceBlock, order, visited);
         return order;
     }
-    private void _reversedDFSRecursive(ASMBlock block, ArrayList<ASMBlock> order,
-                                       ArrayList<ASMBlock> visited) {
-        order.add(block);
+    private void _postOrderDFSRecursive(ASMBlock block, ArrayList<ASMBlock> order,
+                                        Set<ASMBlock> visited) {
         visited.add(block);
-        for (var pred: block.getPredecessors()) {
-            if (!visited.contains(pred)) {
-                _dfsRecursive(pred, order, visited);
+        for (var s: block.getSuccessors()) {
+            if (!visited.contains(s)) {
+                _postOrderDFSRecursive(s, order, visited);
             }
         }
+        order.add(block);
     }
 
     public void performLvnAnalysis() {
         for (var b: blocks.values()) b.solveUsesAndDefs();
 
-        ArrayList<ASMBlock> rOrder = getDFSOrder();
-        Collections.reverse(rOrder);
+        ArrayList<ASMBlock> rOrder = getPostOrder();
         boolean changed = true;
         while (changed) {
             changed = false;

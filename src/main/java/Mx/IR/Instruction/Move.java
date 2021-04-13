@@ -66,7 +66,7 @@ public class Move extends IRInst {
 
     @Override
     public String toString() {
-        return "move " + dst.toString() + " " + src.toString();
+        return "mv " + dst.toString() + " " + src.toString();
     }
     @Override
     public void accept(IRVisitor visitor) {

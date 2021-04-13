@@ -26,8 +26,7 @@ abstract public class Operand {
         return uses;
     }
     public void addUse(IRInst inst) {
-        if (inst!=null)
-            uses.add(inst);
+        if (inst!=null) uses.add(inst);
     }
     public void addUses(ArrayList<IRInst> insts) {
         uses.addAll(insts);
@@ -36,7 +35,8 @@ abstract public class Operand {
         uses.remove(inst);
     }
     public void replaceUse(Operand newUse) {
-        uses.forEach(u -> u.replaceUse(this, newUse));
+        ArrayList<IRInst> instList = new ArrayList<>(uses);
+        instList.forEach(u -> u.replaceUse(this, newUse));
         uses.clear();
     }
 

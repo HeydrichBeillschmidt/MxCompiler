@@ -9,6 +9,7 @@ import Mx.Generated.MxParser;
 import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
+import Mx.Optimize.CFGSimplifier;
 import Mx.Optimize.DominanceAnalysis;
 import Mx.Optimize.SSAConstructor;
 import Mx.Optimize.SSADestructor;
@@ -38,7 +39,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/codegen/e9.mx";
+        //String filename = "testcases/codegen/t29.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -109,12 +110,15 @@ public class Main {
 
             IRModule irModule = irBuilder.getModule();
 
+            new CFGSimplifier(irModule).run();
             new DominanceAnalysis(irModule).run();
             new SSAConstructor(irModule).run();
 
             if (emitLL) new IRPrinter("test.ll").run(irModule);
 
             new SSADestructor(irModule).run();
+
+            //if (emitLL) new IRPrinter("noPhi.ll").run(irModule);
 
             InstructionSelector instructionSelector = new InstructionSelector();
             irModule.accept(instructionSelector);
