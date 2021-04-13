@@ -53,15 +53,7 @@ public class Function {
         else {
             retVal = new Register(new PointerType(retType),
                     "retval$addr");
-            /*//eliminate alloca
-            Register dst = new Register(IRModule.stringT, "malloc");
-            addSymbol(dst);
-            ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(retType.size(), 4));
-            Function mallocFunc = module.getExternalFunction("malloc");
-            entranceBlock.addInst(new Call(entranceBlock, dst, mallocFunc, parameters));
-            entranceBlock.addInst(new BitCast(entranceBlock, retVal, dst, new PointerType(retType)));
-            */entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
+            entranceBlock.addInst(new Alloca(entranceBlock, retVal, retType));
             Register returnValue = new Register(retType, "retval");
             returnBlock.addInst(new Load(returnBlock, returnValue, retType, retVal));
             returnBlock.addInst(new Ret(returnBlock, retType, returnValue));

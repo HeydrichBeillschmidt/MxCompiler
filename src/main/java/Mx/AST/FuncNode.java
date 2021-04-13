@@ -106,15 +106,7 @@ public class FuncNode extends DeclarationNode {
                     "this.addr");
             func.setClassPtr(ptrThis);
             func.addSymbol(ptrThis);
-            //eliminate alloca
-            Register dst = new Register(IRModule.stringT, "malloc");
-            func.addSymbol(dst);
-            ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(parThis.getType().size(), 4));
-            Function mallocFunc = module.getExternalFunction("malloc");
-            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
-            curBlock.addInst(new BitCast(curBlock, ptrThis, dst, new PointerType(parThis.getType())));
-            //curBlock.addInst(new Alloca(curBlock, ptrThis, parThis.getType()));
+            curBlock.addInst(new Alloca(curBlock, ptrThis, parThis.getType()));
             curBlock.addInst(new Store(curBlock, parThis, ptrThis));
         }
         for (int i = 0, it = entityParameterList.size(); i < it; ++i) {
@@ -122,15 +114,7 @@ public class FuncNode extends DeclarationNode {
             Register ptrTmp = new Register(new PointerType(parTmp.getType()),
                     parTmp.getName() + ".addr");
             func.addSymbol(ptrTmp);
-            //eliminate alloca
-            Register dst = new Register(IRModule.stringT, "malloc");
-            func.addSymbol(dst);
-            ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(parTmp.getType().size(), 4));
-            Function mallocFunc = module.getExternalFunction("malloc");
-            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
-            curBlock.addInst(new BitCast(curBlock, ptrTmp, dst, new PointerType(parTmp.getType())));
-            //curBlock.addInst(new Alloca(curBlock, ptrTmp, parTmp.getType()));
+            curBlock.addInst(new Alloca(curBlock, ptrTmp, parTmp.getType()));
             curBlock.addInst(new Store(curBlock, parTmp, ptrTmp));
             entityParameterList.get(i).setAllocatedAddr(ptrTmp);
         }

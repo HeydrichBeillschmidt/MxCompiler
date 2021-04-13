@@ -91,7 +91,8 @@ public class IRBuilder implements ASTVisitor {
         // remove useless loads
         for (var f: module.getFunctions().values()) {
             for (var b: f.getAllBlocks()) {
-                for (var i: b.getAllInst()) {
+                ArrayList<IRInst> instList = b.getAllInst();
+                for (var i: instList) {
                     if (i instanceof Load && i.getDst().getUses().isEmpty()) {
                         i.removeFromBlock();
                     }
@@ -519,16 +520,8 @@ public class IRBuilder implements ASTVisitor {
             // store arrayHead somewhere;
             Register ptrTmp = new Register(new PointerType(irType), "arrayPtrIte$addr");
             curFunc.addSymbol(ptrTmp);
-            /*//eliminate alloca
-            dst = new Register(IRModule.stringT, "malloc");
-            curFunc.addSymbol(dst);
-            parameters = new ArrayList<>();
-            parameters.add(new ConstInt(irType.size(), 4));
-            curFunc.getEntranceBlock().addInstAtHead(new BitCast(curFunc.getEntranceBlock(),
-                    ptrTmp, dst, new PointerType(irType)));
-            curFunc.getEntranceBlock().addInstAtHead(new Call(curFunc.getEntranceBlock(),
-                    dst, func, parameters));
-            */curFunc.getEntranceBlock().addInstAtHead(new Alloca(curFunc.getEntranceBlock(), ptrTmp, irType) );
+            curFunc.getEntranceBlock().addInstAtHead(new Alloca(
+                    curFunc.getEntranceBlock(), ptrTmp, irType) );
             curBlock.addInst(new Store(curBlock, arrayHeadPtr, ptrTmp));
 
             // iteratively malloc lower dimensions
@@ -962,20 +955,6 @@ public class IRBuilder implements ASTVisitor {
         Operand value = tests.get(0).getResult();
 
         if (tests.size() > 1) {
-            /*// to avoid phi
-            Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
-            curFunc.addSymbol(tmp);
-            //eliminate alloca
-            Register dst = new Register(IRModule.stringT, "malloc");
-            curFunc.addSymbol(dst);
-            ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(IRModule.boolT.size(), 4));
-            Function mallocFunc = module.getExternalFunction("malloc");
-            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
-            curBlock.addInst(new BitCast(curBlock, tmp, dst, new PointerType(IRModule.boolT)));
-            //curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
-            curBlock.addInst(new Store(curBlock, value, tmp));
-            */
             ArrayList<Operand> values = new ArrayList<>();
             ArrayList<IRBlock> blocks = new ArrayList<>();
             values.add(new ConstBool(false));
@@ -990,8 +969,6 @@ public class IRBuilder implements ASTVisitor {
             Operand valueE = tests.get(1).getResult();
             values.add(valueE);
             blocks.add(curBlock);
-            // to avoid phi
-            //curBlock.addInst(new Store(curBlock, valueE, tmp));
 
             curFunc.addBlock(branchBlock);
 
@@ -1006,8 +983,6 @@ public class IRBuilder implements ASTVisitor {
                     valueE = tests.get(i).getResult();
                     values.add(valueE);
                     blocks.add(curBlock);
-                    // to avoid phi
-                    //curBlock.addInst(new Store(curBlock, valueE, tmp));
 
                     curFunc.addBlock(branchBlock);
                 }
@@ -1018,8 +993,6 @@ public class IRBuilder implements ASTVisitor {
             Register dst = new Register(IRModule.boolT, "logical_and");
             curFunc.addSymbol(dst);
             curBlock.addInst(new Phi(curBlock, dst, values, blocks));
-            // to avoid phi
-            //curBlock.addInst(new Load(curBlock, dst, IRModule.boolT, tmp));
 
             curFunc.addBlock(endBlock);
             node.setResult(dst);
@@ -1037,20 +1010,6 @@ public class IRBuilder implements ASTVisitor {
         Operand value = tests.get(0).getResult();
 
         if (tests.size() > 1) {
-            /*// to avoid phi
-            Register tmp = new Register(new PointerType(IRModule.boolT), "logicalAnd_tmpAddr");
-            curFunc.addSymbol(tmp);
-            //eliminate alloca
-            Register dst = new Register(IRModule.stringT, "malloc");
-            curFunc.addSymbol(dst);
-            ArrayList<Operand> parameters = new ArrayList<>();
-            parameters.add(new ConstInt(IRModule.boolT.size(), 4));
-            Function mallocFunc = module.getExternalFunction("malloc");
-            curBlock.addInst(new Call(curBlock, dst, mallocFunc, parameters));
-            curBlock.addInst(new BitCast(curBlock, tmp, dst, new PointerType(IRModule.boolT)));
-            //curBlock.addInst(new Alloca(curBlock, tmp, IRModule.boolT));
-            curBlock.addInst(new Store(curBlock, value, tmp));
-            */
             ArrayList<Operand> values = new ArrayList<>();
             ArrayList<IRBlock> blocks = new ArrayList<>();
             values.add(new ConstBool(false));
@@ -1065,8 +1024,6 @@ public class IRBuilder implements ASTVisitor {
             Operand valueE = tests.get(1).getResult();
             values.add(valueE);
             blocks.add(curBlock);
-            // to avoid phi
-            //curBlock.addInst(new Store(curBlock, valueE, tmp));
 
             curFunc.addBlock(branchBlock);
 
@@ -1081,8 +1038,6 @@ public class IRBuilder implements ASTVisitor {
                     valueE = tests.get(i).getResult();
                     values.add(valueE);
                     blocks.add(curBlock);
-                    // to avoid phi
-                    //curBlock.addInst(new Store(curBlock, valueE, tmp));
 
                     curFunc.addBlock(branchBlock);
                 }
@@ -1093,8 +1048,6 @@ public class IRBuilder implements ASTVisitor {
             Register dst = new Register(IRModule.boolT, "logical_or");
             curFunc.addSymbol(dst);
             curBlock.addInst(new Phi(curBlock, dst, values, blocks));
-            // to avoid phi
-            //curBlock.addInst(new Load(curBlock, dst, IRModule.boolT, tmp));
 
             curFunc.addBlock(endBlock);
             node.setResult(dst);
@@ -1494,16 +1447,7 @@ public class IRBuilder implements ASTVisitor {
                 curFunc.addSymbol(ptrTmp);
                 varEntity.setAllocatedAddr(ptrTmp);
                 IRBlock entranceBlock = curFunc.getEntranceBlock();
-                /*//eliminate alloca
-                Register dst = new Register(IRModule.stringT, "malloc");
-                curFunc.addSymbol(dst);
-                ArrayList<Operand> parameters = new ArrayList<>();
-                parameters.add(new ConstInt(irType.size(), 4));
-                Function mallocFunc = module.getExternalFunction("malloc");
-                entranceBlock.addInstAtHead(new BitCast(entranceBlock, ptrTmp, dst,
-                        new PointerType(irType) ) );
-                entranceBlock.addInstAtHead(new Call(entranceBlock, dst, mallocFunc, parameters));
-                */entranceBlock.addInstAtHead(new Alloca(entranceBlock, ptrTmp, irType));
+                entranceBlock.addInstAtHead(new Alloca(entranceBlock, ptrTmp, irType));
                 if (node.hasInitializer()) {
                     node.getInitializer().accept(this);
                     Operand init = node.getInitializer().getResult();

@@ -69,6 +69,7 @@ public class SSADestructor extends Pass {
                 for (var ph: b.getAllPhi()) {
                     ph.getDst().replaceUse(ph.getValues().get(0));
                     ph.removeFromBlock();
+                    ph.severDF();
                 }
             }
             else if (b.getPredecessors().size()>1) {
@@ -83,7 +84,7 @@ public class SSADestructor extends Pass {
             IRBlock pre = critical.pre;
             IRBlock suc = critical.suc;
             IRBlock mid = new IRBlock("criticalBlock");
-            f.addSymbol(mid);
+            f.addBlock(mid);
 
             mid.addInst(new Br(mid, null, suc, null));
 
