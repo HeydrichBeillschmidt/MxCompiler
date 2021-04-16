@@ -45,6 +45,13 @@ public class Phi extends IRInst {
         values.add(value);
         blocks.add(block);
     }
+    public void replaceEntry(IRBlock oldEntry, IRBlock newEntry) {
+        for (int i = 0, it = blocks.size(); i < it; ++i) {
+            if (blocks.get(i)==oldEntry) {
+                blocks.set(i, newEntry);
+            }
+        }
+    }
     public void removeEntry(IRBlock block) {
         for (int i = 0, it = blocks.size(); i < it; ++i) {
             if (blocks.get(i)==block) {

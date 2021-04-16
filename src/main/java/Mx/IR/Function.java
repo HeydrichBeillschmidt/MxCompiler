@@ -118,6 +118,14 @@ public class Function {
             }
         }
     }
+    public void removeBlock(IRBlock block) {
+        block.getAllInst().forEach(IRInst::severDF);
+        if (block==entranceBlock) entranceBlock = block.getNextBlock();
+        else block.getPrevBlock().setNextBlock(block.getNextBlock());
+        if (block==exitBlock) exitBlock = block.getPrevBlock();
+        else block.getNextBlock().setPrevBlock(block.getPrevBlock());
+        block.severCF();
+    }
 
     public Register getClassPtr() {
         return classPtr;
@@ -220,7 +228,7 @@ public class Function {
         }
     }
 
-    // for SSA Construct
+    // for mem to reg
     public ArrayList<Alloca> getAllocas() {
         ArrayList<Alloca> ans = new ArrayList<>();
         entranceBlock.getAllInst().stream()

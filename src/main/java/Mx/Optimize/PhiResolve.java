@@ -10,7 +10,7 @@ import Mx.IR.Operand.Register;
 
 import java.util.*;
 
-public class SSADestructor extends Pass {
+public class PhiResolve extends Pass {
     private static class cEdge {
         public IRBlock pre, suc;
 
@@ -47,7 +47,7 @@ public class SSADestructor extends Pass {
     private Map<IRBlock, parallelCopy> copyMap;
     private Function curFunc;
 
-    public SSADestructor(IRModule module) {
+    public PhiResolve(IRModule module) {
         super(module);
     }
 

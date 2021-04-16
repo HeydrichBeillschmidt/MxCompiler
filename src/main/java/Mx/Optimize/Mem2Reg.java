@@ -12,12 +12,12 @@ import Mx.IR.Operand.Register;
 
 import java.util.*;
 
-public class SSAConstructor extends Pass {
+public class Mem2Reg extends Pass {
     private ArrayList<Alloca> pseudoDefs;
     private Map<Load, Alloca> LTable;
     private Map<Store, Alloca> STable;
 
-    public SSAConstructor(IRModule module) {
+    public Mem2Reg(IRModule module) {
         super(module);
     }
 

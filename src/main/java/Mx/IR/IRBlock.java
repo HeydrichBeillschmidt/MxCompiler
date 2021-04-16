@@ -154,6 +154,13 @@ public class IRBlock {
     public void addPredecessor(IRBlock predecessor) {
         predecessors.add(predecessor);
     }
+    public void replacePredecessor(IRBlock oldPre, IRBlock newPre) {
+        if (predecessors.contains(oldPre)) {
+            predecessors.remove(oldPre);
+            predecessors.add(newPre);
+            getAllPhi().forEach(ph -> ph.replaceEntry(oldPre, newPre));
+        }
+    }
     public boolean hasSuccessors() {
         return successors.size()!=0;
     }
@@ -180,11 +187,56 @@ public class IRBlock {
         }
         replaceInst(oldTail, newTail);
     }
+    public boolean checkAndMerge(Function f) {
+        if (predecessors.size()==1) {
+            IRBlock merged = predecessors.get(0);
+            if (merged.getSuccessors().size()==1) {
+                // deal with inst
+                merged.tailInst.removeFromBlock();
+                ArrayList<IRInst> instList = getAllInst();
+                for (var i: instList) {
+                    if (i instanceof Phi) {
+                        i.getDst().replaceUse(((Phi) i).getValues().get(0));
+                        i.severDF();
+                        i.removeFromBlock();
+                    }
+                    else {
+                        i.setBlock(merged);
+                        if (i==headInst) {
+                            i.setPrevInst(merged.tailInst);
+                            if (merged.headInst==null) merged.headInst = i;
+                            else merged.tailInst.setNextInst(i);
+                        }
+                    }
+                }
+                merged.tailInst = tailInst;
+                // deal with linked list
+                if (this==f.getEntranceBlock()) f.setEntranceBlock(nextBlock);
+                else prevBlock.setNextBlock(nextBlock);
+                if (this==f.getExitBlock()) f.setExitBlock(prevBlock);
+                else nextBlock.setPrevBlock(prevBlock);
+                // deal with control flow
+                merged.successors.clear();
+                merged.successors.addAll(successors);
+                merged.successors.forEach(suc -> suc.replacePredecessor(this, merged));
+                return true;
+            }
+        }
+        return false;
+    }
     // sever the control flow with a particular successor
     public void severCF(IRBlock successor) {
         successor.predecessors.remove(this);
         successor.getAllPhi().forEach(ph -> ph.removeEntry(this));
         successors.remove(successor);
+    }
+    // sever all control flow
+    public void severCF() {
+        for (var s: successors) {
+            s.predecessors.remove(this);
+            s.getAllPhi().forEach(ph -> ph.removeEntry(this));
+        }
+        predecessors.forEach(p -> p.successors.remove(this));
     }
 
     // for dominance analysis

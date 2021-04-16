@@ -11,8 +11,8 @@ import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
 import Mx.Optimize.CFGSimplifier;
 import Mx.Optimize.DominanceAnalysis;
-import Mx.Optimize.SSAConstructor;
-import Mx.Optimize.SSADestructor;
+import Mx.Optimize.Mem2Reg;
+import Mx.Optimize.PhiResolve;
 import Mx.Utils.Errors.*;
 import Mx.Utils.ExceptionHandler;
 import Mx.Utils.MxErrorListener;
@@ -112,11 +112,11 @@ public class Main {
 
             new CFGSimplifier(irModule).run();
             new DominanceAnalysis(irModule).run();
-            new SSAConstructor(irModule).run();
+            new Mem2Reg(irModule).run();
 
             if (emitLL) new IRPrinter("test.ll").run(irModule);
 
-            new SSADestructor(irModule).run();
+            new PhiResolve(irModule).run();
 
             //if (emitLL) new IRPrinter("noPhi.ll").run(irModule);
 

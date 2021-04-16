@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class Br extends IRInst {
     private Operand condition;
-    private final IRBlock thenBlock;
-    private final IRBlock elseBlock;
+    private IRBlock thenBlock;
+    private IRBlock elseBlock;
 
     public Br(IRBlock block, Operand condition,
               IRBlock thenBlock, IRBlock elseBlock) {
@@ -29,6 +29,15 @@ public class Br extends IRInst {
     }
     public IRBlock getThenBlock() {
         return thenBlock;
+    }
+
+    public void rewriteToJump(IRBlock dstBlock) {
+        severDF();
+        severCF();
+        this.condition = null;
+        this.thenBlock = dstBlock;
+        this.elseBlock = null;
+        actuallyWritten();
     }
 
     @Override
