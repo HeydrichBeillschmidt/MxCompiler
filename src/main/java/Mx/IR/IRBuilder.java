@@ -1014,7 +1014,7 @@ public class IRBuilder implements ASTVisitor {
         if (tests.size() > 1) {
             ArrayList<Operand> values = new ArrayList<>();
             ArrayList<IRBlock> blocks = new ArrayList<>();
-            values.add(new ConstBool(false));
+            values.add(new ConstBool(true));
             blocks.add(curBlock);
 
             IRBlock branchBlock = new IRBlock("logicalOr_branch");

@@ -3,38 +3,26 @@ entry:
 	ret void
 }
 
-define i32 @_gcd$$YGHHH$Z(i32 %x, i32 %y) {
-entry:
-	%srem = srem i32 %x, %y
-	%eq = icmp eq i32 %srem, 0
-	br i1 %eq, label %if.then, label %if.else
-
-if.then:
-	br label %return
-
-if.else:
-	%srem_2 = srem i32 %x, %y
-	%funcCallRet = call i32 @_gcd$$YGHHH$Z(i32 %y, i32 %srem_2)
-	br label %return
-
-return:
-	%retval_2 = phi i32 [ %y, %if.then ], [ %funcCallRet, %if.else ]
-	ret i32 %retval_2
-}
-
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
-	%funcCallRet_2 = call i32 @_gcd$$YGHHH$Z(i32 10, i32 1)
-	%funcCallRet = call i8* @_toString$$YGPADH$Z(i32 %funcCallRet_2)
-	call void @_println$$YGXPAD$Z(i8* %funcCallRet)
-	%funcCallRet_4 = call i32 @_gcd$$YGHHH$Z(i32 34986, i32 3087)
-	%funcCallRet_3 = call i8* @_toString$$YGPADH$Z(i32 %funcCallRet_4)
-	call void @_println$$YGXPAD$Z(i8* %funcCallRet_3)
-	%funcCallRet_6 = call i32 @_gcd$$YGHHH$Z(i32 2907, i32 1539)
-	%funcCallRet_5 = call i8* @_toString$$YGPADH$Z(i32 %funcCallRet_6)
-	call void @_println$$YGXPAD$Z(i8* %funcCallRet_5)
-	ret i32 0
+	br label %for.cond
+
+for.cond:
+	%f1_4 = phi i32 [ 1, %entry ], [ %add, %for.body ]
+	%f0_3 = phi i32 [ 0, %entry ], [ %f1_4, %for.body ]
+	%i_4 = phi i32 [ 1, %entry ], [ %prefix_inc, %for.body ]
+	%f2_4 = phi i32 [ 0, %entry ], [ %add, %for.body ]
+	%slt = icmp slt i32 %i_4, 10
+	br i1 %slt, label %for.body, label %for.end
+
+for.body:
+	%add = add i32 %f0_3, %f1_4
+	%prefix_inc = add i32 %i_4, 1
+	br label %for.cond
+
+for.end:
+	ret i32 %f2_4
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)

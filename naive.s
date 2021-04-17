@@ -17,8 +17,6 @@ ___init__$$YGXXZ:                       # @___init__$$YGXXZ
 	mv	.s9.save, s9
 	mv	.s10.save, s10
 	mv	.s11.save, s11
-	j	.LBB0_1
-.LBB0_1:                                # %return
 	mv	s0, .s0.save
 	mv	s1, .s1.save
 	mv	s2, .s2.save
@@ -53,28 +51,24 @@ main:                                   # @main
 	mv	.s10.save, s10
 	mv	.s11.save, s11
 	call	___init__$$YGXXZ
+	mv	f2_4, zero
+	li	f1_4, 1
 	mv	f0_3, zero
 	li	i_4, 1
-	li	f1_4, 1
-	mv	f2_4, zero
 	j	.LBB1_1
 .LBB1_1:                                # %for.cond
 	li	constInt, 10
 	blt	i_4, constInt, .LBB1_2
-	j	.LBB1_4
+	j	.LBB1_3
 .LBB1_2:                                # %for.body
 	add	add, f0_3, f1_4
-	j	.LBB1_3
-.LBB1_3:                                # %for.inc
 	addi	prefix_inc, i_4, 1
 	mv	f0_3, f1_4
-	mv	f1_4, add
 	mv	i_4, prefix_inc
+	mv	f1_4, add
 	mv	f2_4, add
 	j	.LBB1_1
-.LBB1_4:                                # %for.end
-	j	.LBB1_5
-.LBB1_5:                                # %return
+.LBB1_3:                                # %for.end
 	mv	a0, f2_4
 	mv	s0, .s0.save
 	mv	s1, .s1.save

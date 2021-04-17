@@ -10,7 +10,7 @@ public class VirtualReg extends Reg {
     private int size;
     private Immediate stackOffset;
     //  Some attributes for graph coloring.
-    private final ArrayList<VirtualReg> adjList;
+    private final Set<VirtualReg> adjList;
     private int degree;
     private final Set<MV> moveList;
     private VirtualReg alias;
@@ -27,7 +27,7 @@ public class VirtualReg extends Reg {
         this.size = size;
         stackOffset = null;
 
-        adjList = new ArrayList<>();
+        adjList = new HashSet<>();
         degree = 0;
         moveList = new HashSet<>();
         alias = null;
@@ -49,7 +49,7 @@ public class VirtualReg extends Reg {
         this.stackOffset = stackOffset;
     }
 
-    public ArrayList<VirtualReg> getAdjList() {
+    public Set<VirtualReg> getAdjList() {
         return adjList;
     }
     public int getDegree() {

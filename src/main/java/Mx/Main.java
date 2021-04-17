@@ -110,6 +110,8 @@ public class Main {
 
             IRModule irModule = irBuilder.getModule();
 
+            //if (emitLL) new IRPrinter("naive.ll").run(irModule);
+
             new CFGSimplifier(irModule).run();
             new DominanceAnalysis(irModule).run();
             new Mem2Reg(irModule).run();
@@ -117,8 +119,6 @@ public class Main {
             if (emitLL) new IRPrinter("test.ll").run(irModule);
 
             new PhiResolve(irModule).run();
-
-            //if (emitLL) new IRPrinter("noPhi.ll").run(irModule);
 
             InstructionSelector instructionSelector = new InstructionSelector();
             irModule.accept(instructionSelector);

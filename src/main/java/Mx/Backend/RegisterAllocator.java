@@ -35,6 +35,10 @@ public class RegisterAllocator {
         public String toString() {
             return "Edge{" + u.toString() + ", " + v.toString() + "}";
         }
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
     }
 
     //  Data structures.

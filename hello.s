@@ -6,8 +6,6 @@
 ___init__$$YGXXZ:                       # @"___init__$$YGXXZ"
 	.cfi_startproc
 # %bb.0:                                # %entry
-	j	.LBB0_1
-.LBB0_1:                                # %return
 	ret
 .Lfunc_end0:
 	.size	___init__$$YGXXZ, .Lfunc_end0-___init__$$YGXXZ
@@ -44,31 +42,23 @@ main:                                   # @main
 	sw	a1, 20(sp)
 	sw	a2, 16(sp)
 	sw	a3, 12(sp)
-	blt	a4, a3, .LBB1_4
+	blt	a4, a1, .LBB1_3
 	j	.LBB1_2
 .LBB1_2:                                # %for.body
                                         #   in Loop: Header=BB1_1 Depth=1
-	lw	a0, 24(sp)
-	lw	a1, 20(sp)
-	add	a2, a0, a1
-	sw	a2, 8(sp)
-	j	.LBB1_3
-.LBB1_3:                                # %for.inc
-                                        #   in Loop: Header=BB1_1 Depth=1
-	lw	a0, 12(sp)
-	addi	a1, a0, 1
-	lw	a2, 8(sp)
-	lw	a3, 8(sp)
-	lw	a4, 20(sp)
-	sw	a1, 40(sp)
-	sw	a2, 36(sp)
-	sw	a3, 32(sp)
-	sw	a4, 28(sp)
-	j	.LBB1_1
-.LBB1_4:                                # %for.end
-	j	.LBB1_5
-.LBB1_5:                                # %return
 	lw	a0, 16(sp)
+	lw	a1, 12(sp)
+	add	a2, a0, a1
+	lw	a3, 20(sp)
+	addi	a4, a3, 1
+	mv	a5, a2
+	sw	a5, 40(sp)
+	sw	a1, 36(sp)
+	sw	a4, 32(sp)
+	sw	a2, 28(sp)
+	j	.LBB1_1
+.LBB1_3:                                # %for.end
+	lw	a0, 24(sp)
 	lw	ra, 44(sp)
 	addi	sp, sp, 48
 	ret
