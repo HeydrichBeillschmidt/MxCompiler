@@ -35,7 +35,7 @@ unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 
 newExpression: New newTypeId newInitializer?;
 
-newTypeId: typeSpecifierSeq newDeclarator?;
+newTypeId: typeSpecifier/*Seq*/ newDeclarator?;
 
 newDeclarator
     : LeftBracket expression RightBracket
@@ -188,7 +188,7 @@ simpleDeclaration: declSpecifierSeq initDeclaratorList? Semi;
 emptyDeclaration: Semi;
 
 /* specifiers */
-
+/*
 declSpecifier
     : storageClassSpecifier
     | functionSpecifier
@@ -197,9 +197,9 @@ declSpecifier
     | Constexpr
     | trailingTypeSpecifier
     ;
-
-declSpecifierSeq: declSpecifier* typeSpecifier;
-
+*/
+declSpecifierSeq: /*declSpecifier**/ typeSpecifier;
+/*
 storageClassSpecifier
     : Register
     | Static
@@ -213,16 +213,16 @@ functionSpecifier
     | Virtual
     | Explicit
     ;
-
+*/
 typeSpecifier
     : simpleTypeSpecifier
 	| classSpecifier
 	;
-
+/*
 trailingTypeSpecifier: cvQualifier;
 
 typeSpecifierSeq: trailingTypeSpecifier* typeSpecifier;
-
+*/
 simpleTypeSpecifier
     : simpleTypeSpecifier LeftBracket RightBracket
     | nonArrayTypeSpecifier
@@ -265,7 +265,7 @@ initializerList
 bracedInitList: LeftBrace initializerList? RightBrace;
 
 //cvQualifier: Const | Volatile;
-cvQualifier: Volatile;
+//cvQualifier: Volatile;
 
 /* function */
 
@@ -285,7 +285,7 @@ classSpecifier: classHead LeftBrace memberSpecification? RightBrace;
 
 classHead: classKey className;
 
-classKey: Class | Struct;
+classKey: Class /*| Struct*/;
 
 className: Identifier;
 
