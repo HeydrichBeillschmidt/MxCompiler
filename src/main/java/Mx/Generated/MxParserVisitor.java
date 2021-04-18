@@ -287,47 +287,17 @@ public interface MxParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEmptyDeclaration(MxParser.EmptyDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#declSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclSpecifier(MxParser.DeclSpecifierContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MxParser#declSpecifierSeq}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDeclSpecifierSeq(MxParser.DeclSpecifierSeqContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#storageClassSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#functionSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionSpecifier(MxParser.FunctionSpecifierContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MxParser#typeSpecifier}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitTypeSpecifier(MxParser.TypeSpecifierContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#trailingTypeSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTrailingTypeSpecifier(MxParser.TrailingTypeSpecifierContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#typeSpecifierSeq}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#simpleTypeSpecifier}.
 	 * @param ctx the parse tree
@@ -388,12 +358,6 @@ public interface MxParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBracedInitList(MxParser.BracedInitListContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#cvQualifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCvQualifier(MxParser.CvQualifierContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#parametersAndQualifiers}.
 	 * @param ctx the parse tree

@@ -468,16 +468,6 @@ public interface MxParserListener extends ParseTreeListener {
 	 */
 	void exitEmptyDeclaration(MxParser.EmptyDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MxParser#declSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterDeclSpecifier(MxParser.DeclSpecifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#declSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitDeclSpecifier(MxParser.DeclSpecifierContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MxParser#declSpecifierSeq}.
 	 * @param ctx the parse tree
 	 */
@@ -488,26 +478,6 @@ public interface MxParserListener extends ParseTreeListener {
 	 */
 	void exitDeclSpecifierSeq(MxParser.DeclSpecifierSeqContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MxParser#storageClassSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#storageClassSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MxParser#functionSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunctionSpecifier(MxParser.FunctionSpecifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#functionSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunctionSpecifier(MxParser.FunctionSpecifierContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MxParser#typeSpecifier}.
 	 * @param ctx the parse tree
 	 */
@@ -517,26 +487,6 @@ public interface MxParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTypeSpecifier(MxParser.TypeSpecifierContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MxParser#trailingTypeSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterTrailingTypeSpecifier(MxParser.TrailingTypeSpecifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#trailingTypeSpecifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitTrailingTypeSpecifier(MxParser.TrailingTypeSpecifierContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MxParser#typeSpecifierSeq}.
-	 * @param ctx the parse tree
-	 */
-	void enterTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#typeSpecifierSeq}.
-	 * @param ctx the parse tree
-	 */
-	void exitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#simpleTypeSpecifier}.
 	 * @param ctx the parse tree
@@ -637,16 +587,6 @@ public interface MxParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBracedInitList(MxParser.BracedInitListContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MxParser#cvQualifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterCvQualifier(MxParser.CvQualifierContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MxParser#cvQualifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitCvQualifier(MxParser.CvQualifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#parametersAndQualifiers}.
 	 * @param ctx the parse tree
