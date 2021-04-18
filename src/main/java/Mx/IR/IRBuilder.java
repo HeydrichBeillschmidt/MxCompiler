@@ -1510,7 +1510,7 @@ public class IRBuilder implements ASTVisitor {
 
         func.addBlock(func.getReturnBlock());
         func.checkTermination(exceptionHandler);
-        if (node.getPureName().equals("main")) {
+        if (node.getDecoratedName().equals("_main$$YGHXZ")) {
             func = module.getFunction("___init__$$YGXXZ");
             func.checkTermination(exceptionHandler);
             curFunc.getEntranceBlock().addInstAtHead(

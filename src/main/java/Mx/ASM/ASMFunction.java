@@ -72,7 +72,7 @@ public class ASMFunction {
     }
 
     public String getName() {
-        if (FuncNameDecorator.extractPureFuncName(name).equals("main"))
+        if (name.equals("_main$$YGHXZ"))
             return "main";
         return name;
     }
