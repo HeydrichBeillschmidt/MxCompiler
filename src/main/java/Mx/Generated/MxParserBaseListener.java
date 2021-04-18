@@ -592,6 +592,18 @@ public class MxParserBaseListener implements MxParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSimpleTypeSpecifier(MxParser.SimpleTypeSpecifierContext ctx) { }
 	/**
 	 * {@inheritDoc}

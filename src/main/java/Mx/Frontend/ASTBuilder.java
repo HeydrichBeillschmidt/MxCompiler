@@ -148,7 +148,7 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitNewTypeId(MxParser.NewTypeIdContext ctx) {
-        DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.typeSpecifier/*Seq*/());
+        DeclSpecifierSeqNode specifier = (DeclSpecifierSeqNode) visit(ctx.typeSpecifierSeq());
         if (ctx.newDeclarator()!=null) {
             ArrayList<ExprNode> indexes
                     = ((ExprSeqNode) visit(ctx.newDeclarator())).getSubExpressions();
@@ -559,19 +559,84 @@ public class ASTBuilder extends MxParserBaseVisitor<ASTNode>{
     }
 
     /* specifiers */
-
+/*
+    @Override
+    public ASTNode visitDeclSpecifier(MxParser.DeclSpecifierContext ctx) {
+        if (ctx.storageClassSpecifier() != null)
+            return visit(ctx.storageClassSpecifier());
+        else if (ctx.functionSpecifier()!=null)
+            return visit(ctx.functionSpecifier());
+        else if (ctx.Friend()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "friend");
+        else if (ctx.Typedef()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "typedef");
+        else if (ctx.Constexpr()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "constexpr");
+        else return visit(ctx.trailingTypeSpecifier());
+    }
+*/
     @Override
     public ASTNode visitDeclSpecifierSeq(MxParser.DeclSpecifierSeqContext ctx) {
         TypeSpecifierNode typeSpecifier = (TypeSpecifierNode) visit(ctx.typeSpecifier());
+        /*if (ctx.declSpecifier()!=null) {
+            Set<NonTypeSpecifierNode> declSpecifiers = new HashSet<>();
+            for (var declSpec: ctx.declSpecifier())
+                declSpecifiers.add((NonTypeSpecifierNode) visit(declSpec));
+            return new DeclSpecifierSeqNode(new Location(ctx.getStart()),
+                    typeSpecifier, declSpecifiers);
+        }*/
         return new DeclSpecifierSeqNode(new Location(ctx.getStart()), typeSpecifier);
     }
+/*
+    @Override
+    public ASTNode visitStorageClassSpecifier(MxParser.StorageClassSpecifierContext ctx) {
+        if (ctx.Register()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "register");
+        else if (ctx.Static()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "static");
+        else if (ctx.Thread_local()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "thread_local");
+        else if (ctx.Extern()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "extern");
+        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "mutable");
+    }
 
+    @Override
+    public ASTNode visitFunctionSpecifier(MxParser.FunctionSpecifierContext ctx) {
+        if (ctx.Inline()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "inline");
+        else if (ctx.Virtual()!=null)
+            return new NonTypeSpecifierNode(new Location(ctx.getStart()), "virtual");
+        else return new NonTypeSpecifierNode(new Location(ctx.getStart()), "explicit");
+    }
+*/
     @Override
     public ASTNode visitTypeSpecifier(MxParser.TypeSpecifierContext ctx) {
         if (ctx.simpleTypeSpecifier()!=null)
             return visit(ctx.simpleTypeSpecifier());
         else
             return visit(ctx.classSpecifier());
+    }
+/*
+    @Override
+    public ASTNode visitTrailingTypeSpecifier(MxParser.TrailingTypeSpecifierContext ctx) {
+        if (ctx.cvQualifier()!=null) {
+            return visit(ctx.cvQualifier());
+        }
+        return null;
+    }
+*/
+    @Override
+    public ASTNode visitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx) {
+        TypeSpecifierNode typeSpecifier = (TypeSpecifierNode) visit(ctx.typeSpecifier());
+        /*if (ctx.trailingTypeSpecifier()!=null) {
+            Set<NonTypeSpecifierNode> declSpecifiers = new HashSet<>();
+            for (var declSpec: ctx.trailingTypeSpecifier())
+                declSpecifiers.add((NonTypeSpecifierNode) visit(declSpec));
+            return new DeclSpecifierSeqNode(new Location(ctx.getStart()),
+                    typeSpecifier, declSpecifiers);
+        }*/
+        return new DeclSpecifierSeqNode(new Location(ctx.getStart()), typeSpecifier);
     }
 
     @Override

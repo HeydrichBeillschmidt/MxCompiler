@@ -35,7 +35,7 @@ unaryOperator: Or | Star | And | Plus | Tilde | Minus | Not;
 
 newExpression: New newTypeId newInitializer?;
 
-newTypeId: typeSpecifier/*Seq*/ newDeclarator?;
+newTypeId: typeSpecifierSeq newDeclarator?;
 
 newDeclarator
     : LeftBracket expression RightBracket
@@ -220,9 +220,9 @@ typeSpecifier
 	;
 /*
 trailingTypeSpecifier: cvQualifier;
-
-typeSpecifierSeq: trailingTypeSpecifier* typeSpecifier;
 */
+typeSpecifierSeq: /*trailingTypeSpecifier**/ typeSpecifier;
+
 simpleTypeSpecifier
     : simpleTypeSpecifier LeftBracket RightBracket
     | nonArrayTypeSpecifier

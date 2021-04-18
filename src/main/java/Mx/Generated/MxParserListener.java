@@ -488,6 +488,16 @@ public interface MxParserListener extends ParseTreeListener {
 	 */
 	void exitTypeSpecifier(MxParser.TypeSpecifierContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MxParser#typeSpecifierSeq}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MxParser#typeSpecifierSeq}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MxParser#simpleTypeSpecifier}.
 	 * @param ctx the parse tree
 	 */

@@ -299,6 +299,12 @@ public interface MxParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypeSpecifier(MxParser.TypeSpecifierContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MxParser#typeSpecifierSeq}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeSpecifierSeq(MxParser.TypeSpecifierSeqContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MxParser#simpleTypeSpecifier}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
