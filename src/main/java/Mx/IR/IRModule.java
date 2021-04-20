@@ -106,14 +106,12 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "size"));
         func = new Function(this, retType, "_malloc$$YGPADH$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.length(string str);
         retType = int32T;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
         func = new Function(this, retType, "_length$string$$QEAHXZ", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // string string.substring(string str, int left, int right);
         retType = stringT;
@@ -122,14 +120,12 @@ public class IRModule {
         parameters.add(new Parameter(int32T, "left"));
         parameters.add(new Parameter(int32T, "right"));
         func = new Function(this, retType, "_substring$string$$QEAPADHH$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.parseInt(string str);
         retType = int32T;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
         func = new Function(this, retType, "_parseInt$string$$QEAHXZ", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // int string.ord(string str, int pos);
         retType = int32T;
@@ -137,7 +133,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str"));
         parameters.add(new Parameter(int32T, "pos"));
         func = new Function(this, retType, "_ord$string$$QEAHH$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // string strcat(string str1, string str2);
         retType = stringT;
@@ -145,7 +140,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcat$$YGPADPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_eq(string str1, string str2);
         retType = boolT;
@@ -153,7 +147,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_eq$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_neq(string str1, string str2);
         retType = boolT;
@@ -161,7 +154,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_neq$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_lt(string str1, string str2);
         retType = boolT;
@@ -169,7 +161,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_lt$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_gt(string str1, string str2);
         retType = boolT;
@@ -177,7 +168,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_gt$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_le(string str1, string str2);
         retType = boolT;
@@ -185,7 +175,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_le$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // bool strcmp_ge(string str1, string str2);
         retType = boolT;
@@ -193,17 +182,9 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str1"));
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_ge$$YG_NPADPAD$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
-        // int array.size(array arr);
-        /*
-        retType = int32T;
-        parameters = new ArrayList<>();
-        parameters.add(new Parameter(new PointerType(charT), "arr"));
-        func = new Function(this, retType, "_size$array$$QEAHXZ", parameters);
-        func.setSideEffect(false);
-        externalFunctions.put(func.getName(), func);
-         */
+
+        externalFunctions.values().forEach(f -> f.setSideEffect(false));
     }
 
     public Map<String, Function> getExternalFunctions() {

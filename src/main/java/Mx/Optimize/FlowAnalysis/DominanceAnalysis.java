@@ -1,7 +1,10 @@
-package Mx.Optimize;
+package Mx.Optimize.FlowAnalysis;
 
 import Mx.IR.Function;
 import Mx.IR.IRModule;
+import Mx.Optimize.Pass;
+
+//https://www.cs.rice.edu/~keith/EMBED/dom.pdf
 
 public class DominanceAnalysis extends Pass {
     public DominanceAnalysis(IRModule module) {

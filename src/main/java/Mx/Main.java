@@ -10,7 +10,8 @@ import Mx.IR.IRBuilder;
 import Mx.IR.IRModule;
 import Mx.IR.IRPrinter;
 import Mx.Optimize.CFGSimplifier;
-import Mx.Optimize.DominanceAnalysis;
+import Mx.Optimize.OptAssembler;
+import Mx.Optimize.FlowAnalysis.DominanceAnalysis;
 import Mx.Optimize.Mem2Reg;
 import Mx.Optimize.PhiResolve;
 import Mx.Utils.Errors.*;
@@ -25,12 +26,13 @@ import java.io.InputStream;
 
 public class Main {
     public static void main(String[] args) {
-        boolean doCodegen = true, emitLL = false;
+        boolean doCodegen = true, doOptimization = true, emitLL = false;
 
         if (args.length > 0) {
             for (String arg: args) {
                 switch (arg) {
                     case "-semantic": doCodegen = false;break;
+                    case "-O0": doOptimization = false;break;
                     case "-emit-llvm":emitLL = true;break;
                     default:break;
                 }
@@ -39,7 +41,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/optim-new/efficiency.mx";
+        //String filename = "testcases/optim-new/ssa.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -112,13 +114,17 @@ public class Main {
 
             //if (emitLL) new IRPrinter("naive.ll").run(irModule);
 
-            new CFGSimplifier(irModule).run();
+            CFGSimplifier cfgSimplifier = new CFGSimplifier(irModule);
+            cfgSimplifier.run();
             new DominanceAnalysis(irModule).run();
             new Mem2Reg(irModule).run();
+
+            if (doOptimization) new OptAssembler(irModule).run();
 
             if (emitLL) new IRPrinter("test.ll").run(irModule);
 
             new PhiResolve(irModule).run();
+            cfgSimplifier.run();
 
             InstructionSelector instructionSelector = new InstructionSelector();
             irModule.accept(instructionSelector);

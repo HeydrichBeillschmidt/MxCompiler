@@ -18,6 +18,9 @@ abstract public class Operand {
         this.uses = new HashSet<>();
     }
 
+    public String getName() {
+        return null;
+    }
     public IRType getType() {
         return type;
     }

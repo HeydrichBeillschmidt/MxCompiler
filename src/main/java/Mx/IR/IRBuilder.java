@@ -39,6 +39,7 @@ public class IRBuilder implements ASTVisitor {
         this.initializer = new Function(module, new VoidType(),
                 "___init__$$YGXXZ", new ArrayList<>());
         module.addFunction(initializer);
+        initializer.setSideEffect(true);
         curBlock = null;
         curFunc = null;
     }
@@ -247,10 +248,12 @@ public class IRBuilder implements ASTVisitor {
                 node.setResult(result);
             }
             else {
+                boolean newEdge = false;
                 if (objectType instanceof StringType)
                     func = module.getExternalFunction(methodName);
                 else {
                     func = module.getFunction(node.getEntity().getName());
+                    newEdge = true;
                 }
                 assert func!=null;
                 IRType retType = func.getFunctionType().getReturnType();
@@ -268,6 +271,7 @@ public class IRBuilder implements ASTVisitor {
                     }
                 }
                 curBlock.addInst(new Call(curBlock, dst, func, parameters));
+                if (newEdge) curFunc.addCallSite((Call) curBlock.getTailInst());
 
                 node.setResult(dst);
             }
@@ -277,6 +281,7 @@ public class IRBuilder implements ASTVisitor {
             FunctionEntity funcEntity = (FunctionEntity) node.getEntity();
             func = module.getFunction(funcEntity.getName());
             assert func != null;
+            boolean newEdge = module.hasNoFunction(func.getName());
             IRType retType = func.getFunctionType().getReturnType();
             Register dst = pseudoReg;
             if (retType!=null && !(retType instanceof VoidType)) {
@@ -300,6 +305,7 @@ public class IRBuilder implements ASTVisitor {
                 }
             }
             curBlock.addInst(new Call(curBlock, dst, func, parameters));
+            if (newEdge) curFunc.addCallSite((Call) curBlock.getTailInst());
 
             node.setResult(dst);
         }
@@ -829,7 +835,7 @@ public class IRBuilder implements ASTVisitor {
                     }
                     else if (ariths.get(0).getType() instanceof NullType) {
                         if (ariths.get(1).getType() instanceof NullType) {
-                            node.setResult(new ConstBool(true));
+                            node.setResult(new ConstBool(opName == Icmp.IcmpOpName.eq));
                         }
                         else { // null cmp array/class
                             curBlock.addInst(new Icmp(curBlock, cmp, opName,

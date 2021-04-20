@@ -262,6 +262,14 @@ public class IRBlock {
     public void setIDom(IRBlock iDom) {
         this.iDom = iDom;
     }
+    public boolean isDomed(IRBlock query) {
+        IRBlock dom = iDom;
+        while (dom!=null) {
+            if (dom==query) return true;
+            dom = dom.iDom;
+        }
+        return false;
+    }
 
     // for SSA
     //     SSA construct

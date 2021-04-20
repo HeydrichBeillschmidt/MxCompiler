@@ -26,9 +26,11 @@ public class Function {
     private Register retVal;
     private Register classPtr;
     private final FuncSymbolTable symbolTable;
+    private final Set<Call> callSites;
     private boolean sideEffect;
 
-    public Function(IRModule module, IRType retType, String name, ArrayList<Parameter> parameterList) {
+    public Function(IRModule module, IRType retType, String name,
+                    ArrayList<Parameter> parameterList) {
         this.module = module;
         this.name = name;
         this.symbolTable = new FuncSymbolTable();
@@ -40,6 +42,7 @@ public class Function {
         }
         this.functionType = new FunctionType(retType, parameterTypeList);
         this.entranceBlock = null;
+        this.callSites = new HashSet<>();
         this.sideEffect = true;
         this.retVal = null;
         this.classPtr = null;
@@ -119,7 +122,13 @@ public class Function {
         }
     }
     public void removeBlock(IRBlock block) {
-        block.getAllInst().forEach(IRInst::severDF);
+        ArrayList<IRInst> instList = block.getAllInst();
+        for (var inst: instList) {
+            inst.severDF();
+            if (inst instanceof Call) {
+                removeCallSite((Call) inst);
+            }
+        }
         if (block==entranceBlock) entranceBlock = block.getNextBlock();
         else block.getPrevBlock().setNextBlock(block.getNextBlock());
         if (block==exitBlock) exitBlock = block.getPrevBlock();
@@ -136,6 +145,17 @@ public class Function {
     public void addSymbol(Object obj) {
         symbolTable.putIR(obj);
     }
+
+    public Set<Call> getCallSites() {
+        return callSites;
+    }
+    public void addCallSite(Call i) {
+        callSites.add(i);
+    }
+    public void removeCallSite(Call i) {
+        callSites.remove(i);
+    }
+
     public boolean hasSideEffect() {
         return sideEffect;
     }
@@ -143,7 +163,6 @@ public class Function {
         this.sideEffect = sideEffect;
     }
 
-    // for dominance analysis
     // post-order & reversed post-order
     public ArrayList<IRBlock> getPO() {
         Set<IRBlock> visited = new HashSet<>();
@@ -166,6 +185,7 @@ public class Function {
         }
         order.add(block);
     }
+    // for dominance analysis
     public void solveDominance() {
         // actually post-order here
         ArrayList<IRBlock> RPO = getPO();
@@ -200,7 +220,7 @@ public class Function {
             }
         }
     }
-    // find the LCA of b1 & b2 in dominance tree
+        // find the LCA of b1 & b2 in dominance tree
     private IRBlock intersect(IRBlock b1, IRBlock b2) {
         IRBlock finger1 = b1;
         IRBlock finger2 = b2;
