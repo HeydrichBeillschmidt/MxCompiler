@@ -62,6 +62,11 @@ public class Phi extends IRInst {
             }
         }
     }
+    public void conveyEntry(Phi target, int i) {
+        target.addEntry(values.get(i), blocks.get(i));
+        values.remove(i);
+        blocks.remove(i);
+    }
 
     @Override
     public boolean needWriteBack() {

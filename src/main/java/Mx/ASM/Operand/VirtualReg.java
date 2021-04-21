@@ -99,6 +99,12 @@ public class VirtualReg extends Reg {
         moveList.clear();
         alias = null;
     }
+    public void increaseSpillCost(double cost) {
+        spillCost += cost;
+    }
+    public double getSpillCost() {
+        return spillCost;
+    }
 
     @Override
     public String emitCode() {

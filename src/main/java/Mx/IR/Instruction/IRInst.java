@@ -46,14 +46,21 @@ abstract public class IRInst {
     public void severDF() {}
     public void severCF() {}
 
+    public boolean hasDst() {
+        return getDst()!=Register.pseudoReg;
+    }
     public Register getDst() {
-        return IRBuilder.pseudoReg;
+        return Register.pseudoReg;
     }
     public boolean needWriteBack() {
         return false;
     }
     public boolean isNotTerminalInst() {
         return !(this instanceof Br || this instanceof Ret);
+    }
+    public boolean hasNoSideEffect() {
+        return this instanceof BinaryOp || this instanceof BitCast
+                || this instanceof GetElementPtr || this instanceof Icmp;
     }
     abstract public void actuallyWritten();
 

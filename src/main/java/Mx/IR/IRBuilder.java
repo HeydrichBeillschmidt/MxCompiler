@@ -28,8 +28,6 @@ public class IRBuilder implements ASTVisitor {
     private IRBlock curBlock;
     private Function curFunc;
 
-    public static Register pseudoReg = new Register(new VoidType(), "");
-
     public IRBuilder(Scope globalScope, TypeTable astTypeTable,
                      ExceptionHandler exceptionHandler) {
         this.module = new IRModule(astTypeTable);
@@ -257,7 +255,7 @@ public class IRBuilder implements ASTVisitor {
                 }
                 assert func!=null;
                 IRType retType = func.getFunctionType().getReturnType();
-                Register dst = pseudoReg;
+                Register dst = Register.pseudoReg;
                 if (retType!=null && !(retType instanceof VoidType)) {
                     dst = new Register(retType, "funcCallRet");
                     curFunc.addSymbol(dst);
@@ -283,7 +281,7 @@ public class IRBuilder implements ASTVisitor {
             assert func != null;
             boolean newEdge = module.hasNoFunction(func.getName());
             IRType retType = func.getFunctionType().getReturnType();
-            Register dst = pseudoReg;
+            Register dst = Register.pseudoReg;
             if (retType!=null && !(retType instanceof VoidType)) {
                 dst = new Register(retType, "funcCallRet");
                 curFunc.addSymbol(dst);
@@ -446,7 +444,7 @@ public class IRBuilder implements ASTVisitor {
                 assert func != null;
                 parameters = new ArrayList<>();
                 parameters.add(cast);
-                curBlock.addInst(new Call(curBlock, pseudoReg, func, parameters));
+                curBlock.addInst(new Call(curBlock, Register.pseudoReg, func, parameters));
             }
 
             node.setResult(cast);
@@ -1520,8 +1518,8 @@ public class IRBuilder implements ASTVisitor {
             func = module.getFunction("___init__$$YGXXZ");
             func.checkTermination(exceptionHandler);
             curFunc.getEntranceBlock().addInstAtHead(
-                    new Call(curFunc.getEntranceBlock(), pseudoReg,
-                            func, new ArrayList<>()));
+                    new Call(curFunc.getEntranceBlock(),
+                            Register.pseudoReg, func, new ArrayList<>()));
         }
     }
 

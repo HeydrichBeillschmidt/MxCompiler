@@ -4,10 +4,7 @@ import Mx.IR.Function;
 import Mx.IR.IRModule;
 import Mx.Optimize.Pass;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InterProceduralAnalysis extends Pass {
     private final Map<Function, Set<Function>> callForward, callBackward;
@@ -39,5 +36,22 @@ public class InterProceduralAnalysis extends Pass {
             }
         }
         return false;
+    }
+
+    public ArrayList<Function> getPO() {
+        ArrayList<Function> order = new ArrayList<>();
+        _dfsRecursive(module.getFunction("_main$$YGHXZ"),
+                order, new HashSet<>());
+        return order;
+    }
+    private void _dfsRecursive(Function f, ArrayList<Function> order,
+                               Set<Function> visited) {
+        visited.add(f);
+        for (var s: callForward.get(f)) {
+            if (!visited.contains(s)) {
+                _dfsRecursive(s, order, visited);
+            }
+        }
+        order.add(f);
     }
 }

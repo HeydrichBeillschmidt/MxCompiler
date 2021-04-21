@@ -1,5 +1,6 @@
 package Mx.Backend;
 
+import Mx.ASM.ASMBlock;
 import Mx.ASM.ASMFunction;
 import Mx.ASM.ASMModule;
 import Mx.ASM.Instruction.ASMInst;
@@ -176,9 +177,18 @@ public class RegisterAllocator {
         }
         initial.removeAll(precolored);
         initial.forEach(VirtualReg::resetColoringInfo);
-
         precolored.forEach(VirtualReg::resetForPreColoredVRs);
-        // todo: calculate spill costs
+
+        // calculate spill costs
+        ArrayList<ASMBlock> RPO = curFunc.getRPO();
+        for (var b: RPO) {
+            int depth = b.getLoopDepth();
+            double cost = Math.pow(10, depth);
+            for (var i: b.getAllInst()) {
+                i.getUses().forEach(u -> u.increaseSpillCost(cost));
+                i.getDefs().forEach(d -> d.increaseSpillCost(cost));
+            }
+        }
     }
 
     // build interference graph and init workistMoves by static liveness analysis
@@ -396,10 +406,18 @@ public class RegisterAllocator {
         freezeMoves(m);
     }
     private VirtualReg getSpill() {
-        // todo: select using favorite heuristic
         ArrayList<VirtualReg> list = new ArrayList<>(spillWorklist);
-        int index = new Random().nextInt(list.size());
-        return list.get(index);
+        VirtualReg ans = null;
+        double minCost = Double.POSITIVE_INFINITY;
+        for (var v: list) {
+            double cost = v.getSpillCost() / v.getDegree();
+            if (cost <= minCost) {
+                minCost = cost;
+                ans = v;
+            }
+        }
+        assert ans != null;
+        return ans;
     }
 
     private void assignColors() {

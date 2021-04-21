@@ -61,7 +61,7 @@ public class Call extends IRInst {
 
     @Override
     public boolean needWriteBack() {
-        return dst!=IRBuilder.pseudoReg;
+        return hasDst();
     }
     @Override
     public void actuallyWritten() {
@@ -92,7 +92,7 @@ public class Call extends IRInst {
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();
-        if (!(dst.equals(IRBuilder.pseudoReg))) {
+        if (hasDst()) {
             string.append(dst.toString()).append(" = ");
         }
         string.append("call ");

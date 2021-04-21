@@ -6,7 +6,6 @@ import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.Instruction.IRInst;
-import Mx.Utils.FuncNameDecorator;
 import Mx.Utils.FuncSymbolTable;
 
 import java.util.*;
@@ -37,7 +36,7 @@ public class ASMFunction {
         if (irFunc==null) return;
 
         // deal with blocks
-        ArrayList<IRBlock> irBlocks = irFunc.getAllBlocks();
+        ArrayList<IRBlock> irBlocks = irFunc.getRPO();
         for (var b: irBlocks) {
             ASMBlock block = new ASMBlock(b.getName(),
                     ".LBB"+funcID+"_"+blocks.size(),
@@ -132,52 +131,23 @@ public class ASMFunction {
         }
         return order;
     }
-    public ArrayList<ASMBlock> getBFSOrder() {
-        ArrayList<ASMBlock> order = new ArrayList<>();
-        Queue<ASMBlock> queue = new LinkedList<>();
-        Set<ASMBlock> visited = new HashSet<>();
-        queue.add(entranceBlock);
-        visited.add(entranceBlock);
-        do {
-            ASMBlock curBlock = queue.poll();
-            assert curBlock != null;
-            order.add(curBlock);
-            for (var s: curBlock.getSuccessors()) {
-                if (!visited.contains(s)) queue.offer(s);
-            }
-            visited.addAll(curBlock.getSuccessors());
-        }
-        while (!queue.isEmpty());
-        return order;
-    }
-    public ArrayList<ASMBlock> getDFSOrder() {
-        ArrayList<ASMBlock> order = new ArrayList<>();
-        ArrayList<ASMBlock> visited = new ArrayList<>();
-        _dfsRecursive(entranceBlock, order, visited);
-        return order;
-    }
-    private void _dfsRecursive(ASMBlock block, ArrayList<ASMBlock> order,
-                               ArrayList<ASMBlock> visited) {
-        order.add(block);
-        visited.add(block);
-        for (var suc: block.getSuccessors()) {
-            if (!visited.contains(suc)) {
-                _dfsRecursive(suc, order, visited);
-            }
-        }
+    public ArrayList<ASMBlock> getRPO() {
+        ArrayList<ASMBlock> ans = getPostOrder();
+        Collections.reverse(ans);
+        return ans;
     }
     public ArrayList<ASMBlock> getPostOrder() {
         ArrayList<ASMBlock> order = new ArrayList<>();
         Set<ASMBlock> visited = new HashSet<>();
-        _postOrderDFSRecursive(entranceBlock, order, visited);
+        _dfsRecursive(entranceBlock, order, visited);
         return order;
     }
-    private void _postOrderDFSRecursive(ASMBlock block, ArrayList<ASMBlock> order,
-                                        Set<ASMBlock> visited) {
+    private void _dfsRecursive(ASMBlock block, ArrayList<ASMBlock> order,
+                               Set<ASMBlock> visited) {
         visited.add(block);
         for (var s: block.getSuccessors()) {
             if (!visited.contains(s)) {
-                _postOrderDFSRecursive(s, order, visited);
+                _dfsRecursive(s, order, visited);
             }
         }
         order.add(block);

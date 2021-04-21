@@ -4,10 +4,13 @@ import Mx.IR.IRBlock;
 import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.IRInst;
 import Mx.IR.TypeSystem.IRType;
+import Mx.IR.TypeSystem.VoidType;
 
 public class Register extends Operand {
     private String name;
     private IRInst def;
+
+    public static Register pseudoReg = new Register(new VoidType(), "");
 
     public Register(IRType type, String name) {
         super(type);

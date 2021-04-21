@@ -20,6 +20,8 @@ public class IRBlock {
     private final ArrayList<IRBlock> predecessors;
     private final ArrayList<IRBlock> successors;
 
+    private int loopDepth;
+
     // for dominance analysis
     private int blockCnt;
     //     -- dominance frontier
@@ -118,12 +120,18 @@ public class IRBlock {
             if (prev.getNextInst()!=null) addNextInst(prev, newInst);
             else addInst(newInst);
         }
-        else {
+        else if (oldInst.getNextInst()!=null) {
             IRInst next = oldInst.getNextInst();
             oldInst.severDF();
             oldInst.severCF();
             oldInst.removeFromBlock();
             addPrevInst(next, newInst);
+        }
+        else {
+            oldInst.severDF();
+            oldInst.severCF();
+            oldInst.removeFromBlock();
+            addInst(newInst);
         }
     }
 
@@ -237,6 +245,13 @@ public class IRBlock {
             s.getAllPhi().forEach(ph -> ph.removeEntry(this));
         }
         predecessors.forEach(p -> p.successors.remove(this));
+    }
+
+    public int getLoopDepth() {
+        return loopDepth;
+    }
+    public void setLoopDepth(int loopDepth) {
+        this.loopDepth = loopDepth;
     }
 
     // for dominance analysis

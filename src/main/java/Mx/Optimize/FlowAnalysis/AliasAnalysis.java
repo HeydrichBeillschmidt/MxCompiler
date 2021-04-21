@@ -1,6 +1,8 @@
 package Mx.Optimize.FlowAnalysis;
 
+import Mx.IR.Function;
 import Mx.IR.IRBlock;
+import Mx.IR.IRLoop;
 import Mx.IR.IRModule;
 import Mx.IR.Instruction.*;
 import Mx.IR.Operand.Null;
@@ -46,6 +48,10 @@ public class AliasAnalysis extends Pass {
     private Map<Operand, MemNode> pts; // point to
     private Set<MemNode> nodes;
 
+    private Map<Function, Set<MemNode>> funcSTs;
+    private Set<MemNode> loopSTs;
+    private Set<Operand> loopSAs; // addresses of stores
+
     public AliasAnalysis(IRModule module) {
         super(module);
     }
@@ -62,10 +68,14 @@ public class AliasAnalysis extends Pass {
     public boolean run() {
         nodes = new HashSet<>();
         pts = new HashMap<>();
+        funcSTs = new HashMap<>();
+        loopSTs = new HashSet<>();
+        loopSAs = new HashSet<>();
 
         init();
         solveConstraint();
         analyse();
+        collectSTs();
 
         return false;
     }
@@ -210,7 +220,7 @@ public class AliasAnalysis extends Pass {
                 }
             }
             for (var q: v.simpleConstrains) {
-                if (q.simpleConstrains.addAll(v.simpleConstrains)) {
+                if (q.basicConstrains.addAll(v.basicConstrains)) {
                     if (!active.contains(q)) {
                         W.offer(q);
                         active.add(q);
@@ -218,5 +228,57 @@ public class AliasAnalysis extends Pass {
                 }
             }
         }
+    }
+
+    private void collectSTs() {
+        InterProceduralAnalysis interProc = new InterProceduralAnalysis(module);
+        interProc.run();
+
+        ArrayList<Function> PO = interProc.getPO();
+        for (var f: PO) {
+            Set<MemNode> STs = new HashSet<>();
+            ArrayList<IRBlock> BPO = f.getPO();
+            for (var b: BPO) {
+                for (var i: b.getAllInst()) {
+                    if (i instanceof Store) {
+                        STs.addAll(pts.get(((Store)i).getAddr()).basicConstrains);
+                    }
+                }
+            }
+            funcSTs.put(f, STs);
+        }
+        for (var f: PO) {
+            Set<MemNode> STs = funcSTs.get(f);
+            for (var caller: interProc.getCallers(f)) {
+                funcSTs.get(caller).addAll(STs);
+            }
+        }
+    }
+
+    public void buildST(IRLoop loop) {
+        loopSTs.clear();
+        for (var b: loop.getBlocks()) {
+            for (var inst: b.getAllInst()) {
+                if (inst instanceof Store) {
+                    loopSAs.add(((Store) inst).getAddr());
+                }
+                else if (inst instanceof Call) {
+                    Call i = (Call) inst;
+                    if (module.hasNoFunction(i.getCallee().getName())) {
+                        loopSTs.addAll(funcSTs.get(i.getCallee()));
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean useLoopST(Load i) {
+        Operand addr = i.getAddr();
+        Set<MemNode> pointTo = new HashSet<>(pts.get(addr).basicConstrains);
+        if (!Collections.disjoint(pointTo, loopSTs)) return true;
+        for (var sa: loopSAs) {
+            if (mayAlias(sa, addr)) return true;
+        }
+        return false;
     }
 }

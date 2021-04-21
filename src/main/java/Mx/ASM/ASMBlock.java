@@ -3,7 +3,6 @@ package Mx.ASM;
 import Mx.ASM.Instruction.ASMInst;
 import Mx.ASM.Operand.VirtualReg;
 import Mx.IR.IRBlock;
-import Mx.IR.Instruction.IRInst;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,9 +22,10 @@ public class ASMBlock {
     private ASMBlock prevBlock;
     private ASMBlock nextBlock;
 
-    //  for liveness analysis
     private final ArrayList<ASMBlock> predecessors;
     private final ArrayList<ASMBlock> successors;
+
+    // for liveness analysis
     private Set<VirtualReg> uses;
     private Set<VirtualReg> defs;
     private Set<VirtualReg> liveIn;
@@ -50,6 +50,9 @@ public class ASMBlock {
     }
     public IRBlock getIRBlock() {
         return irBlock;
+    }
+    public int getLoopDepth() {
+        return irBlock.getLoopDepth();
     }
     public ASMFunction getFunc() {
         return func;
@@ -121,25 +124,16 @@ public class ASMBlock {
     public void setNextBlock(ASMBlock nextBlock) {
         this.nextBlock = nextBlock;
     }
-    public boolean hasNextBlock() {
-        return nextBlock!=null;
-    }
     public void addBlock(ASMBlock block) {
         this.nextBlock = block;
         block.prevBlock = this;
     }
 
-    public boolean hasPredecessors() {
-        return predecessors.size()!=0;
-    }
     public ArrayList<ASMBlock> getPredecessors() {
         return predecessors;
     }
     public void addPredecessor(ASMBlock predecessor) {
         predecessors.add(predecessor);
-    }
-    public boolean hasSuccessors() {
-        return successors.size()!=0;
     }
     public ArrayList<ASMBlock> getSuccessors() {
         return successors;
@@ -148,6 +142,7 @@ public class ASMBlock {
         successors.add(successor);
     }
 
+    // for liveness analysis
     public void solveUsesAndDefs() {
         uses = new HashSet<>();
         defs = new HashSet<>();
