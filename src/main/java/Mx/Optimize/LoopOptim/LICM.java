@@ -62,6 +62,7 @@ public class LICM extends Pass {
         }
     }
 
+    // loop invariant
     private boolean checkLPI(IRInst inst, IRLoop loop) {
         if (inst.hasNoSideEffect()
                 || inst instanceof Call
@@ -71,8 +72,7 @@ public class LICM extends Pass {
             if (inst instanceof Call) {
                 Call i = (Call) inst;
                 if (i.isVoidCall()) return false;
-                if (i.getCallee().hasSideEffect()
-                        || i.getCallee().getName().equals("_malloc$$YGPADH$Z")) {
+                if (i.getCallee().hasSideEffect()) {
                     return false;
                 }
             }

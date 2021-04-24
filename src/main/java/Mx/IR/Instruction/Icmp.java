@@ -17,7 +17,7 @@ public class Icmp extends IRInst {
         eq, ne, slt, sge, sle, sgt
     }
     private final Register dst;
-    private final IcmpOpName opName;
+    private final IcmpOpName opName, opNameReversed;
     private final IRType type;
     private Operand op1;
     private Operand op2;
@@ -27,6 +27,14 @@ public class Icmp extends IRInst {
         super(block);
         this.dst = dst;
         this.opName = opName;
+        switch (opName) {
+            case eq: opNameReversed=IcmpOpName.eq; break;
+            case ne: opNameReversed=IcmpOpName.ne; break;
+            case slt:opNameReversed=IcmpOpName.sgt;break;
+            case sge:opNameReversed=IcmpOpName.sle;break;
+            case sle:opNameReversed=IcmpOpName.sge;break;
+            default: opNameReversed=IcmpOpName.slt;
+        }
         this.type = type;
         this.op1 = op1;
         this.op2 = op2;
@@ -58,6 +66,19 @@ public class Icmp extends IRInst {
     @Override
     public boolean needWriteBack() {
         return true;
+    }
+    @Override
+    public boolean isCommonExpr(IRInst i) {
+        if (i instanceof Icmp) {
+            Icmp inst = (Icmp) i;
+            if (opName==inst.opName) {
+                return op1.equals(inst.op1) && op2.equals(inst.op2);
+            }
+            else if (opName==inst.opNameReversed) {
+                return op1.equals(inst.op2) && op2.equals(inst.op1);
+            }
+        }
+        return false;
     }
     @Override
     public void actuallyWritten() {

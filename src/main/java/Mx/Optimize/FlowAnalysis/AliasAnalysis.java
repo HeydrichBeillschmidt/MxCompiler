@@ -48,12 +48,14 @@ public class AliasAnalysis extends Pass {
     private Map<Operand, MemNode> pts; // point to
     private Set<MemNode> nodes;
 
+    private final InterProceduralAnalysis interProc;
     private Map<Function, Set<MemNode>> funcSTs;
     private Set<MemNode> loopSTs;
     private Set<Operand> loopSAs; // addresses of stores
 
-    public AliasAnalysis(IRModule module) {
+    public AliasAnalysis(IRModule module, InterProceduralAnalysis interProc) {
         super(module);
+        this.interProc = interProc;
     }
 
     public boolean mayAlias(Operand src1, Operand src2) {
@@ -231,9 +233,6 @@ public class AliasAnalysis extends Pass {
     }
 
     private void collectSTs() {
-        InterProceduralAnalysis interProc = new InterProceduralAnalysis(module);
-        interProc.run();
-
         ArrayList<Function> PO = interProc.getPO();
         for (var f: PO) {
             Set<MemNode> STs = new HashSet<>();
@@ -249,7 +248,7 @@ public class AliasAnalysis extends Pass {
         }
         for (var f: PO) {
             Set<MemNode> STs = funcSTs.get(f);
-            for (var caller: interProc.getCallers(f)) {
+            for (var caller: interProc.getDirectCallers(f)) {
                 funcSTs.get(caller).addAll(STs);
             }
         }

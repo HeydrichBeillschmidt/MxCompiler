@@ -56,6 +56,20 @@ public class BinaryOp extends IRInst {
         return true;
     }
     @Override
+    public boolean isCommonExpr(IRInst i) {
+        if (i instanceof BinaryOp) {
+            BinaryOp inst = (BinaryOp) i;
+            if (opName==inst.opName) {
+                if (commutable) {
+                    return (op1.equals(inst.op1) && op2.equals(inst.op2))
+                            || (op1.equals(inst.op2) && op2.equals(inst.op1));
+                }
+                return op1.equals(inst.op1) && op2.equals(inst.op2);
+            }
+        }
+        return false;
+    }
+    @Override
     public void actuallyWritten() {
         dst.setDef(this);
         op1.addUse(this);

@@ -13,11 +13,17 @@ public class DominanceAnalysis extends Pass {
 
     @Override
     public boolean run() {
-        module.getFunctions().values().forEach(this::runForFn);
-        return true;
+        for (var f: module.getFunctions().values()) {
+            f.solveDominance();
+            f.solveDF();
+        }
+        return false;
     }
-    private void runForFn(Function f) {
-        f.solveDominance();
-        f.solveDF();
+
+    public void runBackward() {
+        for (var f: module.getFunctions().values()) {
+            f.solvePostDominance();
+            f.solvePDF();
+        }
     }
 }

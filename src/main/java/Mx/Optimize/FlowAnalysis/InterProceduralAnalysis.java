@@ -7,23 +7,32 @@ import Mx.Optimize.Pass;
 import java.util.*;
 
 public class InterProceduralAnalysis extends Pass {
-    private final Map<Function, Set<Function>> callForward, callBackward;
+    private Map<Function, Set<Function>> callForward, callBackward;
+    private Map<Function, Set<Function>> callees;
 
     public InterProceduralAnalysis(IRModule module) {
         super(module);
-        callForward = new HashMap<>();
-        callBackward = new HashMap<>();
     }
 
-    public Set<Function> getCallees(Function f) {
+    public Set<Function> getDirectCallees(Function f) {
         return callForward.get(f);
     }
-    public Set<Function> getCallers(Function f) {
+    public Set<Function> getDirectCallers(Function f) {
         return callBackward.get(f);
+    }
+    public Set<Function> getAllCallees(Function f) {
+        return callees.get(f);
+    }
+    public boolean recursiveFunc(Function f) {
+        return callees.get(f).contains(f);
     }
 
     @Override
     public boolean run() {
+        callForward = new HashMap<>();
+        callBackward = new HashMap<>();
+        callees = new HashMap<>();
+
         for (var f: module.getFunctions().values()) {
             callForward.put(f, new HashSet<>());
             callBackward.put(f, new HashSet<>());
@@ -33,6 +42,13 @@ public class InterProceduralAnalysis extends Pass {
                 Function callee = cs.getCallee();
                 callForward.get(f).add(callee);
                 callBackward.get(callee).add(f);
+            }
+        }
+        ArrayList<Function> PO = getPO();
+        for (var f: PO) {
+            callees.put(f, new HashSet<>(callForward.get(f)));
+            for (var callee: callForward.get(f)) {
+                callees.get(f).addAll(callees.get(callee));
             }
         }
         return false;

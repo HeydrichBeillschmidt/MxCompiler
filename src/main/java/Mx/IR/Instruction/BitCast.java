@@ -38,6 +38,14 @@ public class BitCast extends IRInst {
         return true;
     }
     @Override
+    public boolean isCommonExpr(IRInst i) {
+        if (i instanceof BitCast) {
+            BitCast inst = (BitCast) i;
+            return src.equals(inst.src) && castType.equals(inst.castType);
+        }
+        return false;
+    }
+    @Override
     public void actuallyWritten() {
         src.addUse(this);
         dst.setDef(this);

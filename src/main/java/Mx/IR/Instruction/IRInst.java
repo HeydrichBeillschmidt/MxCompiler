@@ -58,6 +58,9 @@ abstract public class IRInst {
     public boolean isNotTerminalInst() {
         return !(this instanceof Br || this instanceof Ret);
     }
+    public boolean isCommonExpr(IRInst i) {
+        return false;
+    }
     public boolean hasNoSideEffect() {
         return this instanceof BinaryOp || this instanceof BitCast
                 || this instanceof GetElementPtr || this instanceof Icmp;

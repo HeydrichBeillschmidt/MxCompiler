@@ -28,9 +28,15 @@ public class IRBlock {
     private Set<IRBlock> DF;
     //     -- immediate dominator
     private IRBlock iDom;
+    //     -- reversed dominance frontier
+    private Set<IRBlock> RDF;
+    //     -- post immediate dominator
+    private IRBlock postIDom;
     // for SSA
     private Map<Alloca, Phi> phiMap;
     private Map<Alloca, Operand> renameTable;
+    // for ADCE
+    private boolean marked;
 
     public IRBlock(String name) {
         this.name = name;
@@ -255,6 +261,7 @@ public class IRBlock {
     }
 
     // for dominance analysis
+    //     forward control flow analysis
     public int getBlockCnt() {
         return blockCnt;
     }
@@ -284,6 +291,47 @@ public class IRBlock {
             dom = dom.iDom;
         }
         return false;
+    }
+    //     backward control flow analysis
+    public void initPostDomInfo() {
+        RDF = new HashSet<>();
+        postIDom = null;
+    }
+    public Set<IRBlock> getRDF() {
+        return RDF;
+    }
+    public void addRDF(IRBlock rdf) {
+        RDF.add(rdf);
+    }
+    public IRBlock getPostIDom() {
+        return postIDom;
+    }
+    public void setPostIDom(IRBlock postIDom) {
+        this.postIDom = postIDom;
+    }
+    public boolean isPostDomed(IRBlock query) {
+        IRBlock dom = postIDom;
+        while (dom!=null) {
+            if (dom==query) return true;
+            dom = dom.postIDom;
+        }
+        return false;
+    }
+
+    // for ADCE
+    public void initMark() {
+        marked = false;
+    }
+    public void mark() {
+        marked = true;
+    }
+    public IRBlock nearestMarkedPostDom() {
+        assert !marked;
+        IRBlock ans = postIDom;
+        while (ans!=null && !ans.marked) {
+            ans = ans.getPostIDom();
+        }
+        return ans;
     }
 
     // for SSA

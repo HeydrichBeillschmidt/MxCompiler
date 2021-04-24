@@ -1,4 +1,4 @@
-package Mx.Optimize.ConstOptim;
+package Mx.Optimize.ExprOptim;
 
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
@@ -8,6 +8,8 @@ import Mx.IR.Operand.*;
 import Mx.Optimize.Pass;
 
 import java.util.*;
+
+//Tiger Ch19.3.3
 
 // sparse conditional constant propagation
 public class SCCP extends Pass {
@@ -88,6 +90,22 @@ public class SCCP extends Pass {
                 }
             }
         } while (!workListBlocks.isEmpty());
+
+        ArrayList<IRBlock> RPO = f.getRPO();
+        for (var b: RPO) {
+            for (var i: b.getAllInst()) {
+                if (i.hasDst()) {
+                    LatticeCell cell = queryCell(i.getDst());
+                    if (cell.isConst()) {
+                        i.severDF();
+                        i.removeFromBlock();
+                        i.getDst().replaceUse(cell.constVal);
+                        changedFn = true;
+                    }
+                }
+            }
+        }
+
         changed |= changedFn;
     }
 
@@ -113,7 +131,7 @@ public class SCCP extends Pass {
         lattice.put(s, ans);
         return ans;
     }
-    private boolean decentCell(Register r, Constant c) {
+    private void decentCell(Register r, Constant c) {
         LatticeCell oldCell = queryCell(r);
         if (c==null) { // decent to bottom
             if (!oldCell.overDefined()) {
@@ -125,9 +143,7 @@ public class SCCP extends Pass {
             LatticeCell cell = new LatticeCell(c);
             if (oldCell.undefined()) {
                 lattice.replace(r, cell);
-                r.replaceUse(c);
                 workListVars.offer(r);
-                return true;
             }
             else if (oldCell.isConst()) {
                 assert oldCell.constVal!=null;
@@ -135,25 +151,20 @@ public class SCCP extends Pass {
             }
             else throw new RuntimeException();
         }
-        return false;
     }
 
     private void propagate(ArrayList<IRInst> instList) {
         for (var inst: instList) {
-            if ( (inst instanceof BinaryOp && checkBinary((BinaryOp) inst))
-                    || (inst instanceof Phi && checkPhi((Phi) inst))
-                    || (inst instanceof Icmp && checkCmp((Icmp) inst)) ) {
-                inst.severDF();
-                inst.removeFromBlock();
-                changedFn = true;
-            }
+            if (inst instanceof BinaryOp) checkBinary((BinaryOp) inst);
+            else if (inst instanceof Icmp) checkCmp((Icmp) inst);
+            else if (inst instanceof Phi) checkPhi((Phi) inst);
             else if (inst instanceof Load || inst instanceof Call) {
                 decentCell(inst.getDst(), null);
             }
             else if (inst instanceof Br) checkBr((Br) inst);
         }
     }
-    private boolean checkBinary(BinaryOp i) {
+    private void checkBinary(BinaryOp i) {
         LatticeCell l1 = queryCell(i.getOp1()), l2 = queryCell(i.getOp2());
         if (l1.isConst() && l2.isConst()) {
             assert l1.constVal!=null; assert l2.constVal!=null;
@@ -166,10 +177,10 @@ public class SCCP extends Pass {
                     case sub: value = c1 - c2; break;
                     case mul: value = c1 * c2; break;
                     case sdiv:
-                        if (c2==0) return false;
+                        if (c2==0) return;
                         value = c1 / c2;break;
                     case srem:
-                        if (c2==0) return false;
+                        if (c2==0) return;
                         value = c1 % c2;break;
                     case shl: value = c1 << c2;break;
                     case ashr:value = c1 >> c2;break;
@@ -178,7 +189,7 @@ public class SCCP extends Pass {
                     case xor: value = c1 ^ c2; break;
                     default: throw new RuntimeException();
                 }
-                return decentCell(i.getDst(), new ConstInt(value, 4));
+                decentCell(i.getDst(), new ConstInt(value, 4));
             }
             else {
                 boolean c1 = ((ConstBool)l1.constVal).getValue(),
@@ -190,13 +201,12 @@ public class SCCP extends Pass {
                     case xor: value = c1 ^ c2; break;
                     default: throw new RuntimeException();
                 }
-                return decentCell(i.getDst(), new ConstBool(value));
+                decentCell(i.getDst(), new ConstBool(value));
             }
         }
         else if (l1.overDefined() || l2.overDefined()) decentCell(i.getDst(), null);
-        return false;
     }
-    private boolean checkCmp(Icmp i) {
+    private void checkCmp(Icmp i) {
         LatticeCell l1 = queryCell(i.getOp1()), l2 = queryCell(i.getOp2());
         if (l1.isConst() && l2.isConst()) {
             assert l1.constVal!=null; assert l2.constVal!=null;
@@ -223,27 +233,31 @@ public class SCCP extends Pass {
                 }
             }
             else value = i.getOpName() == Icmp.IcmpOpName.eq;
-            return decentCell(i.getDst(), new ConstBool(value));
+            decentCell(i.getDst(), new ConstBool(value));
         }
         else if (l1.overDefined() || l2.overDefined()) decentCell(i.getDst(), null);
-        return false;
     }
-    private boolean checkPhi(Phi i) {
+    private void checkPhi(Phi i) {
         Constant c = null;
         for (int it = 0, itt = i.getBlocks().size(); it < itt; ++it) {
             if (!executable.contains(i.getBlocks().get(it))) continue;
             LatticeCell value = queryCell(i.getValues().get(it));
-            if (value.overDefined()) return decentCell(i.getDst(), null);
+            if (value.overDefined()) {
+                decentCell(i.getDst(), null);
+                return;
+            }
             else if (value.isConst()) {
                 assert value.constVal!=null;
                 if (c==null) c = (Constant) value.constVal;
                 else if (!c.equals(value.getConstVal())) {
-                    return decentCell(i.getDst(), null);
+                    decentCell(i.getDst(), null);
+                    return;
                 }
             }
         }
-        if (c!=null) return decentCell(i.getDst(), c);
-        return false;
+        if (c!=null) {
+            decentCell(i.getDst(), c);
+        }
     }
     private void checkBr(Br i) {
         if (i.getCondition()==null) {

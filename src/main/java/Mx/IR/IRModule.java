@@ -65,47 +65,53 @@ public class IRModule {
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
         func = new Function(this, retType, "_print$$YGXPAD$Z", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // void println(string str);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(stringT, "str"));
         func = new Function(this, retType, "_println$$YGXPAD$Z", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // void printInt(int n);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "n"));
         func = new Function(this, retType, "_printInt$$YGXH$Z", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // void printlnInt(int n);
         retType = new VoidType();
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "n"));
         func = new Function(this, retType, "_printlnInt$$YGXH$Z", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // string getString();
         retType = stringT;
         parameters = new ArrayList<>();
         func = new Function(this, retType, "_getString$$YGPADXZ", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // int getInt();
         retType = int32T;
         parameters = new ArrayList<>();
         func = new Function(this, retType, "_getInt$$YGHXZ", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // string toString(int i);
         retType = stringT;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "i"));
         func = new Function(this, retType, "_toString$$YGPADH$Z", parameters);
-        func.setSideEffect(false);
         externalFunctions.put(func.getName(), func);
         // char* malloc(int size);
         retType = stringT;
         parameters = new ArrayList<>();
         parameters.add(new Parameter(int32T, "size"));
         func = new Function(this, retType, "_malloc$$YGPADH$Z", parameters);
+        func.setSideEffect(true);
         externalFunctions.put(func.getName(), func);
         // int string.length(string str);
         retType = int32T;
@@ -183,8 +189,6 @@ public class IRModule {
         parameters.add(new Parameter(stringT, "str2"));
         func = new Function(this, retType, "_strcmp_ge$$YG_NPADPAD$Z", parameters);
         externalFunctions.put(func.getName(), func);
-
-        externalFunctions.values().forEach(f -> f.setSideEffect(false));
     }
 
     public Map<String, Function> getExternalFunctions() {

@@ -43,7 +43,7 @@ public class Function {
         this.functionType = new FunctionType(retType, parameterTypeList);
         this.entranceBlock = null;
         this.callSites = new HashSet<>();
-        this.sideEffect = true;
+        this.sideEffect = false;
         this.retVal = null;
         this.classPtr = null;
 
@@ -186,6 +186,7 @@ public class Function {
         order.add(block);
     }
     // for dominance analysis
+    //     forward control flow analysis
     public void solveDominance() {
         // actually post-order here
         ArrayList<IRBlock> RPO = getPO();
@@ -210,7 +211,7 @@ public class Function {
                 for (var p: b.getPredecessors()) {
                     if (p==newIDom) continue;
                     if (p.getIDom()!=null) {
-                        newIDom = intersect(newIDom, p);
+                        newIDom = intersectForward(newIDom, p);
                     }
                 }
                 if (b.getIDom()!=newIDom) {
@@ -221,7 +222,7 @@ public class Function {
         }
     }
         // find the LCA of b1 & b2 in dominance tree
-    private IRBlock intersect(IRBlock b1, IRBlock b2) {
+    private IRBlock intersectForward(IRBlock b1, IRBlock b2) {
         IRBlock finger1 = b1;
         IRBlock finger2 = b2;
         while (finger1 != finger2) {
@@ -235,13 +236,77 @@ public class Function {
         return finger1;
     }
     public void solveDF() {
-        for (var b: getAllBlocks()) {
+        ArrayList<IRBlock> RPO = getRPO();
+        for (var b: RPO) {
             if (b.getPredecessors().size() >= 2) {
                 for (var p: b.getPredecessors()) {
                     IRBlock runner = p;
-                    while (runner!= b.getIDom()) {
+                    while (runner != b.getIDom()) {
                         runner.addDF(b);
                         runner = runner.getIDom();
+                    }
+                }
+            }
+        }
+    }
+    //     backward control flow analysis
+    public void solvePostDominance() {
+        // actually reversed post-order here
+        ArrayList<IRBlock> PO = getRPO();
+        int cnt = 0;
+        // set block counter by RPO
+        for (var b: PO) b.setBlockCnt(cnt++);
+        Collections.reverse(PO);
+        PO.forEach(IRBlock::initPostDomInfo);
+        IRBlock retBlock = PO.get(0);
+        retBlock.setPostIDom(retBlock);
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            for (var b: PO) {
+                if (b==retBlock) continue;
+                IRBlock newPostIDom = null;
+                for (var p: b.getSuccessors()) {
+                    if (p.getPostIDom()!=null) {
+                        newPostIDom = p;
+                        break;
+                    }
+                }
+                for (var p: b.getSuccessors()) {
+                    if (p==newPostIDom) continue;
+                    if (p.getPostIDom()!=null) {
+                        newPostIDom = intersectBackward(newPostIDom, p);
+                    }
+                }
+                if (b.getPostIDom()!=newPostIDom) {
+                    b.setPostIDom(newPostIDom);
+                    changed = true;
+                }
+            }
+        }
+    }
+    private IRBlock intersectBackward(IRBlock b1, IRBlock b2) {
+        IRBlock finger1 = b1;
+        IRBlock finger2 = b2;
+        while (finger1 != finger2) {
+            while (finger1.getBlockCnt() < finger2.getBlockCnt()) {
+                finger1 = finger1.getPostIDom();
+            }
+            while (finger2.getBlockCnt() < finger1.getBlockCnt()) {
+                finger2 = finger2.getPostIDom();
+            }
+        }
+        return finger1;
+    }
+    public void solvePDF() {
+        ArrayList<IRBlock> PO = getPO();
+        for (var b: PO) {
+            if (b.getSuccessors().size() >= 2) {
+                for (var s: b.getSuccessors()) {
+                    IRBlock runner = s;
+                    while (runner != b.getPostIDom()) {
+                        runner.addRDF(b);
+                        runner = runner.getPostIDom();
                     }
                 }
             }

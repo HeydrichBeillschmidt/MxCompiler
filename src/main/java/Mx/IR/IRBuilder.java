@@ -37,7 +37,6 @@ public class IRBuilder implements ASTVisitor {
         this.initializer = new Function(module, new VoidType(),
                 "___init__$$YGXXZ", new ArrayList<>());
         module.addFunction(initializer);
-        initializer.setSideEffect(true);
         curBlock = null;
         curFunc = null;
     }

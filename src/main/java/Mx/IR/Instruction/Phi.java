@@ -73,6 +73,21 @@ public class Phi extends IRInst {
         return true;
     }
     @Override
+    public boolean isCommonExpr(IRInst i) {
+        if (i instanceof Phi) {
+            Phi inst = (Phi) i;
+            if (blocks.size()==inst.blocks.size()) {
+                Set<Operand> valueSet = new HashSet<>(inst.getValues());
+                for (int it = 0, itt = blocks.size(); it < itt; ++it) {
+                    if (!valueSet.contains(values.get(it))
+                            || blocks.get(it)!=inst.blocks.get(it)) return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    @Override
     public void actuallyWritten() {
         dst.setDef(this);
         values.forEach(v -> v.addUse(this));

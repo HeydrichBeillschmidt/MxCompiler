@@ -48,6 +48,19 @@ public class GetElementPtr extends IRInst {
         return true;
     }
     @Override
+    public boolean isCommonExpr(IRInst i) {
+        if (i instanceof GetElementPtr) {
+            GetElementPtr inst = (GetElementPtr) i;
+            if (!ptr.equals(inst.ptr)) return false;
+            if (!type.equals(inst.type)) return false;
+            for (int it = 0, itt = index.size(); it < itt; ++it) {
+                if (!index.get(it).equals(inst.index.get(it))) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    @Override
     public void actuallyWritten() {
         dst.setDef(this);
         ptr.addUse(this);
