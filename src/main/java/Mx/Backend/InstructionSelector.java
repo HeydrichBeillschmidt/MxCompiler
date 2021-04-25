@@ -104,8 +104,8 @@ public class InstructionSelector implements IRVisitor {
             paraOffset += 4;
         }
 
-        for (var b: node.getAllBlocks())
-            b.accept(this);
+        ArrayList<IRBlock> RPO = node.getRPO();
+        for (var b: RPO) b.accept(this);
     }
 
     @Override
@@ -118,9 +118,7 @@ public class InstructionSelector implements IRVisitor {
     }
 
     @Override
-    public void visit(Alloca node) {
-
-    }
+    public void visit(Alloca node) {}
 
     @Override
     public void visit(BinaryOp node) {
@@ -491,7 +489,7 @@ public class InstructionSelector implements IRVisitor {
                 }
                 if (reasonableImm(op2)) {
                     rs = resolveToVR(op1);
-                    if (opName== BinaryOp.BinaryOpName.sub)
+                    if (opName == BinaryOp.BinaryOpName.sub)
                         imm = new Immediate(-1*((ConstInt)op2).getValue());
                     else
                         imm = new Immediate(((ConstInt)op2).getValue());

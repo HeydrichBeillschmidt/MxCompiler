@@ -4,9 +4,12 @@ import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
+import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Store extends IRInst {
@@ -61,7 +64,18 @@ public class Store extends IRInst {
             addr.addUse(this);
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (value instanceof Parameter || value instanceof Register) value = os.get(value);
+        if (addr instanceof Parameter || addr instanceof Register) addr = os.get(addr);
+        value.addUse(this);
+        addr.addUse(this);
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        return new Store(block, value, addr);
+    }
     @Override
     public String toString() {
         return "store " + ((PointerType)addr.getType()).getBaseType().toString() + " "

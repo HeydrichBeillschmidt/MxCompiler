@@ -1,4 +1,4 @@
-package Mx.Optimize.LoopOptim;
+package Mx.Optimize;
 
 import Mx.IR.IRBlock;
 import Mx.IR.IRLoop;
@@ -9,7 +9,6 @@ import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 import Mx.Optimize.FlowAnalysis.AliasAnalysis;
 import Mx.Optimize.FlowAnalysis.LoopAnalysis;
-import Mx.Optimize.Pass;
 
 import java.util.HashSet;
 import java.util.LinkedList;

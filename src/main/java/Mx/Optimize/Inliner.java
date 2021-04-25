@@ -3,7 +3,9 @@ package Mx.Optimize;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
+import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.Call;
+import Mx.IR.Instruction.Ret;
 import Mx.Optimize.FlowAnalysis.DominanceAnalysis;
 import Mx.Optimize.FlowAnalysis.InterProceduralAnalysis;
 
@@ -32,8 +34,8 @@ public class Inliner extends Pass {
         instCnt = new HashMap<>();
         for (var f: module.getFunctions().values()) {
             int cnt = 0;
-            ArrayList<IRBlock> RPO = f.getRPO();
-            for (var b: RPO) {
+            ArrayList<IRBlock> PO = f.getPO();
+            for (var b: PO) {
                 cnt += b.getAllInst().size();
             }
             instCnt.put(f, cnt);
@@ -41,7 +43,21 @@ public class Inliner extends Pass {
     }
 
     private void funcInsert(Function caller, Call cs) {
-        //todo
+        IRBlock inlineEntrance = cs.getBlock();
+        IRBlock inlineExit = inlineEntrance.split(caller, cs);
+        ArrayList<IRBlock> inlineBlocks = cs.getCallee().inlineToFunc(caller, cs.getParameterList());
+        caller.insertBlocks(inlineEntrance, inlineBlocks);
+
+        IRBlock inlineTail = inlineBlocks.get(inlineBlocks.size()-1);
+        Ret instRet = (Ret) inlineTail.getTailInst();
+        if (!cs.isVoidCall()) cs.getDst().replaceUse(instRet.getRetValue());
+
+        cs.severDF();
+        cs.removeFromBlock();
+        instRet.severDF();
+        instRet.removeFromBlock();
+        inlineEntrance.addInst(new Br(inlineEntrance, null, inlineBlocks.get(0), null));
+        inlineTail.addInst(new Br(inlineTail, null, inlineExit, null));
     }
     private boolean inlineBasic() {
         boolean changed = false;

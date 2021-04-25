@@ -1,9 +1,7 @@
 package Mx.Optimize;
 
 import Mx.IR.IRModule;
-import Mx.Optimize.ExprOptim.*;
 import Mx.Optimize.FlowAnalysis.*;
-import Mx.Optimize.LoopOptim.*;
 
 public class OptAssembler {
     private final IRModule module;
@@ -33,8 +31,8 @@ public class OptAssembler {
             alias.run();
             loop.run();
             changed |= new LICM(module, alias, loop).run();
-            changed |= new StrengthReduction(module, loop).run();
             changed |= new Inliner(module, interProc).run();
+            changed |= new AlgebraicSimplifier(module).run();
             changed |= new CFGSimplifier(module).run();
 
             if (!changed) break;

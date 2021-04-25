@@ -88,7 +88,7 @@ public class LoopAnalysis extends Pass {
         if (pres.size()==1) loop.setPreHeader(pres.get(0));
         else {
             IRBlock preHeader = new IRBlock(header.getName()+"_preHeader");
-            curFunc.addBlock(preHeader);
+            curFunc.addPrevBlock(header, preHeader);
 
             // split phis by whether their entries are from loop blocks or otherwise
             // move the latter phis to the preHeader

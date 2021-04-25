@@ -37,6 +37,9 @@ public class Register extends Operand {
         }
         return false;
     }
+    public Register getCopy() {
+        return new Register(getType(), name);
+    }
 
     @Override
     public boolean isConstant() {

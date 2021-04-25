@@ -1,6 +1,7 @@
 package Mx.IR;
 
 import Mx.IR.Instruction.*;
+import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.FunctionType;
@@ -103,12 +104,74 @@ public class Function {
         exitBlock = block;
         addSymbol(block);
     }
+    public void addPrevBlock(IRBlock target, IRBlock blockToAdd) {
+        if (target==entranceBlock) {
+            entranceBlock = blockToAdd;
+            blockToAdd.addBlock(target);
+        }
+        else target.getPrevBlock().addBlock(blockToAdd);
+        addSymbol(blockToAdd);
+    }
+    public void addNextBlock(IRBlock target, IRBlock blockToAdd) {
+        target.addBlock(blockToAdd);
+        if (target==exitBlock) exitBlock = blockToAdd;
+        addSymbol(blockToAdd);
+    }
+    public void insertBlocks(IRBlock target, ArrayList<IRBlock> blocksToAdd) {
+        IRBlock head = blocksToAdd.get(0), tail = blocksToAdd.get(blocksToAdd.size()-1);
+        if (target==exitBlock) exitBlock = tail;
+        tail.setNextBlock(target.getNextBlock());
+        if (target.hasNextBlock()) target.getNextBlock().setPrevBlock(tail);
+        head.setPrevBlock(target);
+        target.setNextBlock(head);
+        blocksToAdd.forEach(this::addSymbol);
+    }
     public ArrayList<IRBlock> getAllBlocks() {
         ArrayList<IRBlock> ans = new ArrayList<>();
         IRBlock tmp = entranceBlock;
         while (tmp != null) {
             ans.add(tmp);
             tmp = tmp.getNextBlock();
+        }
+        return ans;
+    }
+    public ArrayList<IRBlock> inlineToFunc(Function caller, ArrayList<Operand> aps) {
+        ArrayList<IRBlock> ans = new ArrayList<>();
+        Map<IRBlock, IRBlock> blockMap = new HashMap<>();
+        Map<Operand, Operand> F2A = new HashMap<>(); // formal to actual
+        for (int i = 0, it = parameterList.size(); i < it; ++i) {
+            F2A.put(parameterList.get(i), aps.get(i));
+        }
+        ArrayList<IRBlock> RPO = getRPO();
+        boolean atFirst = true;
+        for (var b: RPO) {
+            IRBlock bCpy = b.getCopy();
+            if (atFirst) atFirst = false;
+            else {
+                IRBlock bLast = ans.get(ans.size()-1);
+                bLast.setNextBlock(bCpy);
+                bCpy.setPrevBlock(bLast);
+            }
+            ans.add(bCpy);
+            blockMap.put(b, bCpy);
+
+            ArrayList<IRInst> iList = b.getAllInst(), iListCpy = bCpy.getAllInst();
+            for (int i = 0, it = iList.size(); i < it; ++i) {
+                if (iList.get(i).hasDst()) {
+                    F2A.put(iList.get(i).getDst(), iListCpy.get(i).getDst());
+                    caller.addSymbol(iListCpy.get(i).getDst());
+                }
+            }
+        }
+        for (var b: ans) {
+            ArrayList<IRBlock> pre = new ArrayList<>(), suc = new ArrayList<>();
+            b.getPredecessors().forEach(p -> pre.add(blockMap.get(p)));
+            b.getSuccessors().forEach(s -> suc.add(blockMap.get(s)));
+            b.getPredecessors().clear();
+            b.getPredecessors().addAll(pre);
+            b.getSuccessors().clear();
+            b.getSuccessors().addAll(suc);
+            b.getAllInst().forEach(i -> i.refresh(F2A, blockMap));
         }
         return ans;
     }

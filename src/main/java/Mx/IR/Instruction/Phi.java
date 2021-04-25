@@ -4,11 +4,13 @@ import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Phi extends IRInst {
@@ -112,7 +114,23 @@ public class Phi extends IRInst {
             }
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        for (int i = 0, it = blocks.size(); i < it; ++i) {
+            Operand v = values.get(i);
+            if (v instanceof Parameter || v instanceof Register) values.set(i, os.get(v));
+            values.get(i).addUse(this);
+            IRBlock b = blocks.get(i);
+            blocks.set(i, bs.get(b));
+        }
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        Phi ans = new Phi(block, dst.getCopy(), new ArrayList<>(values), new ArrayList<>(blocks));
+        ans.dst.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder(dst.toString());

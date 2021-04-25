@@ -84,7 +84,7 @@ public class PhiResolve extends Pass {
             IRBlock pre = critical.pre;
             IRBlock suc = critical.suc;
             IRBlock mid = new IRBlock("criticalBlock");
-            f.addBlock(mid);
+            f.addNextBlock(pre, mid);
 
             mid.addInst(new Br(mid, null, suc, null));
 

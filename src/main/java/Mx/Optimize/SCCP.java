@@ -1,11 +1,10 @@
-package Mx.Optimize.ExprOptim;
+package Mx.Optimize;
 
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
 import Mx.IR.Instruction.*;
 import Mx.IR.Operand.*;
-import Mx.Optimize.Pass;
 
 import java.util.*;
 

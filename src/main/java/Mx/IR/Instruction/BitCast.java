@@ -3,11 +3,13 @@ package Mx.IR.Instruction;
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class BitCast extends IRInst {
@@ -67,7 +69,18 @@ public class BitCast extends IRInst {
             src.addUse(this);
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (src instanceof Parameter || src instanceof Register) src = os.get(src);
+        src.addUse(this);
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        BitCast ans = new BitCast(block, dst.getCopy(), src, castType);
+        ans.dst.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         return dst.toString() + " = bitcast "

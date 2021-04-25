@@ -6,11 +6,13 @@ import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.VoidType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Call extends IRInst {
@@ -88,7 +90,22 @@ public class Call extends IRInst {
             }
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        for (int i = 0, it = parameterList.size(); i < it; ++i) {
+            Operand p = parameterList.get(i);
+            if (p instanceof Parameter || p instanceof Register) parameterList.set(i, os.get(p));
+            parameterList.get(i).addUse(this);
+        }
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        Register dstCopy = voidCall ? dst : dst.getCopy();
+        Call ans = new Call(block, dstCopy, callee, new ArrayList<>(parameterList));
+        dstCopy.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();

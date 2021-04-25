@@ -36,6 +36,12 @@ public class Alloca extends IRInst {
     }
 
     @Override
+    public IRInst copyToBlock(IRBlock block) {
+        Alloca ans = new Alloca(block, dst.getCopy(), allocType);
+        ans.dst.setDef(ans);
+        return ans;
+    }
+    @Override
     public String toString() {
         return dst.toString() + " = alloca " + allocType.toString()
                 + ", align " + allocType.size();

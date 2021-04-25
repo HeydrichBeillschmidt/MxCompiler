@@ -2,14 +2,13 @@ package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
-import Mx.IR.Operand.Null;
-import Mx.IR.Operand.Operand;
-import Mx.IR.Operand.Register;
+import Mx.IR.Operand.*;
 import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.IntegerType;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Icmp extends IRInst {
@@ -17,7 +16,7 @@ public class Icmp extends IRInst {
         eq, ne, slt, sge, sle, sgt
     }
     private final Register dst;
-    private final IcmpOpName opName, opNameReversed;
+    private IcmpOpName opName, opNameReversed;
     private final IRType type;
     private Operand op1;
     private Operand op2;
@@ -61,6 +60,22 @@ public class Icmp extends IRInst {
     }
     public Operand getOp2() {
         return op2;
+    }
+    public void balance() {
+        if (op1 instanceof Constant && !(op2 instanceof Constant)) {
+            opName = opNameReversed;
+            switch (opName) {
+                case eq: opNameReversed=IcmpOpName.eq; break;
+                case ne: opNameReversed=IcmpOpName.ne; break;
+                case slt:opNameReversed=IcmpOpName.sgt;break;
+                case sge:opNameReversed=IcmpOpName.sle;break;
+                case sle:opNameReversed=IcmpOpName.sge;break;
+                default: opNameReversed=IcmpOpName.slt;
+            }
+            Operand tmp = op1;
+            op1 = op2;
+            op2 = tmp;
+        }
     }
 
     @Override
@@ -112,7 +127,20 @@ public class Icmp extends IRInst {
             op2.addUse(this);
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (op1 instanceof Parameter || op1 instanceof Register) op1 = os.get(op1);
+        if (op2 instanceof Parameter || op2 instanceof Register) op2 = os.get(op2);
+        op1.addUse(this);
+        op2.addUse(this);
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        Icmp ans = new Icmp(block, dst.getCopy(), opName, type, op1, op2);
+        ans.dst.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         return dst.toString() +" = icmp " + opName.toString() +" " + type.toString()

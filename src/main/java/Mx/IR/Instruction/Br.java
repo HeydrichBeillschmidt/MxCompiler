@@ -3,9 +3,12 @@ package Mx.IR.Instruction;
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
+import Mx.IR.Operand.Register;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Br extends IRInst {
@@ -73,7 +76,20 @@ public class Br extends IRInst {
             condition.addUse(this);
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (condition!=null) {
+            if (condition instanceof Parameter || condition instanceof Register) condition = os.get(condition);
+            condition.addUse(this);
+            elseBlock = bs.get(elseBlock);
+        }
+        thenBlock = bs.get(thenBlock);
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        return new Br(block, condition, thenBlock, elseBlock);
+    }
     @Override
     public String toString() {
         if (condition!=null)

@@ -3,9 +3,11 @@ package Mx.IR.Instruction;
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class BinaryOp extends IRInst {
@@ -14,7 +16,7 @@ public class BinaryOp extends IRInst {
         shl, ashr, and, or, xor
     }
     private final Register dst;
-    private final BinaryOpName opName;
+    private BinaryOpName opName;
     private Operand op1;
     private Operand op2;
     private final boolean commutable;
@@ -41,11 +43,39 @@ public class BinaryOp extends IRInst {
     public BinaryOpName getOpName() {
         return opName;
     }
+    public void setOpName(BinaryOpName opName) {
+        this.opName = opName;
+    }
     public Operand getOp1() {
         return op1;
     }
+    public void setOp1(Operand op1) {
+        this.op1 = op1;
+    }
+    public void replaceOp1(Operand op1) {
+        this.op1.removeUse(this);
+        this.op1 = op1;
+        this.op1.addUse(this);
+    }
     public Operand getOp2() {
         return op2;
+    }
+    public void setOp2(Operand op2) {
+        this.op2 = op2;
+    }
+    public void replaceOp2(Operand op2) {
+        this.op2.removeUse(this);
+        this.op2 = op2;
+        this.op2.addUse(this);
+    }
+    public void rewrite(BinaryOpName opName, Operand op1, Operand op2) {
+        this.opName = opName;
+        this.op1.removeUse(this);
+        this.op2.removeUse(this);
+        this.op1 = op1;
+        this.op2 = op2;
+        op1.addUse(this);
+        op2.addUse(this);
     }
     public boolean isCommutable() {
         return commutable;
@@ -101,7 +131,20 @@ public class BinaryOp extends IRInst {
             op2.addUse(this);
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (op1 instanceof Parameter || op1 instanceof Register) op1 = os.get(op1);
+        if (op2 instanceof Parameter || op2 instanceof Register) op2 = os.get(op2);
+        op1.addUse(this);
+        op2.addUse(this);
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        BinaryOp ans = new BinaryOp(block, dst.getCopy(), opName, op1, op2);
+        ans.dst.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         return dst.toString() + " = " + opName.toString() + " " + dst.getType().toString()

@@ -7,6 +7,7 @@ import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 abstract public class IRInst {
@@ -71,7 +72,11 @@ abstract public class IRInst {
         return new HashSet<>();
     }
     public void replaceUse(Operand oldUse, Operand newUse) {}
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {}
 
+    public IRInst copyToBlock(IRBlock block) {
+        return null;
+    }
     abstract public String toString();
     abstract public void accept(IRVisitor visitor);
 }

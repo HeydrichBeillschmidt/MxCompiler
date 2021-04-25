@@ -3,12 +3,14 @@ package Mx.IR.Instruction;
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Operand;
+import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
 import Mx.IR.TypeSystem.IRType;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class GetElementPtr extends IRInst {
@@ -94,7 +96,22 @@ public class GetElementPtr extends IRInst {
             }
         }
     }
+    @Override
+    public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
+        if (ptr instanceof Parameter || ptr instanceof Register) ptr = os.get(ptr);
+        for (int i = 0, it = index.size(); i < it; ++i) {
+            Operand idx = index.get(i);
+            if (idx instanceof Parameter || idx instanceof Register) index.set(i, os.get(idx));
+            index.get(i).addUse(this);
+        }
+    }
 
+    @Override
+    public IRInst copyToBlock(IRBlock block) {
+        GetElementPtr ans = new GetElementPtr(block, dst.getCopy(), ptr, new ArrayList<>(index));
+        ans.dst.setDef(ans);
+        return ans;
+    }
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder(dst.toString());

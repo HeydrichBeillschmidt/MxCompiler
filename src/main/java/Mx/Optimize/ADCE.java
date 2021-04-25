@@ -15,7 +15,7 @@ import java.util.*;
 public class ADCE extends Pass {
     private boolean changed;
     private Queue<IRInst> W;
-    Set<IRInst> liveCode;
+    private Set<IRInst> liveCode;
 
     public ADCE(IRModule module) {
         super(module);

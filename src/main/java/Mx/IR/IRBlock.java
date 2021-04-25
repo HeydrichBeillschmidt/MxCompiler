@@ -155,13 +155,14 @@ public class IRBlock {
         this.nextBlock = nextBlock;
     }
     public void addBlock(IRBlock block) {
-        this.nextBlock = block;
+        block.nextBlock = nextBlock;
+        if (nextBlock!=null) {
+            nextBlock.prevBlock = block;
+        }
+        nextBlock = block;
         block.prevBlock = this;
     }
 
-    public boolean hasPredecessors() {
-        return predecessors.size()!=0;
-    }
     public ArrayList<IRBlock> getPredecessors() {
         return predecessors;
     }
@@ -174,9 +175,6 @@ public class IRBlock {
             predecessors.add(newPre);
             getAllPhi().forEach(ph -> ph.replaceEntry(oldPre, newPre));
         }
-    }
-    public boolean hasSuccessors() {
-        return successors.size()!=0;
     }
     public ArrayList<IRBlock> getSuccessors() {
         return successors;
@@ -237,6 +235,24 @@ public class IRBlock {
             }
         }
         return false;
+    }
+    public IRBlock split(Function f, IRInst inst) {
+        IRBlock splitBlock = new IRBlock("inline.end");
+
+        splitBlock.headInst = inst.getNextInst();
+        splitBlock.tailInst = tailInst;
+        tailInst = inst;
+        inst.getNextInst().setPrevInst(null);
+        inst.setNextInst(null);
+        splitBlock.getAllInst().forEach(i -> i.setBlock(splitBlock));
+
+        // notice: the control flows between the split blocks are blank for following options
+        splitBlock.successors.addAll(successors);
+        successors.forEach(s -> s.replacePredecessor(this, splitBlock));
+        successors.clear();
+
+        f.addNextBlock(this, splitBlock);
+        return splitBlock;
     }
     // sever the control flow with a particular successor
     public void severCF(IRBlock successor) {
@@ -385,6 +401,22 @@ public class IRBlock {
         }
     }
 
+    // for inline
+    public IRBlock getCopy() {
+        IRBlock ans = new IRBlock("inline_"+name);
+        getAllInst().forEach(i -> ans.addInstAtCopy(i.copyToBlock(ans)));
+        ans.successors.addAll(successors);
+        ans.predecessors.addAll(predecessors);
+        return ans;
+    }
+    private void addInstAtCopy(IRInst inst) {
+        if (headInst==null) headInst = tailInst = inst;
+        else {
+            tailInst.setNextInst(inst);
+            inst.setPrevInst(tailInst);
+            tailInst = inst;
+        }
+    }
     @Override
     public String toString() {
         return "%" + name;
