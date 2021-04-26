@@ -60,6 +60,12 @@ public class ADCE extends Pass {
                     markInst(inst.getBlock().getTailInst());
                 }
             }
+            if (i instanceof Phi) {
+                Phi inst = (Phi) i;
+                for (var e: inst.getBlocks()) {
+                    markInst(e.getTailInst());
+                }
+            }
             if (i.getBlock().getRDF()!=null) {
                 for (var b: i.getBlock().getRDF()) {
                     IRInst j = b.getTailInst();
