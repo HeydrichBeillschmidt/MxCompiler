@@ -424,6 +424,7 @@ public class IRBuilder implements ASTVisitor {
             ArrayList<Operand> parameters = new ArrayList<>();
             parameters.add(new ConstInt(sz, 4));
             curBlock.addInst(new Call(curBlock, dst, func, parameters));
+            curFunc.addCallSite((Call) curBlock.getTailInst());
 
             // T cast = *((T*)dst);
             IRType irType = module.getIRType(astType);
@@ -438,6 +439,7 @@ public class IRBuilder implements ASTVisitor {
                 parameters = new ArrayList<>();
                 parameters.add(cast);
                 curBlock.addInst(new Call(curBlock, Register.pseudoReg, func, parameters));
+                curFunc.addCallSite((Call) curBlock.getTailInst());
             }
 
             node.setResult(cast);
@@ -482,6 +484,7 @@ public class IRBuilder implements ASTVisitor {
 
         parameters.add(size);
         curBlock.addInst(new Call(curBlock, dst, func, parameters));
+        curFunc.addCallSite((Call) curBlock.getTailInst());
 
         // store arraySize ((int*)dst);
         Register castPtr = new Register(new PointerType(IRModule.int32T), "mallocInt32Ptr");
@@ -650,6 +653,7 @@ public class IRBuilder implements ASTVisitor {
                 parameters.add(value);
                 parameters.add(valueE);
                 curBlock.addInst(new Call(curBlock, add, func, parameters));
+                curFunc.addCallSite((Call) curBlock.getTailInst());
 
                 if (ops.size() > 1) {
                     Register addE;
@@ -662,6 +666,7 @@ public class IRBuilder implements ASTVisitor {
                         parameters.add(add);
                         parameters.add(valueE);
                         curBlock.addInst(new Call(curBlock, addE, func, parameters));
+                        curFunc.addCallSite((Call) curBlock.getTailInst());
                         add = addE;
                     }
                 }
@@ -754,6 +759,7 @@ public class IRBuilder implements ASTVisitor {
                 parameters.add(value);
                 parameters.add(valueE);
                 curBlock.addInst(new Call(curBlock, cmp, func, parameters));
+                curFunc.addCallSite((Call) curBlock.getTailInst());
             }
             node.setResult(cmp);
         }
@@ -811,6 +817,7 @@ public class IRBuilder implements ASTVisitor {
                     parameters.add(value);
                     parameters.add(valueE);
                     curBlock.addInst(new Call(curBlock, cmp, func, parameters));
+                    curFunc.addCallSite((Call) curBlock.getTailInst());
                     node.setResult(cmp);
                 }
                 else {
@@ -1118,6 +1125,7 @@ public class IRBuilder implements ASTVisitor {
                     parameters.add(lValue);
                     parameters.add(rValue);
                     curBlock.addInst(new Call(curBlock, tmp, func, parameters));
+                    curFunc.addCallSite((Call) curBlock.getTailInst());
                 }
                 curFunc.addSymbol(tmp);
                 node.getLhs().setResult(tmp);
