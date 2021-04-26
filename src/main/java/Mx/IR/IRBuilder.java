@@ -244,13 +244,9 @@ public class IRBuilder implements ASTVisitor {
                 node.setResult(result);
             }
             else {
-                boolean newEdge = false;
                 if (objectType instanceof StringType)
                     func = module.getExternalFunction(methodName);
-                else {
-                    func = module.getFunction(node.getEntity().getName());
-                    newEdge = true;
-                }
+                else func = module.getFunction(node.getEntity().getName());
                 assert func!=null;
                 IRType retType = func.getFunctionType().getReturnType();
                 Register dst = Register.pseudoReg;
@@ -267,7 +263,7 @@ public class IRBuilder implements ASTVisitor {
                     }
                 }
                 curBlock.addInst(new Call(curBlock, dst, func, parameters));
-                if (newEdge) curFunc.addCallSite((Call) curBlock.getTailInst());
+                curFunc.addCallSite((Call) curBlock.getTailInst());
 
                 node.setResult(dst);
             }
@@ -277,7 +273,6 @@ public class IRBuilder implements ASTVisitor {
             FunctionEntity funcEntity = (FunctionEntity) node.getEntity();
             func = module.getFunction(funcEntity.getName());
             assert func != null;
-            boolean newEdge = module.hasNoFunction(func.getName());
             IRType retType = func.getFunctionType().getReturnType();
             Register dst = Register.pseudoReg;
             if (retType!=null && !(retType instanceof VoidType)) {
@@ -301,7 +296,7 @@ public class IRBuilder implements ASTVisitor {
                 }
             }
             curBlock.addInst(new Call(curBlock, dst, func, parameters));
-            if (newEdge) curFunc.addCallSite((Call) curBlock.getTailInst());
+            curFunc.addCallSite((Call) curBlock.getTailInst());
 
             node.setResult(dst);
         }
@@ -1518,6 +1513,7 @@ public class IRBuilder implements ASTVisitor {
             curFunc.getEntranceBlock().addInstAtHead(
                     new Call(curFunc.getEntranceBlock(),
                             Register.pseudoReg, func, new ArrayList<>()));
+            curFunc.addCallSite((Call) curFunc.getEntranceBlock().getHeadInst());
         }
     }
 

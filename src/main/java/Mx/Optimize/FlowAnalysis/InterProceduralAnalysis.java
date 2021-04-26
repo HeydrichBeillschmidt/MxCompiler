@@ -2,6 +2,7 @@ package Mx.Optimize.FlowAnalysis;
 
 import Mx.IR.Function;
 import Mx.IR.IRModule;
+import Mx.IR.Instruction.Call;
 import Mx.Optimize.Pass;
 
 import java.util.*;
@@ -34,6 +35,7 @@ public class InterProceduralAnalysis extends Pass {
         callees = new HashMap<>();
 
         for (var f: module.getFunctions().values()) {
+            if (module.hasNoFunction(f.getName())) continue;
             callForward.put(f, new HashSet<>());
             callBackward.put(f, new HashSet<>());
         }

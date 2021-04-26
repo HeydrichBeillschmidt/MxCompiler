@@ -74,6 +74,7 @@ public class Inliner extends Pass {
             Set<Call> css = new HashSet<>(f.getCallSites());
             for (var cs: css) {
                 Function callee = cs.getCallee();
+                if (module.hasNoFunction(callee.getName())) continue;
                 if (instCnt.get(callee)<thresholdInstNum && callee!=f
                         && !interProc.recursiveFunc(callee)) {
                     funcInsert(f, cs);
@@ -95,6 +96,7 @@ public class Inliner extends Pass {
                 Set<Call> css = new HashSet<>(f.getCallSites());
                 for (var cs: css) {
                     Function callee = cs.getCallee();
+                    if (module.hasNoFunction(callee.getName())) continue;
                     if (instCnt.get(callee)<thresholdInstNum && callee==f) {
                         funcInsert(f, cs);
                         instCnt.put(f, instCnt.get(f)+instCnt.get(callee));

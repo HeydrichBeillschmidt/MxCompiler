@@ -1,81 +1,13 @@
 @a = global i32* null, align 4
-@i = global i32 0, align 4
-@n = global i32 0, align 4
-
-define i32 @_jud$$YGHH$Z(i32 %x) {
-entry:
-	br label %for.cond
-
-for.cond:
-	%flag_4 = phi i1 [ 0, %entry ], [ %flag_6, %if.end_2 ]
-	%j_7 = phi i32 [ 0, %entry ], [ %j_8, %if.end_2 ]
-	%i_6 = phi i32 [ 0, %entry ], [ %postfix_inc_2, %if.end_2 ]
-	%n = load i32, i32* @n, align 4
-	%sdiv = sdiv i32 %n, %x
-	%slt = icmp slt i32 %i_6, %sdiv
-	br i1 %slt, label %for.body_2, label %for.end_2
-
-for.cond_2:
-	%flag_6 = phi i1 [ 0, %for.body_2 ], [ %flag_5, %if.end ]
-	%j_8 = phi i32 [ 0, %for.body_2 ], [ %postfix_inc, %if.end ]
-	%sub = sub i32 %x, 1
-	%slt_2 = icmp slt i32 %j_8, %sub
-	br i1 %slt_2, label %for.body, label %for.end
-
-if.then:
-	br label %if.end
-
-if.end:
-	%flag_5 = phi i1 [ 1, %if.then ], [ %flag_6, %for.body ]
-	%postfix_inc = add i32 %j_8, 1
-	br label %for.cond_2
-
-for.body:
-	%a = load i32*, i32** @a, align 4
-	%mul = mul i32 %i_6, %x
-	%add = add i32 %mul, %j_8
-	%elementPtr = getelementptr i32, i32* %a, i32 %add
-	%arrayElement = load i32, i32* %elementPtr, align 4
-	%a_2 = load i32*, i32** @a, align 4
-	%mul_2 = mul i32 %i_6, %x
-	%add_2 = add i32 %mul_2, %j_8
-	%add_3 = add i32 %add_2, 1
-	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %add_3
-	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%sgt = icmp sgt i32 %arrayElement, %arrayElement_2
-	br i1 %sgt, label %if.then, label %if.end
-
-for.end:
-	%prefix_logicalNot = xor i1 %flag_6, 1
-	br i1 %prefix_logicalNot, label %if.then_2, label %if.end_2
-
-if.then_2:
-	br label %return
-
-if.end_2:
-	%postfix_inc_2 = add i32 %i_6, 1
-	br label %for.cond
-
-for.body_2:
-	br label %for.cond_2
-
-for.end_2:
-	br label %return
-
-return:
-	%flag_3 = phi i1 [ %flag_6, %if.then_2 ], [ %flag_4, %for.end_2 ]
-	%j_6 = phi i32 [ %j_8, %if.then_2 ], [ %j_7, %for.end_2 ]
-	%retval_2 = phi i32 [ 1, %if.then_2 ], [ 0, %for.end_2 ]
-	ret i32 %retval_2
-}
+@__const.main.str0 = private unnamed_addr constant [1 x i8] c"\00", align 1
 
 define void @___init__$$YGXXZ() {
 entry:
-	%sizeTmp = mul i32 20, 4
+	%sizeTmp = mul i32 4, 4
 	%size = add i32 %sizeTmp, 4
 	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
 	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 20, i32* %mallocInt32Ptr, align 4
+	store i32 4, i32* %mallocInt32Ptr, align 4
 	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
 	%arrayHeadPtr = bitcast i32* %arrayHeadPtrUnguarded to i32*
 	store i32* %arrayHeadPtr, i32** @a, align 4
@@ -85,62 +17,81 @@ entry:
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet, i32* @n, align 4
-	store i32 0, i32* @i, align 4
+	%a = load i32*, i32** @a, align 4
+	%arrayElemPtr = getelementptr i32, i32* %a, i32 -1
+	%arraySize = load i32, i32* %arrayElemPtr, align 4
+	%sizeTmp = mul i32 %arraySize, 4
+	%size = add i32 %sizeTmp, 4
+	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
+	%mallocInt32Ptr = bitcast i8* %malloc to i32*
+	store i32 %arraySize, i32* %mallocInt32Ptr, align 4
+	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
+	%arrayHeadPtr = bitcast i32* %arrayHeadPtrUnguarded to i32*
 	br label %for.cond
 
 for.cond:
-	%i_2 = load i32, i32* @i, align 4
-	%n_2 = load i32, i32* @n, align 4
-	%slt = icmp slt i32 %i_2, %n_2
+	%i_16 = phi i32 [ 0, %entry ], [ %postfix_inc, %for.body ]
+	%a_2 = load i32*, i32** @a, align 4
+	%arrayElemPtr_2 = getelementptr i32, i32* %a_2, i32 -1
+	%arraySize_2 = load i32, i32* %arrayElemPtr_2, align 4
+	%slt = icmp slt i32 %i_16, %arraySize_2
 	br i1 %slt, label %for.body, label %for.end
 
 for.body:
-	%a = load i32*, i32** @a, align 4
-	%i_3 = load i32, i32* @i, align 4
-	%elementPtr = getelementptr i32, i32* %a, i32 %i_3
-	%funcCallRet_2 = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet_2, i32* %elementPtr, align 4
-	%i_4 = load i32, i32* @i, align 4
-	%postfix_inc = add i32 %i_4, 1
-	store i32 %postfix_inc, i32* @i, align 4
+	%a_3 = load i32*, i32** @a, align 4
+	%elementPtr = getelementptr i32, i32* %a_3, i32 %i_16
+	store i32 0, i32* %elementPtr, align 4
+	%elementPtr_2 = getelementptr i32, i32* %arrayHeadPtr, i32 %i_16
+	%funcCallRet = call i32 @_getInt$$YGHXZ()
+	store i32 %funcCallRet, i32* %elementPtr_2, align 4
+	%postfix_inc = add i32 %i_16, 1
 	br label %for.cond
 
 for.end:
-	%n_3 = load i32, i32* @n, align 4
-	store i32 %n_3, i32* @i, align 4
 	br label %for.cond_2
 
 for.cond_2:
-	%i_6 = load i32, i32* @i, align 4
-	%sgt = icmp sgt i32 %i_6, 0
-	br i1 %sgt, label %for.body_2, label %for.end_2
-
-if.then:
-	%i_8 = load i32, i32* @i, align 4
-	%funcCallRet_4 = call i8* @_toString$$YGPADH$Z(i32 %i_8)
-	call void @_print$$YGXPAD$Z(i8* %funcCallRet_4)
-	br label %return
-
-if.end:
-	%i_10 = load i32, i32* @i, align 4
-	%sdiv = sdiv i32 %i_10, 2
-	store i32 %sdiv, i32* @i, align 4
-	br label %for.cond_2
+	%i_15 = phi i32 [ 0, %for.end ], [ %postfix_inc_2, %for.body_2 ]
+	%a_4 = load i32*, i32** @a, align 4
+	%arrayElemPtr_3 = getelementptr i32, i32* %a_4, i32 -1
+	%arraySize_3 = load i32, i32* %arrayElemPtr_3, align 4
+	%slt_2 = icmp slt i32 %i_15, %arraySize_3
+	br i1 %slt_2, label %for.body_2, label %for.end_2
 
 for.body_2:
-	%i_7 = load i32, i32* @i, align 4
-	%funcCallRet_3 = call i32 @_jud$$YGHH$Z(i32 %i_7)
-	%sgt_2 = icmp sgt i32 %funcCallRet_3, 0
-	br i1 %sgt_2, label %if.then, label %if.end
+	%a_5 = load i32*, i32** @a, align 4
+	%elementPtr_3 = getelementptr i32, i32* %a_5, i32 %i_15
+	%arrayElement_3 = load i32, i32* %elementPtr_3, align 4
+	%funcCallRet_2 = call i8* @_toString$$YGPADH$Z(i32 %arrayElement_3)
+	call void @_print$$YGXPAD$Z(i8* %funcCallRet_2)
+	%postfix_inc_2 = add i32 %i_15, 1
+	br label %for.cond_2
 
 for.end_2:
-	br label %return
+	%__const.main.str0 = getelementptr [1 x i8], [1 x i8]* @__const.main.str0, i32 0, i32 0
+	call void @_println$$YGXPAD$Z(i8* %__const.main.str0)
+	store i32* %arrayHeadPtr, i32** @a, align 4
+	br label %for.cond_3
 
-return:
-	%retval_2 = phi i32 [ 0, %if.then ], [ 0, %for.end_2 ]
-	ret i32 %retval_2
+for.cond_3:
+	%i_14 = phi i32 [ 0, %for.end_2 ], [ %postfix_inc_3, %for.body_3 ]
+	%a_7 = load i32*, i32** @a, align 4
+	%arrayElemPtr_4 = getelementptr i32, i32* %a_7, i32 -1
+	%arraySize_4 = load i32, i32* %arrayElemPtr_4, align 4
+	%slt_3 = icmp slt i32 %i_14, %arraySize_4
+	br i1 %slt_3, label %for.body_3, label %for.end_3
+
+for.body_3:
+	%a_8 = load i32*, i32** @a, align 4
+	%elementPtr_4 = getelementptr i32, i32* %a_8, i32 %i_14
+	%arrayElement_4 = load i32, i32* %elementPtr_4, align 4
+	%funcCallRet_3 = call i8* @_toString$$YGPADH$Z(i32 %arrayElement_4)
+	call void @_print$$YGXPAD$Z(i8* %funcCallRet_3)
+	%postfix_inc_3 = add i32 %i_14, 1
+	br label %for.cond_3
+
+for.end_3:
+	ret i32 0
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)
