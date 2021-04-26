@@ -33,9 +33,9 @@ public class AlgebraicSimplifier extends Pass {
     }
     private void runForFn(Function f) {
         curFunc = f;
-        ArrayList<IRBlock> PO = f.getPO();
-        for (var b: PO) {
-            treeBalance(b);
+        ArrayList<IRBlock> RPO = f.getRPO();
+        RPO.forEach(this::treeBalance);
+        for (var b: RPO) {
             for (var i: b.getAllInst()) {
                 if (i.hasNoSideEffect()) {
                     W.offer(i);
@@ -163,15 +163,15 @@ public class AlgebraicSimplifier extends Pass {
             int vt;
             int vl = ((ConstInt) NL).getValue(), vr = ((ConstInt) NR).getValue();
             switch (opName) {
-                case add: vt = vl + vr;break;
-                case sub: vt = vl - vr;break;
-                case mul: vt = vl * vr;break;
-                case sdiv:vt = vl / vr;break;
-                case srem:vt = vl % vr;break;
+                case add: vt = vl + vr; break;
+                case sub: vt = vl - vr; break;
+                case mul: vt = vl * vr; break;
+                case sdiv:vt = vl / vr; break;
+                case srem:vt = vl % vr; break;
                 case shl: vt = vl << vr;break;
                 case ashr:vt = vl >> vr;break;
-                case and: vt = vl & vr;break;
-                case or:  vt = vl | vr;break;
+                case and: vt = vl & vr; break;
+                case or:  vt = vl | vr; break;
                 default:  vt = vl ^ vr;
             }
             return new ConstInt(vt, 4);

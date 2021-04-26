@@ -36,7 +36,7 @@ public class CFGSimplifier extends Pass {
                         boolean tune = ((ConstBool)instBR.getCondition()).getValue();
                         IRBlock dstBlock = tune ? instBR.getThenBlock() : instBR.getElseBlock();
                         IRBlock redundant = tune ? instBR.getElseBlock() : instBR.getThenBlock();
-                        f.removeBlock(redundant);
+                        b.severCF(redundant);
                         instBR.rewriteToJump(dstBlock);
                         loopCond = true;
                     }

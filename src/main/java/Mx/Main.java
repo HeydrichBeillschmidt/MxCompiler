@@ -41,7 +41,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/optim-new/const.mx";
+        //String filename = "testcases/optim-new/const-adv.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
