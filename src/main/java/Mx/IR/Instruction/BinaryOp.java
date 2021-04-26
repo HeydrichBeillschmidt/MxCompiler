@@ -126,7 +126,7 @@ public class BinaryOp extends IRInst {
             op1.addUse(this);
         }
         if (op2==oldUse) {
-            op1.removeUse(this);
+            op2.removeUse(this);
             op2 = newUse;
             op2.addUse(this);
         }

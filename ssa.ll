@@ -71,7 +71,9 @@ return:
 
 define void @___init__$$YGXXZ() {
 entry:
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 84)
+	%sizeTmp = mul i32 20, 4
+	%size = add i32 %sizeTmp, 4
+	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
 	%mallocInt32Ptr = bitcast i8* %malloc to i32*
 	store i32 20, i32* %mallocInt32Ptr, align 4
 	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
@@ -137,7 +139,8 @@ for.end_2:
 	br label %return
 
 return:
-	ret i32 0
+	%retval_2 = phi i32 [ 0, %if.then ], [ 0, %for.end_2 ]
+	ret i32 %retval_2
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)

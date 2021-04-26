@@ -41,7 +41,7 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/optim-new/const-adv.mx";
+        //String filename = "testcases/codegen/e2.mx";
         String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
@@ -118,6 +118,8 @@ public class Main {
             cfgSimplifier.run();
             new DominanceAnalysis(irModule).run();
             new Mem2Reg(irModule).run();
+
+            if (emitLL) new IRPrinter("ssa.ll").run(irModule);
 
             if (doOptimization) new OptAssembler(irModule).run();
 

@@ -1,7 +1,6 @@
 package Mx.Optimize;
 
 import Mx.IR.IRModule;
-import Mx.IR.IRPrinter;
 import Mx.Optimize.FlowAnalysis.*;
 
 public class OptAssembler {

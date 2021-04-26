@@ -92,7 +92,8 @@ public class SCCP extends Pass {
 
         ArrayList<IRBlock> RPO = f.getRPO();
         for (var b: RPO) {
-            for (var i: b.getAllInst()) {
+            ArrayList<IRInst> instList = b.getAllInst();
+            for (var i: instList) {
                 if (i.hasDst()) {
                     LatticeCell cell = queryCell(i.getDst());
                     if (cell.isConst()) {
@@ -120,6 +121,7 @@ public class SCCP extends Pass {
             executable.add(block);
             workListBlocks.offer(block);
         }
+        else block.getAllPhi().forEach(this::checkPhi);
     }
     private LatticeCell queryCell(Operand s) {
         if (lattice.containsKey(s)) return lattice.get(s);
