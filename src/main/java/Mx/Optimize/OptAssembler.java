@@ -21,9 +21,9 @@ public class OptAssembler {
             LoopAnalysis loop = new LoopAnalysis(module);
 
             boolean changed = new SCCP(module).run();
-            //interProc.run();
-            //sideEffect.run();
-            //changed |= new ADCE(module).run();
+            interProc.run();
+            sideEffect.run();
+            changed |= new ADCE(module).run();
             //changed |= new CFGSimplifier(module).run();
             //changed |= new CSE(module).run();
             //interProc.run();

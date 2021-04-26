@@ -6,6 +6,7 @@ import Mx.IR.IRModule;
 import Mx.IR.Instruction.*;
 import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
+import Mx.Optimize.FlowAnalysis.DominanceAnalysis;
 
 import java.util.*;
 
@@ -26,6 +27,7 @@ public class ADCE extends Pass {
         changed = false;
         W = new LinkedList<>();
         liveCode = new HashSet<>();
+        new DominanceAnalysis(module).runBackward();
         module.getFunctions().values().forEach(this::runForFn);
         return changed;
     }
@@ -56,10 +58,12 @@ public class ADCE extends Pass {
                     markInst(((Register)u).getDef());
                 }
             }
-            for (var b: i.getBlock().getRDF()) {
-                IRInst j = b.getTailInst();
-                if (j instanceof Br && ((Br)j).getCondition()!=null) {
-                    markInst(j);
+            if (i.getBlock().getRDF()!=null) {
+                for (var b: i.getBlock().getRDF()) {
+                    IRInst j = b.getTailInst();
+                    if (j instanceof Br && ((Br)j).getCondition()!=null) {
+                        markInst(j);
+                    }
                 }
             }
         }
@@ -79,7 +83,8 @@ public class ADCE extends Pass {
                 if (!liveCode.contains(i)) {
                     changed = true;
                     if (i instanceof Br && ((Br)i).getCondition()!=null) {
-                        ((Br) i).rewriteToJump(i.getBlock().nearestMarkedPostDom());
+                        IRBlock pDom = i.getBlock().nearestMarkedPostDom();
+                        if (pDom!=null) ((Br) i).rewriteToJump(pDom);
                     }
                     if (!(i instanceof Br && ((Br)i).getCondition()==null)) {
                         i.severDF();

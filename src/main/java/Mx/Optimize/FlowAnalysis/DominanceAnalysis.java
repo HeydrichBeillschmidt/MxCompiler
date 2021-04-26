@@ -1,6 +1,5 @@
 package Mx.Optimize.FlowAnalysis;
 
-import Mx.IR.Function;
 import Mx.IR.IRModule;
 import Mx.Optimize.Pass;
 
@@ -23,7 +22,7 @@ public class DominanceAnalysis extends Pass {
     public void runBackward() {
         for (var f: module.getFunctions().values()) {
             f.solvePostDominance();
-            f.solvePDF();
+            f.solveRDF();
         }
     }
 }

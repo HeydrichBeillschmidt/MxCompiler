@@ -223,6 +223,7 @@ public class IRBlock {
                 }
                 merged.tailInst = tailInst;
                 // deal with linked list
+                if (this==f.getReturnBlock()) f.setReturnBlock(merged);
                 if (this==f.getEntranceBlock()) f.setEntranceBlock(nextBlock);
                 else prevBlock.setNextBlock(nextBlock);
                 if (this==f.getExitBlock()) f.setExitBlock(prevBlock);
@@ -251,6 +252,7 @@ public class IRBlock {
         successors.forEach(s -> s.replacePredecessor(this, splitBlock));
         successors.clear();
 
+        if (this==f.getReturnBlock()) f.setReturnBlock(splitBlock);
         f.addNextBlock(this, splitBlock);
         return splitBlock;
     }

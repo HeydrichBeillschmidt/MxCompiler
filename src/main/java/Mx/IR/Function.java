@@ -23,7 +23,7 @@ public class Function {
     private final ArrayList<Parameter> parameterList;
     private IRBlock entranceBlock;
     private IRBlock exitBlock;
-    private final IRBlock returnBlock;
+    private IRBlock returnBlock;
     private Register retVal;
     private Register classPtr;
     private final FuncSymbolTable symbolTable;
@@ -81,6 +81,9 @@ public class Function {
     }
     public IRBlock getReturnBlock() {
         return returnBlock;
+    }
+    public void setReturnBlock(IRBlock returnBlock) {
+        this.returnBlock = returnBlock;
     }
     public Register getRetVal() {
         return retVal;
@@ -248,6 +251,26 @@ public class Function {
         }
         order.add(block);
     }
+    public ArrayList<IRBlock> getBackwardPO() {
+        ArrayList<IRBlock> order = new ArrayList<>();
+        _reverseDFSRecursive(returnBlock, order, new HashSet<>());
+        return order;
+    }
+    public ArrayList<IRBlock> getBackwardRPO() {
+        ArrayList<IRBlock> order = getBackwardPO();
+        Collections.reverse(order);
+        return order;
+    }
+    private void _reverseDFSRecursive(IRBlock block, ArrayList<IRBlock> order,
+                                      Set<IRBlock> visited) {
+        visited.add(block);
+        for (var p: block.getPredecessors()) {
+            if (!visited.contains(p)) {
+                _reverseDFSRecursive(p, order, visited);
+            }
+        }
+        order.add(block);
+    }
     // for dominance analysis
     //     forward control flow analysis
     public void solveDominance() {
@@ -314,20 +337,19 @@ public class Function {
     }
     //     backward control flow analysis
     public void solvePostDominance() {
-        // actually reversed post-order here
-        ArrayList<IRBlock> PO = getRPO();
+        // actually backward post-order here
+        ArrayList<IRBlock> BwdRPO = getBackwardPO();
         int cnt = 0;
-        // set block counter by RPO
-        for (var b: PO) b.setBlockCnt(cnt++);
-        Collections.reverse(PO);
-        PO.forEach(IRBlock::initPostDomInfo);
-        IRBlock retBlock = PO.get(0);
-        retBlock.setPostIDom(retBlock);
+        // set block counter by backward PO
+        for (var b: BwdRPO) b.setBlockCnt(cnt++);
+        Collections.reverse(BwdRPO);
+        BwdRPO.forEach(IRBlock::initPostDomInfo);
+        returnBlock.setPostIDom(returnBlock);
         boolean changed = true;
         while (changed) {
             changed = false;
-            for (var b: PO) {
-                if (b==retBlock) continue;
+            for (var b: BwdRPO) {
+                if (b==returnBlock) continue;
                 IRBlock newPostIDom = null;
                 for (var p: b.getSuccessors()) {
                     if (p.getPostIDom()!=null) {
@@ -361,9 +383,9 @@ public class Function {
         }
         return finger1;
     }
-    public void solvePDF() {
-        ArrayList<IRBlock> PO = getPO();
-        for (var b: PO) {
+    public void solveRDF() {
+        ArrayList<IRBlock> BwdRPO = getBackwardRPO();
+        for (var b: BwdRPO) {
             if (b.getSuccessors().size() >= 2) {
                 for (var s: b.getSuccessors()) {
                     IRBlock runner = s;
