@@ -26,8 +26,8 @@ public class OptAssembler {
             interProc.run();
             sideEffect.run();
             changed |= new ADCE(module).run();
-            //changed |= new CFGSimplifier(module).run();
-            //changed |= new CSE(module).run();
+            changed |= new CFGSimplifier(module).run();
+            changed |= new CSE(module).run();
             //interProc.run();
             //sideEffect.run();
             //alias.run();
