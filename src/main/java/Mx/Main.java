@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 public class Main {
     public static void main(String[] args) {
-        boolean doCodegen = true, doOptimization = true, emitLL = false;
+        boolean doCodegen = true, doOptimization = true, emitLL = true;
 
         if (args.length > 0) {
             for (String arg: args) {
@@ -41,8 +41,8 @@ public class Main {
 
         ExceptionHandler exceptionHandler = new ExceptionHandler();
 
-        //String filename = "testcases/optim-new/adce-adv.mx";
-        String filename = "test.mx";
+        String filename = "testcases/codegen/e2.mx";
+        //String filename = "test.mx";
         InputStream inputStream;
         CharStream input;
         try {

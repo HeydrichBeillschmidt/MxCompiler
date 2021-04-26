@@ -40,6 +40,7 @@ public class InterProceduralAnalysis extends Pass {
         for (var f: module.getFunctions().values()) {
             for (var cs: f.getCallSites()) {
                 Function callee = cs.getCallee();
+                if (module.hasNoFunction(callee.getName())) continue;
                 callForward.get(f).add(callee);
                 callBackward.get(callee).add(f);
             }
