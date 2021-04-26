@@ -208,7 +208,8 @@ public class IRBlock {
                 ArrayList<IRInst> instList = getAllInst();
                 for (var i: instList) {
                     if (i instanceof Phi) {
-                        i.getDst().replaceUse(((Phi) i).getValues().get(0));
+                        if (((Phi)i).getBlocks().size()>0)
+                            i.getDst().replaceUse(((Phi) i).getValues().get(0));
                         i.severDF();
                         i.removeFromBlock();
                     }

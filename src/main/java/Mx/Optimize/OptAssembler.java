@@ -1,6 +1,7 @@
 package Mx.Optimize;
 
 import Mx.IR.IRModule;
+import Mx.IR.IRPrinter;
 import Mx.Optimize.FlowAnalysis.*;
 
 public class OptAssembler {
@@ -21,6 +22,7 @@ public class OptAssembler {
             LoopAnalysis loop = new LoopAnalysis(module);
 
             boolean changed = new SCCP(module).run();
+            changed |= new CFGSimplifier(module).run();
             interProc.run();
             sideEffect.run();
             changed |= new ADCE(module).run();
@@ -36,6 +38,7 @@ public class OptAssembler {
             changed |= new CFGSimplifier(module).run();
 
             if (!changed) break;
+            //new IRPrinter("inOpt_"+(10-cnt)+".ll").run(module);
         }
     }
 }

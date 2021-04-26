@@ -4,6 +4,7 @@ import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
 import Mx.IR.Instruction.Br;
+import Mx.IR.Instruction.Phi;
 import Mx.IR.Operand.ConstBool;
 
 import java.util.ArrayList;
@@ -49,6 +50,19 @@ public class CFGSimplifier extends Pass {
                     loopCond = true;
                 }
                 else loopCond |= b.checkAndMerge(f);
+            }
+            PO = f.getPO();
+            for (var b: PO) {
+                ArrayList<Phi> phiList = b.getAllPhi();
+                for (var ph: phiList) {
+                    if (ph.getBlocks().size()==1) {
+                        assert b.getPredecessors().size()==1;
+                        ph.getDst().replaceUse(ph.getValues().get(0));
+                        ph.severDF();
+                        ph.removeFromBlock();
+                        loopCond = true;
+                    }
+                }
             }
 
             if (loopCond) changed = true;

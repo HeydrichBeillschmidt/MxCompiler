@@ -44,9 +44,9 @@ public class ADCE extends Pass {
             b.initMark();
             for (var i: b.getAllInst()) {
                 if (i instanceof Store || i instanceof Ret
-                        || (i instanceof Call && ((Call)i).getCallee().hasSideEffect())
-                        || (i instanceof Br && ((Br)i).getCondition()==null)) {
+                        || (i instanceof Call && ((Call)i).getCallee().hasSideEffect())) {
                     markInst(i);
+                    markInst(b.getTailInst());
                 }
             }
         }
@@ -55,7 +55,9 @@ public class ADCE extends Pass {
             Set<Operand> uses = i.getUses();
             for (var u: uses) {
                 if (u instanceof Register) {
-                    markInst(((Register)u).getDef());
+                    IRInst inst = ((Register)u).getDef();
+                    markInst(inst);
+                    markInst(inst.getBlock().getTailInst());
                 }
             }
             if (i.getBlock().getRDF()!=null) {
