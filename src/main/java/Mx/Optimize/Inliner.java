@@ -48,7 +48,14 @@ public class Inliner extends Pass {
         ArrayList<IRBlock> inlineBlocks = cs.getCallee().inlineToFunc(caller, cs.getParameterList());
         caller.insertBlocks(inlineEntrance, inlineBlocks);
 
-        IRBlock inlineTail = inlineBlocks.get(inlineBlocks.size()-1);
+        IRBlock inlineTail = null;
+        for (var b: inlineBlocks) {
+            if (b.getTailInst() instanceof Ret) {
+                inlineTail = b;
+                break;
+            }
+        }
+        assert inlineTail!=null;
         Ret instRet = (Ret) inlineTail.getTailInst();
         if (!cs.isVoidCall()) cs.getDst().replaceUse(instRet.getRetValue());
 

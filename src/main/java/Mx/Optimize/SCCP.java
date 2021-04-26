@@ -159,7 +159,8 @@ public class SCCP extends Pass {
             if (inst instanceof BinaryOp) checkBinary((BinaryOp) inst);
             else if (inst instanceof Icmp) checkCmp((Icmp) inst);
             else if (inst instanceof Phi) checkPhi((Phi) inst);
-            else if (inst instanceof Load || inst instanceof Call) {
+            else if (inst instanceof BitCast || inst instanceof Call
+                    || inst instanceof Load || inst instanceof GetElementPtr) {
                 decentCell(inst.getDst(), null);
             }
             else if (inst instanceof Br) checkBr((Br) inst);
