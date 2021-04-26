@@ -48,8 +48,8 @@ public class InterProceduralAnalysis extends Pass {
             }
         }
         ArrayList<Function> PO = getPO();
+        for (var f: PO) callees.put(f, new HashSet<>(callForward.get(f)));
         for (var f: PO) {
-            callees.put(f, new HashSet<>(callForward.get(f)));
             for (var callee: callForward.get(f)) {
                 callees.get(f).addAll(callees.get(callee));
             }
