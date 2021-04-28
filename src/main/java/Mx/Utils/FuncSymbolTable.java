@@ -36,6 +36,9 @@ public class FuncSymbolTable {
         else {
             ArrayList<Object> arr = new ArrayList<>();
             arr.add(obj);
+            if (obj instanceof IRBlock) ((IRBlock)obj).setName(name);
+            else if (obj instanceof Parameter) ((Parameter)obj).setName(name);
+            else ((Register)obj).setName(name);
             symbolTable.put(name, arr);
         }
     }

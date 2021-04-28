@@ -1,146 +1,112 @@
-@a = global i32* null, align 4
-@i = global i32 0, align 4
-@n = global i32 0, align 4
+%class.older = type { i32 }
 
-define i32 @_jud$$YGHH$Z(i32 %x) {
+@__const.main.str0 = private unnamed_addr constant [9 x i8] c"eternal!\00", align 1
+
+define void @___init__$$YGXXZ() {
+entry:
+	ret void
+}
+
+define void @_solveAge$older$$QEAXXZ(%class.older* %this) {
 entry:
 	br label %for.cond
 
 for.cond:
-	%j_8 = phi i32 [ 0, %entry ], [ %j_6, %if.end_2 ]
-	%flag_5 = phi i1 [ 0, %entry ], [ %flag_6, %if.end_2 ]
-	%i_6 = phi i32 [ 0, %entry ], [ %postfix_inc_2, %if.end_2 ]
-	%n = load i32, i32* @n, align 4
-	%sdiv = sdiv i32 %n, %x
-	%slt = icmp slt i32 %i_6, %sdiv
-	br i1 %slt, label %for.body_2, label %for.end_2
+	%j_14 = phi i32 [ 0, %entry ], [ %j_13, %for.end_2 ]
+	%i_13 = phi i32 [ 1, %entry ], [ %postfix_3, %for.end_2 ]
+	%k_14 = phi i32 [ 0, %entry ], [ %k_13, %for.end_2 ]
+	%slt = icmp slt i32 %i_13, 100
+	br i1 %slt, label %for.body_3, label %for.end_3
 
 for.cond_2:
-	%j_6 = phi i32 [ 0, %for.body_2 ], [ %postfix_inc, %if.end ]
-	%flag_6 = phi i1 [ 0, %for.body_2 ], [ %flag_3, %if.end ]
-	%sub = sub i32 %x, 1
-	%slt_2 = icmp slt i32 %j_6, %sub
-	br i1 %slt_2, label %for.body, label %for.end
+	%j_13 = phi i32 [ %add, %for.body_3 ], [ %postfix_2, %for.end ]
+	%k_13 = phi i32 [ %k_14, %for.body_3 ], [ %k_12, %for.end ]
+	%slt_2 = icmp slt i32 %j_13, 100
+	br i1 %slt_2, label %for.body_2, label %for.end_2
+
+for.cond_3:
+	%k_12 = phi i32 [ %add_2, %for.body_2 ], [ %postfix, %if.end ]
+	%slt_3 = icmp slt i32 %k_12, 100
+	br i1 %slt_3, label %for.body, label %for.end
 
 if.then:
+	%older.age.addr = getelementptr %class.older, %class.older* %this, i32 0, i32 0
+	%sub_4 = sub i32 %i_13, %i_13
+	%add_10 = add i32 %sub_4, %i_13
+	%add_11 = add i32 %add_10, %j_13
+	%sub_5 = sub i32 %add_11, %j_13
+	%add_12 = add i32 %sub_5, %j_13
+	%add_13 = add i32 %add_12, %k_12
+	%sub_6 = sub i32 %add_13, %k_12
+	%add_14 = add i32 %sub_6, %k_12
+	%mul_4 = mul i32 100, %i_13
+	%mul_5 = mul i32 10, %j_13
+	%add_15 = add i32 %mul_4, %mul_5
+	%add_16 = add i32 %add_15, %k_12
+	%mul_6 = mul i32 %add_14, %add_16
+	store i32 %mul_6, i32* %older.age.addr, align 4
 	br label %if.end
 
 if.end:
-	%flag_3 = phi i1 [ 1, %if.then ], [ %flag_6, %for.body ]
-	%postfix_inc = add i32 %j_6, 1
-	br label %for.cond_2
+	%postfix = add i32 %k_12, 1
+	br label %for.cond_3
 
 for.body:
-	%a = load i32*, i32** @a, align 4
-	%mul = mul i32 %i_6, %x
-	%add = add i32 %mul, %j_6
-	%elementPtr = getelementptr i32, i32* %a, i32 %add
-	%arrayElement = load i32, i32* %elementPtr, align 4
-	%a_2 = load i32*, i32** @a, align 4
-	%mul_2 = mul i32 %i_6, %x
-	%add_2 = add i32 %mul_2, %j_6
-	%add_3 = add i32 %add_2, 1
-	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %add_3
-	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%sgt = icmp sgt i32 %arrayElement, %arrayElement_2
-	br i1 %sgt, label %if.then, label %if.end
+	%sub = sub i32 %i_13, %i_13
+	%add_3 = add i32 %sub, %i_13
+	%add_4 = add i32 %add_3, %j_13
+	%sub_2 = sub i32 %add_4, %j_13
+	%add_5 = add i32 %sub_2, %j_13
+	%add_6 = add i32 %add_5, %k_12
+	%sub_3 = sub i32 %add_6, %k_12
+	%add_7 = add i32 %sub_3, %k_12
+	%mul = mul i32 100, %i_13
+	%mul_2 = mul i32 10, %j_13
+	%add_8 = add i32 %mul, %mul_2
+	%add_9 = add i32 %add_8, %k_12
+	%mul_3 = mul i32 %add_7, %add_9
+	%srem = srem i32 %mul_3, 1926
+	%eq = icmp eq i32 %srem, 0
+	br i1 %eq, label %if.then, label %if.end
 
 for.end:
-	%prefix_logicalNot = xor i1 %flag_6, 1
-	br i1 %prefix_logicalNot, label %if.then_2, label %if.end_2
-
-if.then_2:
-	br label %return
-
-if.end_2:
-	%postfix_inc_2 = add i32 %i_6, 1
-	br label %for.cond
-
-for.body_2:
+	%postfix_2 = add i32 %j_13, 1
 	br label %for.cond_2
 
+for.body_2:
+	%add_2 = add i32 %j_13, 1
+	br label %for.cond_3
+
 for.end_2:
-	br label %return
+	%postfix_3 = add i32 %i_13, 1
+	br label %for.cond
 
-return:
-	%retval_2 = phi i32 [ 1, %if.then_2 ], [ 0, %for.end_2 ]
-	%j_7 = phi i32 [ %j_6, %if.then_2 ], [ %j_8, %for.end_2 ]
-	%flag_4 = phi i1 [ %flag_6, %if.then_2 ], [ %flag_5, %for.end_2 ]
-	ret i32 %retval_2
-}
+for.body_3:
+	%add = add i32 %i_13, 1
+	br label %for.cond_2
 
-define void @___init__$$YGXXZ() {
-entry:
-	%sizeTmp = mul i32 20, 4
-	%size = add i32 %sizeTmp, 4
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
-	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 20, i32* %mallocInt32Ptr, align 4
-	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
-	%arrayHeadPtr = bitcast i32* %arrayHeadPtrUnguarded to i32*
-	store i32* %arrayHeadPtr, i32** @a, align 4
+for.end_3:
 	ret void
 }
 
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet, i32* @n, align 4
-	store i32 0, i32* @i, align 4
-	br label %for.cond
-
-for.cond:
-	%i_2 = load i32, i32* @i, align 4
-	%n_2 = load i32, i32* @n, align 4
-	%slt = icmp slt i32 %i_2, %n_2
-	br i1 %slt, label %for.body, label %for.end
-
-for.body:
-	%a = load i32*, i32** @a, align 4
-	%i_3 = load i32, i32* @i, align 4
-	%elementPtr = getelementptr i32, i32* %a, i32 %i_3
-	%funcCallRet_2 = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet_2, i32* %elementPtr, align 4
-	%i_4 = load i32, i32* @i, align 4
-	%postfix_inc = add i32 %i_4, 1
-	store i32 %postfix_inc, i32* @i, align 4
-	br label %for.cond
-
-for.end:
-	%n_3 = load i32, i32* @n, align 4
-	store i32 %n_3, i32* @i, align 4
-	br label %for.cond_2
-
-for.cond_2:
-	%i_6 = load i32, i32* @i, align 4
-	%sgt = icmp sgt i32 %i_6, 0
-	br i1 %sgt, label %for.body_2, label %for.end_2
+	%malloc = call i8* @_malloc$$YGPADH$Z(i32 4)
+	%castToClassPtr = bitcast i8* %malloc to %class.older*
+	call void @_solveAge$older$$QEAXXZ(%class.older* %castToClassPtr)
+	%older.age.addr = getelementptr %class.older, %class.older* %castToClassPtr, i32 0, i32 0
+	%older.age = load i32, i32* %older.age.addr, align 4
+	%sgt = icmp sgt i32 %older.age, 10000
+	br i1 %sgt, label %if.then, label %if.end
 
 if.then:
-	%i_8 = load i32, i32* @i, align 4
-	%funcCallRet_4 = call i8* @_toString$$YGPADH$Z(i32 %i_8)
-	call void @_print$$YGXPAD$Z(i8* %funcCallRet_4)
-	br label %return
+	%_ = getelementptr [9 x i8], [9 x i8]* @__const.main.str0, i32 0, i32 0
+	call void @_println$$YGXPAD$Z(i8* %_)
+	br label %if.end
 
 if.end:
-	%i_10 = load i32, i32* @i, align 4
-	%sdiv = sdiv i32 %i_10, 2
-	store i32 %sdiv, i32* @i, align 4
-	br label %for.cond_2
-
-for.body_2:
-	%i_7 = load i32, i32* @i, align 4
-	%funcCallRet_3 = call i32 @_jud$$YGHH$Z(i32 %i_7)
-	%sgt_2 = icmp sgt i32 %funcCallRet_3, 0
-	br i1 %sgt_2, label %if.then, label %if.end
-
-for.end_2:
-	br label %return
-
-return:
-	%retval_2 = phi i32 [ 0, %if.then ], [ 0, %for.end_2 ]
-	ret i32 %retval_2
+	ret i32 0
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)

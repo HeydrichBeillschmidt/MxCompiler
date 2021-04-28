@@ -127,7 +127,7 @@ public class Function {
         if (target.hasNextBlock()) target.getNextBlock().setPrevBlock(tail);
         head.setPrevBlock(target);
         target.setNextBlock(head);
-        blocksToAdd.forEach(this::addOriginalSymbol);
+        blocksToAdd.forEach(this::addSymbol);
     }
     public ArrayList<IRBlock> getAllBlocks() {
         ArrayList<IRBlock> ans = new ArrayList<>();
@@ -162,7 +162,7 @@ public class Function {
             for (int i = 0, it = iList.size(); i < it; ++i) {
                 if (iList.get(i).hasDst()) {
                     F2A.put(iList.get(i).getDst(), iListCpy.get(i).getDst());
-                    caller.addOriginalSymbol(iListCpy.get(i).getDst());
+                    caller.addSymbol(iListCpy.get(i).getDst());
                 }
                 if (iList.get(i) instanceof Call) {
                     caller.addCallSite((Call) iListCpy.get(i));
@@ -211,14 +211,14 @@ public class Function {
     public void setClassPtr(Register classPtr) {
         this.classPtr = classPtr;
     }
-    public void addOriginalSymbol(Register r) {
+    public void addSymbol(Register r) {
         symbolTable.putIR(r.getOriginalName(), r);
     }
-    public void addOriginalSymbol(IRBlock b) {
-        symbolTable.putIR(b.getOriginalName(), b);
+    public void addSymbol(Parameter p) {
+        symbolTable.putIR(p);
     }
-    public void addSymbol(Object obj) {
-        symbolTable.putIR(obj);
+    public void addSymbol(IRBlock b) {
+        symbolTable.putIR(b.getOriginalName(), b);
     }
 
     public Set<Call> getCallSites() {
