@@ -26,7 +26,7 @@ public class Inliner extends Pass {
     public boolean run() {
         countInst();
         boolean changed = inlineBasic();
-        //changed |= inlineRecursive();
+        changed |= inlineRecursive();
         removeRedundantFunc();
         return changed;
     }
