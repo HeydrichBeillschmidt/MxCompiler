@@ -74,7 +74,7 @@ public class Inliner extends Pass {
 
         ArrayList<Function> cPO = interProc.getPO();
         for (var f: cPO) {
-            Set<Call> css = new HashSet<>(f.getCallSites());
+            ArrayList<Call> css = new ArrayList<>(f.getCallSites());
             for (var cs: css) {
                 Function callee = cs.getCallee();
                 if (module.hasNoFunction(callee.getName())) continue;
@@ -96,7 +96,7 @@ public class Inliner extends Pass {
         int thresholdRecursive = 3;
         for (int i = 0; i < thresholdRecursive; ++i) {
             for (var f: cPO) {
-                Set<Call> css = new HashSet<>(f.getCallSites());
+                ArrayList<Call> css = new ArrayList<>(f.getCallSites());
                 for (var cs: css) {
                     Function callee = cs.getCallee();
                     if (module.hasNoFunction(callee.getName())) continue;

@@ -27,7 +27,7 @@ public class Function {
     private Register retVal;
     private Register classPtr;
     private final FuncSymbolTable symbolTable;
-    private final Set<Call> callSites;
+    private final ArrayList<Call> callSites;
     private boolean sideEffect;
 
     public Function(IRModule module, IRType retType, String name,
@@ -43,7 +43,7 @@ public class Function {
         }
         this.functionType = new FunctionType(retType, parameterTypeList);
         this.entranceBlock = null;
-        this.callSites = new HashSet<>();
+        this.callSites = new ArrayList<>();
         this.sideEffect = false;
         this.retVal = null;
         this.classPtr = null;
@@ -221,7 +221,7 @@ public class Function {
         symbolTable.putIR(b.getOriginalName(), b);
     }
 
-    public Set<Call> getCallSites() {
+    public ArrayList<Call> getCallSites() {
         return callSites;
     }
     public void addCallSite(Call i) {

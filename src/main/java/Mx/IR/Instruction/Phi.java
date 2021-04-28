@@ -81,8 +81,9 @@ public class Phi extends IRInst {
             if (blocks.size()==inst.blocks.size()) {
                 Set<Operand> valueSet = new HashSet<>(inst.getValues());
                 for (int it = 0, itt = blocks.size(); it < itt; ++it) {
-                    if (!valueSet.contains(values.get(it))
-                            || blocks.get(it)!=inst.blocks.get(it)) return false;
+                    Operand src = values.get(it);
+                    if (!valueSet.contains(src)
+                            || blocks.get(it)!=inst.blocks.get(inst.values.indexOf(src))) return false;
                 }
                 return true;
             }
