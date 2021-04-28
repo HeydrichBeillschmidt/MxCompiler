@@ -54,6 +54,17 @@ public class IRBlock {
     public void setName(String name) {
         this.name = name;
     }
+    public String getOriginalName() {
+        if (name.contains("_")) {
+            String[] ss = name.split("_");
+            StringBuilder ans = new StringBuilder(ss[0]);
+            for (int i = 1; i < ss.length-1; ++i) {
+                ans.append("_").append(ss[i]);
+            }
+            return ans.toString();
+        }
+        else return name;
+    }
 
     public IRInst getHeadInst() {
         return headInst;

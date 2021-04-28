@@ -127,7 +127,7 @@ public class Function {
         if (target.hasNextBlock()) target.getNextBlock().setPrevBlock(tail);
         head.setPrevBlock(target);
         target.setNextBlock(head);
-        blocksToAdd.forEach(this::addSymbol);
+        blocksToAdd.forEach(this::addOriginalSymbol);
     }
     public ArrayList<IRBlock> getAllBlocks() {
         ArrayList<IRBlock> ans = new ArrayList<>();
@@ -213,6 +213,9 @@ public class Function {
     }
     public void addOriginalSymbol(Register r) {
         symbolTable.putIR(r.getOriginalName(), r);
+    }
+    public void addOriginalSymbol(IRBlock b) {
+        symbolTable.putIR(b.getOriginalName(), b);
     }
     public void addSymbol(Object obj) {
         symbolTable.putIR(obj);
