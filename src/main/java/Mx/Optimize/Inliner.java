@@ -3,6 +3,7 @@ package Mx.Optimize;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
+import Mx.IR.IRPrinter;
 import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.Call;
 import Mx.IR.Instruction.Ret;
@@ -25,7 +26,7 @@ public class Inliner extends Pass {
     public boolean run() {
         countInst();
         boolean changed = inlineBasic();
-        changed |= inlineRecursive();
+        //changed |= inlineRecursive();
         removeRedundantFunc();
         return changed;
     }
@@ -43,11 +44,7 @@ public class Inliner extends Pass {
     }
 
     private void funcInsert(Function caller, Call cs) {
-        IRBlock inlineEntrance = cs.getBlock();
-        IRBlock inlineExit = inlineEntrance.split(caller, cs);
         ArrayList<IRBlock> inlineBlocks = cs.getCallee().inlineToFunc(caller, cs.getParameterList());
-        caller.insertBlocks(inlineEntrance, inlineBlocks);
-
         IRBlock inlineTail = null;
         for (var b: inlineBlocks) {
             if (b.getTailInst() instanceof Ret) {
@@ -59,11 +56,17 @@ public class Inliner extends Pass {
         Ret instRet = (Ret) inlineTail.getTailInst();
         if (!cs.isVoidCall()) cs.getDst().replaceUse(instRet.getRetValue());
 
+        IRBlock inlineEntrance = cs.getBlock();
+        IRBlock inlineExit = inlineEntrance.split(caller, cs);
+        caller.insertBlocks(inlineEntrance, inlineBlocks);
+
         cs.severDF();
         cs.removeFromBlock();
+        caller.removeCallSite(cs);
+        inlineEntrance.addInst(new Br(inlineEntrance, null, inlineBlocks.get(0), null));
+
         instRet.severDF();
         instRet.removeFromBlock();
-        inlineEntrance.addInst(new Br(inlineEntrance, null, inlineBlocks.get(0), null));
         inlineTail.addInst(new Br(inlineTail, null, inlineExit, null));
     }
     private boolean inlineBasic() {

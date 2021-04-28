@@ -966,8 +966,8 @@ public class IRBuilder implements ASTVisitor {
             values.add(new ConstBool(false));
             blocks.add(curBlock);
 
-            IRBlock branchBlock = new IRBlock("logicalAnd_branch");
-            IRBlock endBlock = new IRBlock("logicalAnd_end");
+            IRBlock branchBlock = new IRBlock("logical_and_branch");
+            IRBlock endBlock = new IRBlock("logical_and_end");
             curBlock.addInst(new Br(curBlock, value, branchBlock, endBlock));
 
             curBlock = branchBlock;
@@ -996,7 +996,7 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addInst(new Br(curBlock, null, endBlock, null));
 
             curBlock = endBlock;
-            Register dst = new Register(IRModule.boolT, "logical_and");
+            Register dst = new Register(IRModule.boolT, "logicalAnd");
             curFunc.addSymbol(dst);
             curBlock.addInst(new Phi(curBlock, dst, values, blocks));
 
@@ -1021,8 +1021,8 @@ public class IRBuilder implements ASTVisitor {
             values.add(new ConstBool(true));
             blocks.add(curBlock);
 
-            IRBlock branchBlock = new IRBlock("logicalOr_branch");
-            IRBlock endBlock = new IRBlock("logicalOr_end");
+            IRBlock branchBlock = new IRBlock("logical_or_branch");
+            IRBlock endBlock = new IRBlock("logical_or_end");
             curBlock.addInst(new Br(curBlock, value, endBlock, branchBlock));
 
             curBlock = branchBlock;
@@ -1051,7 +1051,7 @@ public class IRBuilder implements ASTVisitor {
             curBlock.addInst(new Br(curBlock, null, endBlock, null));
 
             curBlock = endBlock;
-            Register dst = new Register(IRModule.boolT, "logical_or");
+            Register dst = new Register(IRModule.boolT, "logicalOr");
             curFunc.addSymbol(dst);
             curBlock.addInst(new Phi(curBlock, dst, values, blocks));
 

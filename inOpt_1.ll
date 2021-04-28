@@ -5,7 +5,6 @@ entry:
 
 define i32 @_unsigned_shr$$YGHHH$Z(i32 %x, i32 %k) {
 entry:
-	%shl = shl i32 1, 31
 	%sge = icmp sge i32 %x, 0
 	br i1 %sge, label %if.then, label %if.else
 
@@ -16,7 +15,7 @@ if.then:
 if.else:
 	%sub = sub i32 31, %k
 	%shl_2 = shl i32 1, %sub
-	%xor = xor i32 %x, %shl
+	%xor = xor i32 %x, -2147483648
 	%ashr_2 = ashr i32 %xor, %k
 	%bitwise_or = or i32 %shl_2, %ashr_2
 	br label %return
@@ -37,13 +36,13 @@ entry:
 	%eq = icmp eq i32 %q, %w
 	br i1 %eq, label %if.then_2, label %if.else_2
 
-logical_or_branch:
+logicalOr_branch:
 	%ne_2 = icmp ne i32 %e, %r
-	br label %logical_or_end
+	br label %logicalOr_end
 
-logical_or_end:
-	%logicalOr = phi i1 [ 1, %if.then_2 ], [ %ne_2, %logical_or_branch ]
-	br i1 %logicalOr, label %if.then, label %if.else
+logicalOr_end:
+	%logical_or = phi i1 [ 1, %if.then_2 ], [ %ne_2, %logicalOr_branch ]
+	br i1 %logical_or, label %if.then, label %if.else
 
 if.then:
 	%funcCallRet = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %w, i32 %e, i32 %r, i32 %t, i32 %y, i32 %u, i32 %i, i32 %o, i32 %p, i32 %q)
@@ -59,7 +58,7 @@ if.else:
 
 if.then_2:
 	%ne = icmp ne i32 %w, %e
-	br i1 %ne, label %logical_or_end, label %logical_or_branch
+	br i1 %ne, label %logicalOr_end, label %logicalOr_branch
 
 if.else_2:
 	%add_3 = add i32 %q, %w
@@ -73,7 +72,6 @@ return:
 
 define i32 @main() {
 entry:
-	call void @___init__$$YGXXZ()
 	br label %for.body
 
 if.then:
@@ -101,15 +99,8 @@ if.else:
 	ret i32 %sub
 
 for.body:
-	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %if.then ]
-	%zz_4 = phi i32 [ 0, %entry ], [ %funcCallRet_7, %if.then ]
-	%u_3 = phi i32 [ 0, %entry ], [ %funcCallRet, %if.then ]
-	%y_4 = phi i32 [ 0, %entry ], [ %funcCallRet_5, %if.then ]
-	%w_4 = phi i32 [ 0, %entry ], [ %funcCallRet_3, %if.then ]
-	%x_4 = phi i32 [ 0, %entry ], [ %funcCallRet_4, %if.then ]
-	%z_4 = phi i32 [ 0, %entry ], [ %funcCallRet_6, %if.then ]
-	%v_3 = phi i32 [ 0, %entry ], [ %funcCallRet_2, %if.then ]
 	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %funcCallRet_7, %if.then ]
+	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %if.then ]
 	%funcCallRet = call i32 @_rng$$YGHH$Z(i32 %rng_seed_5)
 	%funcCallRet_2 = call i32 @_rng$$YGHH$Z(i32 %funcCallRet)
 	%bitwise_and = and i32 %funcCallRet, 255

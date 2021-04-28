@@ -406,7 +406,7 @@ public class IRBlock {
 
     // for inline
     public IRBlock getCopy() {
-        IRBlock ans = new IRBlock("inline_"+name);
+        IRBlock ans = new IRBlock(name);
         getAllInst().forEach(i -> ans.addInstAtCopy(i.copyToBlock(ans)));
         ans.successors.addAll(successors);
         ans.predecessors.addAll(predecessors);

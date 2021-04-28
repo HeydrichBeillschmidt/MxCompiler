@@ -28,12 +28,13 @@ public class OptAssembler {
             changed |= new ADCE(module).run();
             changed |= new CFGSimplifier(module).run();
             changed |= new CSE(module).run();
-            //interProc.run();
+            interProc.run();
             //sideEffect.run();
             //alias.run();
             //loop.run();
             //changed |= new LICM(module, alias, loop).run();
-            //changed |= new Inliner(module, interProc).run();
+            //new IRPrinter("inOpt_"+(10-cnt)+".ll").run(module);
+            changed |= new Inliner(module, interProc).run();
             //changed |= new AlgebraicSimplifier(module).run();
             changed |= new CFGSimplifier(module).run();
 

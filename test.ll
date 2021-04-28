@@ -1,139 +1,219 @@
-@a = global i32* null, align 4
-@i = global i32 0, align 4
-@n = global i32 0, align 4
-
-define i32 @_jud$$YGHH$Z(i32 %x) {
+define i32 @_test$$YGHHHHHHHHHHH$Z(i32 %q, i32 %w, i32 %e, i32 %r, i32 %t, i32 %y, i32 %u, i32 %i, i32 %o, i32 %p) {
 entry:
-	br label %for.cond
+	%eq = icmp eq i32 %q, %w
+	br i1 %eq, label %if.then_2, label %if.else_2
 
-for.cond:
-	%i_6 = phi i32 [ 0, %entry ], [ %postfix_inc_2, %if.end_2 ]
-	%n = load i32, i32* @n, align 4
-	%sdiv = sdiv i32 %n, %x
-	%slt = icmp slt i32 %i_6, %sdiv
-	br i1 %slt, label %for.body_2, label %for.end_2
+logical_or_branch:
+	%ne_2 = icmp ne i32 %e, %r
+	br label %logical_or_end
 
-for.cond_2:
-	%j_6 = phi i32 [ 0, %for.body_2 ], [ %postfix_inc, %if.end ]
-	%flag_6 = phi i1 [ 0, %for.body_2 ], [ %flag_5, %if.end ]
-	%sub = sub i32 %x, 1
-	%slt_2 = icmp slt i32 %j_6, %sub
-	br i1 %slt_2, label %for.body, label %for.end
+logical_or_end:
+	%logicalOr = phi i1 [ 1, %if.then_2 ], [ %ne_2, %logical_or_branch ]
+	br i1 %logicalOr, label %if.then, label %if.else
 
 if.then:
-	br label %if.end
-
-if.end:
-	%flag_5 = phi i1 [ 1, %if.then ], [ %flag_6, %for.body ]
-	%postfix_inc = add i32 %j_6, 1
-	br label %for.cond_2
-
-for.body:
-	%a = load i32*, i32** @a, align 4
-	%mul = mul i32 %i_6, %x
-	%add = add i32 %mul, %j_6
-	%elementPtr = getelementptr i32, i32* %a, i32 %add
-	%arrayElement = load i32, i32* %elementPtr, align 4
-	%a_2 = load i32*, i32** @a, align 4
-	%mul_2 = mul i32 %i_6, %x
-	%add_2 = add i32 %mul_2, %j_6
-	%add_3 = add i32 %add_2, 1
-	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %add_3
-	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%sgt = icmp sgt i32 %arrayElement, %arrayElement_2
-	br i1 %sgt, label %if.then, label %if.end
-
-for.end:
-	%prefix_logicalNot = xor i1 %flag_6, 1
-	br i1 %prefix_logicalNot, label %if.then_2, label %if.end_2
-
-if.then_2:
+	%funcCallRet = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %w, i32 %e, i32 %r, i32 %t, i32 %y, i32 %u, i32 %i, i32 %o, i32 %p, i32 %q)
+	%add = add i32 %funcCallRet, 1
 	br label %return
 
-if.end_2:
-	%postfix_inc_2 = add i32 %i_6, 1
-	br label %for.cond
+if.else:
+	%sub = sub i32 %y, 1
+	%sub_2 = sub i32 %u, 2
+	%funcCallRet_2 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %w, i32 %e, i32 %r, i32 %t, i32 %sub, i32 %sub_2, i32 %i, i32 %o, i32 %p, i32 %q)
+	%add_2 = add i32 %funcCallRet_2, 2
+	br label %return
 
-for.body_2:
-	br label %for.cond_2
+if.then_2:
+	%ne = icmp ne i32 %w, %e
+	br i1 %ne, label %logical_or_end, label %logical_or_branch
 
-for.end_2:
+if.else_2:
+	%add_3 = add i32 %q, %w
+	%add_4 = add i32 %add_3, %q
 	br label %return
 
 return:
-	%retval_2 = phi i32 [ 1, %if.then_2 ], [ 0, %for.end_2 ]
+	%retval_2 = phi i32 [ %add, %if.then ], [ %add_2, %if.else ], [ %add_4, %if.else_2 ]
 	ret i32 %retval_2
-}
-
-define void @___init__$$YGXXZ() {
-entry:
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 84)
-	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 20, i32* %mallocInt32Ptr, align 4
-	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
-	%arrayHeadPtr = bitcast i32* %arrayHeadPtrUnguarded to i32*
-	store i32* %arrayHeadPtr, i32** @a, align 4
-	ret void
 }
 
 define i32 @main() {
 entry:
-	call void @___init__$$YGXXZ()
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet, i32* @n, align 4
-	store i32 0, i32* @i, align 4
-	br label %for.cond
-
-for.cond:
-	%i_2 = load i32, i32* @i, align 4
-	%n_2 = load i32, i32* @n, align 4
-	%slt = icmp slt i32 %i_2, %n_2
-	br i1 %slt, label %for.body, label %for.end
-
-for.body:
-	%a = load i32*, i32** @a, align 4
-	%i_3 = load i32, i32* @i, align 4
-	%elementPtr = getelementptr i32, i32* %a, i32 %i_3
-	%funcCallRet_2 = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet_2, i32* %elementPtr, align 4
-	%i_4 = load i32, i32* @i, align 4
-	%postfix_inc = add i32 %i_4, 1
-	store i32 %postfix_inc, i32* @i, align 4
-	br label %for.cond
-
-for.end:
-	%n_3 = load i32, i32* @n, align 4
-	store i32 %n_3, i32* @i, align 4
-	br label %for.cond_2
-
-for.cond_2:
-	%i_6 = load i32, i32* @i, align 4
-	%sgt = icmp sgt i32 %i_6, 0
-	br i1 %sgt, label %for.body_2, label %for.end_2
+	br label %for.body
 
 if.then:
-	%i_8 = load i32, i32* @i, align 4
-	%funcCallRet_4 = call i8* @_toString$$YGPADH$Z(i32 %i_8)
-	call void @_print$$YGXPAD$Z(i8* %funcCallRet_4)
-	br label %return
+	%shl_19 = shl i32 %bitwise_6, 13
+	%xor_26 = xor i32 %bitwise_6, %shl_19
+	%sge_7 = icmp sge i32 %xor_26, 0
+	br i1 %sge_7, label %if.then_8, label %if.else_8
 
-if.end:
-	%i_10 = load i32, i32* @i, align 4
-	%sdiv = sdiv i32 %i_10, 2
-	store i32 %sdiv, i32* @i, align 4
-	br label %for.cond_2
+if.then_8:
+	%ashr_18 = ashr i32 %xor_26, 17
+	br label %return_2_7
 
-for.body_2:
-	%i_7 = load i32, i32* @i, align 4
-	%funcCallRet_3 = call i32 @_jud$$YGHH$Z(i32 %i_7)
-	%sgt_2 = icmp sgt i32 %funcCallRet_3, 0
-	br i1 %sgt_2, label %if.then, label %if.end
+if.else_8:
+	%xor_27 = xor i32 %xor_26, -2147483648
+	%ashr_19 = ashr i32 %xor_27, 17
+	%bitwise_13 = or i32 16384, %ashr_19
+	br label %return_2_7
 
-for.end_2:
-	br label %return
+return_2_7:
+	%retval_8 = phi i32 [ %ashr_18, %if.then_8 ], [ %bitwise_13, %if.else_8 ]
+	%xor_28 = xor i32 %xor_26, %retval_8
+	%shl_21 = shl i32 %xor_28, 5
+	%xor_29 = xor i32 %xor_28, %shl_21
+	%bitwise_14 = and i32 %xor_29, 1073741823
+	%shl_2 = shl i32 %bitwise_14, 13
+	%xor_2 = xor i32 %bitwise_14, %shl_2
+	%sge = icmp sge i32 %xor_2, 0
+	br i1 %sge, label %if.then_2, label %if.else_2
 
-return:
-	ret i32 0
+if.then_2:
+	%ashr_6 = ashr i32 %xor_2, 17
+	br label %return_2
+
+if.else_2:
+	%xor_3 = xor i32 %xor_2, -2147483648
+	%ashr_7 = ashr i32 %xor_3, 17
+	%bitwise_or = or i32 16384, %ashr_7
+	br label %return_2
+
+return_2:
+	%retval_2 = phi i32 [ %ashr_6, %if.then_2 ], [ %bitwise_or, %if.else_2 ]
+	%xor_4 = xor i32 %xor_2, %retval_2
+	%shl_3 = shl i32 %xor_4, 5
+	%xor_5 = xor i32 %xor_4, %shl_3
+	%bitwise_2 = and i32 %xor_5, 1073741823
+	%shl_16 = shl i32 %bitwise_2, 13
+	%xor_22 = xor i32 %bitwise_2, %shl_16
+	%sge_6 = icmp sge i32 %xor_22, 0
+	br i1 %sge_6, label %if.then_7, label %if.else_7
+
+if.then_7:
+	%ashr_16 = ashr i32 %xor_22, 17
+	br label %return_2_6
+
+if.else_7:
+	%xor_23 = xor i32 %xor_22, -2147483648
+	%ashr_17 = ashr i32 %xor_23, 17
+	%bitwise_11 = or i32 16384, %ashr_17
+	br label %return_2_6
+
+return_2_6:
+	%retval_7 = phi i32 [ %ashr_16, %if.then_7 ], [ %bitwise_11, %if.else_7 ]
+	%xor_24 = xor i32 %xor_22, %retval_7
+	%shl_18 = shl i32 %xor_24, 5
+	%xor_25 = xor i32 %xor_24, %shl_18
+	%bitwise_12 = and i32 %xor_25, 1073741823
+	%shl_4 = shl i32 %bitwise_12, 13
+	%xor_6 = xor i32 %bitwise_12, %shl_4
+	%sge_2 = icmp sge i32 %xor_6, 0
+	br i1 %sge_2, label %if.then_3, label %if.else_3
+
+if.then_3:
+	%ashr_8 = ashr i32 %xor_6, 17
+	br label %return_2_2
+
+if.else_3:
+	%xor_7 = xor i32 %xor_6, -2147483648
+	%ashr_9 = ashr i32 %xor_7, 17
+	%bitwise_3 = or i32 16384, %ashr_9
+	br label %return_2_2
+
+return_2_2:
+	%retval_3 = phi i32 [ %ashr_8, %if.then_3 ], [ %bitwise_3, %if.else_3 ]
+	%xor_8 = xor i32 %xor_6, %retval_3
+	%shl_6 = shl i32 %xor_8, 5
+	%xor_9 = xor i32 %xor_8, %shl_6
+	%bitwise_4 = and i32 %xor_9, 1073741823
+	%shl_10 = shl i32 %bitwise_4, 13
+	%xor_14 = xor i32 %bitwise_4, %shl_10
+	%sge_4 = icmp sge i32 %xor_14, 0
+	br i1 %sge_4, label %if.then_5, label %if.else_5
+
+if.then_5:
+	%ashr_12 = ashr i32 %xor_14, 17
+	br label %return_2_4
+
+if.else_5:
+	%xor_15 = xor i32 %xor_14, -2147483648
+	%ashr_13 = ashr i32 %xor_15, 17
+	%bitwise_7 = or i32 16384, %ashr_13
+	br label %return_2_4
+
+return_2_4:
+	%retval_5 = phi i32 [ %ashr_12, %if.then_5 ], [ %bitwise_7, %if.else_5 ]
+	%xor_16 = xor i32 %xor_14, %retval_5
+	%shl_12 = shl i32 %xor_16, 5
+	%xor_17 = xor i32 %xor_16, %shl_12
+	%bitwise_8 = and i32 %xor_17, 1073741823
+	%bitwise_and_3 = and i32 %bitwise_14, 3
+	%ashr = ashr i32 %bitwise_14, 28
+	%bitwise_and_4 = and i32 %bitwise_2, 1
+	%ashr_2 = ashr i32 %bitwise_2, 29
+	%ashr_3 = ashr i32 %bitwise_12, 25
+	%bitwise_and_5 = and i32 %bitwise_12, 31
+	%ashr_4 = ashr i32 %bitwise_4, 15
+	%bitwise_and_6 = and i32 %bitwise_4, 32767
+	%ashr_5 = ashr i32 %bitwise_8, 15
+	%bitwise_and_7 = and i32 %bitwise_8, 32767
+	%funcCallRet_8 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %bitwise_and_3, i32 %ashr, i32 %bitwise_and_4, i32 %ashr_2, i32 %ashr_3, i32 %bitwise_and_5, i32 %ashr_4, i32 %bitwise_and_6, i32 %ashr_5, i32 %bitwise_and_7)
+	%xor = xor i32 %sum_4, %funcCallRet_8
+	br label %for.body
+
+if.else:
+	%sub = sub i32 %sum_4, 19
+	ret i32 %sub
+
+for.body:
+	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %return_2_4 ]
+	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %bitwise_8, %return_2_4 ]
+	%shl_13 = shl i32 %rng_seed_5, 13
+	%xor_18 = xor i32 %rng_seed_5, %shl_13
+	%sge_5 = icmp sge i32 %xor_18, 0
+	br i1 %sge_5, label %if.then_6, label %if.else_6
+
+if.then_6:
+	%ashr_14 = ashr i32 %xor_18, 17
+	br label %return_2_5
+
+if.else_6:
+	%xor_19 = xor i32 %xor_18, -2147483648
+	%ashr_15 = ashr i32 %xor_19, 17
+	%bitwise_9 = or i32 16384, %ashr_15
+	br label %return_2_5
+
+return_2_5:
+	%retval_6 = phi i32 [ %ashr_14, %if.then_6 ], [ %bitwise_9, %if.else_6 ]
+	%xor_20 = xor i32 %xor_18, %retval_6
+	%shl_15 = shl i32 %xor_20, 5
+	%xor_21 = xor i32 %xor_20, %shl_15
+	%bitwise_10 = and i32 %xor_21, 1073741823
+	%shl_7 = shl i32 %bitwise_10, 13
+	%xor_10 = xor i32 %bitwise_10, %shl_7
+	%sge_3 = icmp sge i32 %xor_10, 0
+	br i1 %sge_3, label %if.then_4, label %if.else_4
+
+if.then_4:
+	%ashr_10 = ashr i32 %xor_10, 17
+	br label %return_2_3
+
+if.else_4:
+	%xor_11 = xor i32 %xor_10, -2147483648
+	%ashr_11 = ashr i32 %xor_11, 17
+	%bitwise_5 = or i32 16384, %ashr_11
+	br label %return_2_3
+
+return_2_3:
+	%retval_4 = phi i32 [ %ashr_10, %if.then_4 ], [ %bitwise_5, %if.else_4 ]
+	%xor_12 = xor i32 %xor_10, %retval_4
+	%shl_9 = shl i32 %xor_12, 5
+	%xor_13 = xor i32 %xor_12, %shl_9
+	%bitwise_6 = and i32 %xor_13, 1073741823
+	%bitwise_and = and i32 %bitwise_10, 255
+	%bitwise_and_2 = and i32 %bitwise_6, 255
+	%ne = icmp ne i32 %bitwise_and, %bitwise_and_2
+	br i1 %ne, label %if.then, label %if.else
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)

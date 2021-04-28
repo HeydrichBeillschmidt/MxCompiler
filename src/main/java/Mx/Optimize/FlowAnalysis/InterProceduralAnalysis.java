@@ -47,11 +47,21 @@ public class InterProceduralAnalysis extends Pass {
                 callBackward.get(callee).add(f);
             }
         }
+        // compute overall callees
         ArrayList<Function> PO = getPO();
         for (var f: PO) callees.put(f, new HashSet<>(callForward.get(f)));
         for (var f: PO) {
-            for (var callee: callForward.get(f)) {
-                callees.get(f).addAll(callees.get(callee));
+            Queue<Function> W = new LinkedList<>();
+            Set<Function> fCallees = callees.get(f);
+            fCallees.forEach(W::offer);
+            while (!W.isEmpty()) {
+                Function fn = W.poll();
+                for (var callee: callees.get(fn)) {
+                    if (!fCallees.contains(callee)) {
+                        fCallees.add(callee);
+                        W.offer(callee);
+                    }
+                }
             }
         }
         return false;

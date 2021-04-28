@@ -162,7 +162,10 @@ public class Function {
             for (int i = 0, it = iList.size(); i < it; ++i) {
                 if (iList.get(i).hasDst()) {
                     F2A.put(iList.get(i).getDst(), iListCpy.get(i).getDst());
-                    caller.addSymbol(iListCpy.get(i).getDst());
+                    caller.addOriginalSymbol(iListCpy.get(i).getDst());
+                }
+                if (iList.get(i) instanceof Call) {
+                    caller.addCallSite((Call) iListCpy.get(i));
                 }
             }
         }
@@ -208,6 +211,9 @@ public class Function {
     public void setClassPtr(Register classPtr) {
         this.classPtr = classPtr;
     }
+    public void addOriginalSymbol(Register r) {
+        symbolTable.putIR(r.getOriginalName(), r);
+    }
     public void addSymbol(Object obj) {
         symbolTable.putIR(obj);
     }
@@ -233,7 +239,24 @@ public class Function {
     public ArrayList<IRBlock> getPO() {
         Set<IRBlock> visited = new HashSet<>();
         ArrayList<IRBlock> order = new ArrayList<>();
-        _dfsRecursive(entranceBlock, order, visited);
+        Stack<IRBlock> stNode = new Stack<>();
+        Stack<Boolean> stStat = new Stack<>();
+        stNode.push(entranceBlock);
+        stStat.push(false);
+        while (!stNode.isEmpty()) {
+            IRBlock block = stNode.pop();
+            boolean postVisit = stStat.pop();
+            if (postVisit) order.add(block);
+            else if (!visited.contains(block)) {
+                visited.add(block);
+                stNode.push(block);
+                stStat.push(true);
+                for (var s: block.getSuccessors()) {
+                    stNode.push(s);
+                    stStat.push(false);
+                }
+            }
+        }
         return order;
     }
     public ArrayList<IRBlock> getRPO() {
@@ -251,9 +274,28 @@ public class Function {
         }
         order.add(block);
     }
+    // post-order & reversed post-order on reversed CFG
     public ArrayList<IRBlock> getBackwardPO() {
+        Set<IRBlock> visited = new HashSet<>();
         ArrayList<IRBlock> order = new ArrayList<>();
-        _reverseDFSRecursive(returnBlock, order, new HashSet<>());
+        Stack<IRBlock> stNode = new Stack<>();
+        Stack<Boolean> stStat = new Stack<>();
+        stNode.push(returnBlock);
+        stStat.push(false);
+        while (!stNode.isEmpty()) {
+            IRBlock block = stNode.pop();
+            boolean postVisit = stStat.pop();
+            if (postVisit) order.add(block);
+            else if (!visited.contains(block)) {
+                visited.add(block);
+                stNode.push(block);
+                stStat.push(true);
+                for (var s: block.getPredecessors()) {
+                    stNode.push(s);
+                    stStat.push(false);
+                }
+            }
+        }
         return order;
     }
     public ArrayList<IRBlock> getBackwardRPO() {

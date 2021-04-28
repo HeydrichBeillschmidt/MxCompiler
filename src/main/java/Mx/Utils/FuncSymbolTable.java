@@ -21,6 +21,9 @@ public class FuncSymbolTable {
         else if (obj instanceof Parameter) name = ((Parameter)obj).getName();
         else if (obj instanceof Register) name = ((Register)obj).getName();
         else throw new RuntimeException();
+        putIR(name, obj);
+    }
+    public void putIR(String name, Object obj) {
         String objLabel = "";
         if (symbolTable.containsKey(name)) {
             ArrayList<Object> arr = symbolTable.get(name);
