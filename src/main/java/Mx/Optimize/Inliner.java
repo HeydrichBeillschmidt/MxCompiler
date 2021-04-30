@@ -93,7 +93,7 @@ public class Inliner extends Pass {
         boolean changed = false;
 
         ArrayList<Function> cPO = interProc.getPO();
-        int thresholdRecursive = 2;
+        int thresholdRecursive = 4;
         for (int i = 0; i < thresholdRecursive; ++i) {
             for (var f: cPO) {
                 ArrayList<Call> css = new ArrayList<>(f.getCallSites());
