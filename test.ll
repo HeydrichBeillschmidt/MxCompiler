@@ -1,737 +1,405 @@
-%class.Slice_int = type { i32*, i32, i32 }
+@a = global i32* null, align 4
+@.const.main.str1 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
+@.const.main.str0 = private unnamed_addr constant [2 x i8] c" \00", align 1
+@n = global i32 10000, align 4
 
-@$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0 = private unnamed_addr constant [40 x i8] c"Warning: Slice_int::slice: out of range\00", align 1
-@$const.main.str3 = private unnamed_addr constant [1 x i8] c"\00", align 1
-@$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1 = private unnamed_addr constant [46 x i8] c"Warning: Slice_int::copy: size() < arr.size()\00", align 1
-@$const.main.str2 = private unnamed_addr constant [2 x i8] c" \00", align 1
-
-define i32 @main() {
+define i32 @_qsrt$$YGHHH$Z(i32 %l, i32 %r) {
 entry:
-	%funcCallRet = call i32 @_getInt$$YGHXZ()
-	%sizeTmp = shl i32 %funcCallRet, 2
-	%size = add i32 %sizeTmp, 4
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
-	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 %funcCallRet, i32* %mallocInt32Ptr, align 4
-	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
-	br label %for.cond
+	%a = load i32*, i32** @a, align 4
+	%add = add i32 %l, %r
+	%sdiv = sdiv i32 %add, 2
+	%elementPtr = getelementptr i32, i32* %a, i32 %sdiv
+	%arrayElement = load i32, i32* %elementPtr, align 4
+	br label %while.cond
 
-for.cond:
-	%i_9 = phi i32 [ 0, %entry ], [ %prefix_inc, %for.body ]
-	%slt = icmp slt i32 %i_9, %funcCallRet
-	br i1 %slt, label %for.body, label %for.end
+while.cond:
+	%j_12 = phi i32 [ %r, %entry ], [ %j_10, %if.end ]
+	%i_12 = phi i32 [ %l, %entry ], [ %i_10, %if.end ]
+	%sle = icmp sle i32 %i_12, %j_12
+	br i1 %sle, label %while.body_3, label %while.end_3
 
-for.body:
-	%elementPtr = getelementptr i32, i32* %arrayHeadPtrUnguarded, i32 %i_9
-	%funcCallRet_2 = call i32 @_getInt$$YGHXZ()
-	store i32 %funcCallRet_2, i32* %elementPtr, align 4
-	%prefix_inc = add i32 %i_9, 1
-	br label %for.cond
-
-for.end:
-	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr = bitcast i8* %malloc_2 to %class.Slice_int*
-	%Slice_int.storage.addr_2 = bitcast %class.Slice_int* %castToClassPtr to i32**
-	store i32* %arrayHeadPtrUnguarded, i32** %Slice_int.storage.addr_2, align 4
-	%Slice_int.beg.addr = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 1
-	store i32 0, i32* %Slice_int.beg.addr, align 4
-	%Slice_int.end.addr = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 2
-	%arrayElemPtr = getelementptr i32, i32* %arrayHeadPtrUnguarded, i32 -1
-	%arraySize = load i32, i32* %arrayElemPtr, align 4
-	store i32 %arraySize, i32* %Slice_int.end.addr, align 4
-	call void @_mergeSort$$YGXUSlice_int$$$Z(%class.Slice_int* %castToClassPtr)
-	br label %for.cond_2
-
-for.cond_2:
-	%i_10 = phi i32 [ 0, %for.end ], [ %prefix_inc_2, %for.body_2 ]
-	%slt_2 = icmp slt i32 %i_10, %funcCallRet
-	br i1 %slt_2, label %for.body_2, label %for.end_2
-
-for.body_2:
-	%elementPtr_2 = getelementptr i32, i32* %arrayHeadPtrUnguarded, i32 %i_10
+while.cond_2:
+	%i_11 = phi i32 [ %i_12, %while.body_3 ], [ %postfix_inc, %while.body ]
+	%a_2 = load i32*, i32** @a, align 4
+	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %i_11
 	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%funcCallRet_3 = call i8* @_toString$$YGPADH$Z(i32 %arrayElement_2)
-	%$const.main.str2 = getelementptr [2 x i8], [2 x i8]* @$const.main.str2, i32 0, i32 0
-	%add = call i8* @_strcat$$YGPADPADPAD$Z(i8* %funcCallRet_3, i8* %$const.main.str2)
-	call void @_print$$YGXPAD$Z(i8* %add)
-	%prefix_inc_2 = add i32 %i_10, 1
-	br label %for.cond_2
+	%slt = icmp slt i32 %arrayElement_2, %arrayElement
+	br i1 %slt, label %while.body, label %while.end
 
-for.end_2:
-	%$const.main.str3 = getelementptr [1 x i8], [1 x i8]* @$const.main.str3, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const.main.str3)
-	ret i32 0
-}
+while.body:
+	%postfix_inc = add i32 %i_11, 1
+	br label %while.cond_2
 
-define i32* @_merge$$YGPAHUSlice_int$$USlice_int$$$Z(%class.Slice_int* %l, %class.Slice_int* %r) {
-entry:
-	%Slice_int.end.addr = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 2
-	%Slice_int.end = load i32, i32* %Slice_int.end.addr, align 4
-	%Slice_int.beg.addr = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg = load i32, i32* %Slice_int.beg.addr, align 4
-	%sub = sub i32 %Slice_int.end, %Slice_int.beg
-	%eq = icmp eq i32 %sub, 0
-	br i1 %eq, label %if.then, label %if.end
+while.end:
+	br label %while.cond_3
+
+while.cond_3:
+	%j_11 = phi i32 [ %j_12, %while.end ], [ %postfix_dec, %while.body_2 ]
+	%a_3 = load i32*, i32** @a, align 4
+	%elementPtr_3 = getelementptr i32, i32* %a_3, i32 %j_11
+	%arrayElement_3 = load i32, i32* %elementPtr_3, align 4
+	%sgt = icmp sgt i32 %arrayElement_3, %arrayElement
+	br i1 %sgt, label %while.body_2, label %while.end_2
+
+while.body_2:
+	%postfix_dec = sub i32 %j_11, 1
+	br label %while.cond_3
+
+while.end_2:
+	%sle_2 = icmp sle i32 %i_11, %j_11
+	br i1 %sle_2, label %if.then, label %if.end
 
 if.then:
-	%Slice_int.end.addr_2 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 2
-	%Slice_int.end_2 = load i32, i32* %Slice_int.end.addr_2, align 4
-	%Slice_int.beg.addr_2 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_2 = load i32, i32* %Slice_int.beg.addr_2, align 4
-	%sub_2 = sub i32 %Slice_int.end_2, %Slice_int.beg_2
-	%sizeTmp_2 = shl i32 %sub_2, 2
-	%size_2 = add i32 %sizeTmp_2, 4
-	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 %size_2)
-	%mallocInt32Ptr_2 = bitcast i8* %malloc_2 to i32*
-	store i32 %sub_2, i32* %mallocInt32Ptr_2, align 4
-	%arrayHeadPtrUnguarded_2 = getelementptr i32, i32* %mallocInt32Ptr_2, i32 1
-	br label %for.cond
-
-for.cond:
-	%i = phi i32 [ 0, %if.then ], [ %prefix_inc, %for.body ]
-	%Slice_int.end.addr_3 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 2
-	%Slice_int.end_3 = load i32, i32* %Slice_int.end.addr_3, align 4
-	%Slice_int.beg.addr_3 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_3 = load i32, i32* %Slice_int.beg.addr_3, align 4
-	%sub_3 = sub i32 %Slice_int.end_3, %Slice_int.beg_3
-	%slt_2 = icmp slt i32 %i, %sub_3
-	br i1 %slt_2, label %for.body, label %for.end
-
-for.body:
-	%elementPtr_3 = getelementptr i32, i32* %arrayHeadPtrUnguarded_2, i32 %i
-	%Slice_int.storage.addr_23 = bitcast %class.Slice_int* %r to i32**
-	%Slice_int.storage = load i32*, i32** %Slice_int.storage.addr_23, align 4
-	%Slice_int.beg.addr_4 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_4 = load i32, i32* %Slice_int.beg.addr_4, align 4
-	%add_2 = add i32 %Slice_int.beg_4, %i
-	%elementPtr_4 = getelementptr i32, i32* %Slice_int.storage, i32 %add_2
-	%arrayElement_3 = load i32, i32* %elementPtr_4, align 4
-	store i32 %arrayElement_3, i32* %elementPtr_3, align 4
-	%prefix_inc = add i32 %i, 1
-	br label %for.cond
-
-for.end:
-	br label %return
+	%a_4 = load i32*, i32** @a, align 4
+	%elementPtr_4 = getelementptr i32, i32* %a_4, i32 %i_11
+	%arrayElement_4 = load i32, i32* %elementPtr_4, align 4
+	%a_5 = load i32*, i32** @a, align 4
+	%elementPtr_5 = getelementptr i32, i32* %a_5, i32 %i_11
+	%a_6 = load i32*, i32** @a, align 4
+	%elementPtr_6 = getelementptr i32, i32* %a_6, i32 %j_11
+	%arrayElement_6 = load i32, i32* %elementPtr_6, align 4
+	store i32 %arrayElement_6, i32* %elementPtr_5, align 4
+	%a_7 = load i32*, i32** @a, align 4
+	%elementPtr_7 = getelementptr i32, i32* %a_7, i32 %j_11
+	store i32 %arrayElement_4, i32* %elementPtr_7, align 4
+	%postfix_inc_2 = add i32 %i_11, 1
+	%postfix_dec_2 = sub i32 %j_11, 1
+	br label %if.end
 
 if.end:
-	%Slice_int.end.addr_4 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 2
-	%Slice_int.end_4 = load i32, i32* %Slice_int.end.addr_4, align 4
-	%Slice_int.beg.addr_5 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_5 = load i32, i32* %Slice_int.beg.addr_5, align 4
-	%sub_4 = sub i32 %Slice_int.end_4, %Slice_int.beg_5
-	%eq_2 = icmp eq i32 %sub_4, 0
-	br i1 %eq_2, label %if.then_2, label %if.end_2
+	%j_10 = phi i32 [ %postfix_dec_2, %if.then ], [ %j_11, %while.end_2 ]
+	%i_10 = phi i32 [ %postfix_inc_2, %if.then ], [ %i_11, %while.end_2 ]
+	br label %while.cond
+
+while.body_3:
+	br label %while.cond_2
+
+while.end_3:
+	%slt_2 = icmp slt i32 %l, %j_12
+	br i1 %slt_2, label %if.then_2, label %if.end_2
 
 if.then_2:
-	%Slice_int.end.addr_5 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 2
-	%Slice_int.end_5 = load i32, i32* %Slice_int.end.addr_5, align 4
-	%Slice_int.beg.addr_6 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_6 = load i32, i32* %Slice_int.beg.addr_6, align 4
-	%sub_5 = sub i32 %Slice_int.end_5, %Slice_int.beg_6
-	%sizeTmp_3 = shl i32 %sub_5, 2
-	%size_3 = add i32 %sizeTmp_3, 4
-	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 %size_3)
-	%mallocInt32Ptr_3 = bitcast i8* %malloc_3 to i32*
-	store i32 %sub_5, i32* %mallocInt32Ptr_3, align 4
-	%arrayHeadPtrUnguarded_3 = getelementptr i32, i32* %mallocInt32Ptr_3, i32 1
-	br label %for.cond_2
+	%a_8 = load i32*, i32** @a, align 4
+	%add_2 = add i32 %l, %j_12
+	%sdiv_2 = sdiv i32 %add_2, 2
+	%elementPtr_8 = getelementptr i32, i32* %a_8, i32 %sdiv_2
+	%arrayElement_8 = load i32, i32* %elementPtr_8, align 4
+	br label %while.cond_4
 
-for.cond_2:
-	%i_2 = phi i32 [ 0, %if.then_2 ], [ %prefix_inc_2, %for.body_2 ]
-	%Slice_int.end.addr_6 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 2
-	%Slice_int.end_6 = load i32, i32* %Slice_int.end.addr_6, align 4
-	%Slice_int.beg.addr_7 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_7 = load i32, i32* %Slice_int.beg.addr_7, align 4
-	%sub_6 = sub i32 %Slice_int.end_6, %Slice_int.beg_7
-	%slt_3 = icmp slt i32 %i_2, %sub_6
-	br i1 %slt_3, label %for.body_2, label %for.end_2
+while.cond_4:
+	%j_13 = phi i32 [ %j_12, %if.then_2 ], [ %j_15, %if.end_4 ]
+	%i_13 = phi i32 [ %l, %if.then_2 ], [ %i_15, %if.end_4 ]
+	%sle_3 = icmp sle i32 %i_13, %j_13
+	br i1 %sle_3, label %while.body_4, label %while.end_6
 
-for.body_2:
-	%elementPtr_5 = getelementptr i32, i32* %arrayHeadPtrUnguarded_3, i32 %i_2
-	%Slice_int.storage.addr_24 = bitcast %class.Slice_int* %l to i32**
-	%Slice_int.storage_2 = load i32*, i32** %Slice_int.storage.addr_24, align 4
-	%Slice_int.beg.addr_8 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_8 = load i32, i32* %Slice_int.beg.addr_8, align 4
-	%add_3 = add i32 %Slice_int.beg_8, %i_2
-	%elementPtr_6 = getelementptr i32, i32* %Slice_int.storage_2, i32 %add_3
-	%arrayElement_4 = load i32, i32* %elementPtr_6, align 4
-	store i32 %arrayElement_4, i32* %elementPtr_5, align 4
-	%prefix_inc_2 = add i32 %i_2, 1
-	br label %for.cond_2
+while.body_4:
+	br label %while.cond_5
 
-for.end_2:
-	br label %return
+while.cond_5:
+	%i_14 = phi i32 [ %i_13, %while.body_4 ], [ %postfix_inc_3, %while.body_5 ]
+	%a_9 = load i32*, i32** @a, align 4
+	%elementPtr_9 = getelementptr i32, i32* %a_9, i32 %i_14
+	%arrayElement_9 = load i32, i32* %elementPtr_9, align 4
+	%slt_4 = icmp slt i32 %arrayElement_9, %arrayElement_8
+	br i1 %slt_4, label %while.body_5, label %while.end_4
 
-if.end_2:
-	%Slice_int.end.addr_7 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 2
-	%Slice_int.end_7 = load i32, i32* %Slice_int.end.addr_7, align 4
-	%Slice_int.beg.addr_9 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_9 = load i32, i32* %Slice_int.beg.addr_9, align 4
-	%sub_7 = sub i32 %Slice_int.end_7, %Slice_int.beg_9
-	%Slice_int.end.addr_8 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 2
-	%Slice_int.end_8 = load i32, i32* %Slice_int.end.addr_8, align 4
-	%Slice_int.beg.addr_10 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_10 = load i32, i32* %Slice_int.beg.addr_10, align 4
-	%sub_8 = sub i32 %Slice_int.end_8, %Slice_int.beg_10
-	%add = add i32 %sub_7, %sub_8
-	%sizeTmp = shl i32 %add, 2
-	%size = add i32 %sizeTmp, 4
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
-	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 %add, i32* %mallocInt32Ptr, align 4
-	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
-	%malloc_4 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr = bitcast i8* %malloc_4 to %class.Slice_int*
-	%Slice_int.storage.addr_25 = bitcast %class.Slice_int* %castToClassPtr to i32**
-	store i32* %arrayHeadPtrUnguarded, i32** %Slice_int.storage.addr_25, align 4
-	%Slice_int.beg.addr_11 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 1
-	store i32 0, i32* %Slice_int.beg.addr_11, align 4
-	%Slice_int.end.addr_9 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 2
-	%arrayElemPtr = getelementptr i32, i32* %arrayHeadPtrUnguarded, i32 -1
-	%arraySize = load i32, i32* %arrayElemPtr, align 4
-	store i32 %arraySize, i32* %Slice_int.end.addr_9, align 4
-	%Slice_int.end_9 = load i32, i32* %Slice_int.end.addr_9, align 4
-	%Slice_int.beg_11 = load i32, i32* %Slice_int.beg.addr_11, align 4
-	%sub_9 = sub i32 %Slice_int.end_9, %Slice_int.beg_11
-	%malloc_5 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_2 = bitcast i8* %malloc_5 to %class.Slice_int*
-	%Slice_int.storage.addr_26 = bitcast %class.Slice_int* %castToClassPtr_2 to i32**
-	%Slice_int.storage_3 = load i32*, i32** %Slice_int.storage.addr_25, align 4
-	store i32* %Slice_int.storage_3, i32** %Slice_int.storage.addr_26, align 4
-	%Slice_int.beg.addr_13 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg_12 = load i32, i32* %Slice_int.beg.addr_11, align 4
-	%add_4 = add i32 %Slice_int.beg_12, 1
-	store i32 %add_4, i32* %Slice_int.beg.addr_13, align 4
-	%Slice_int.end.addr_11 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.beg_13 = load i32, i32* %Slice_int.beg.addr_11, align 4
-	%add_5 = add i32 %Slice_int.beg_13, %sub_9
-	store i32 %add_5, i32* %Slice_int.end.addr_11, align 4
-	%Slice_int.beg_14 = load i32, i32* %Slice_int.beg.addr_13, align 4
-	%Slice_int.storage_4 = load i32*, i32** %Slice_int.storage.addr_25, align 4
-	%arrayElemPtr_2 = getelementptr i32, i32* %Slice_int.storage_4, i32 -1
-	%arraySize_2 = load i32, i32* %arrayElemPtr_2, align 4
-	%sgt = icmp sgt i32 %Slice_int.beg_14, %arraySize_2
-	br i1 %sgt, label %logical_or_end, label %logical_or_branch
+while.body_5:
+	%postfix_inc_3 = add i32 %i_14, 1
+	br label %while.cond_5
 
-logical_or_branch:
-	%Slice_int.end.addr_12 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.end_10 = load i32, i32* %Slice_int.end.addr_12, align 4
-	%Slice_int.storage.addr_28 = bitcast %class.Slice_int* %castToClassPtr to i32**
-	%Slice_int.storage_5 = load i32*, i32** %Slice_int.storage.addr_28, align 4
-	%arrayElemPtr_3 = getelementptr i32, i32* %Slice_int.storage_5, i32 -1
-	%arraySize_3 = load i32, i32* %arrayElemPtr_3, align 4
-	%sgt_2 = icmp sgt i32 %Slice_int.end_10, %arraySize_3
-	br label %logical_or_end
+while.end_4:
+	br label %while.cond_6
 
-logical_or_end:
-	%logicalOr = phi i1 [ 1, %if.end_2 ], [ %sgt_2, %logical_or_branch ]
-	br i1 %logicalOr, label %if.then_4, label %if.end_4
+while.cond_6:
+	%j_14 = phi i32 [ %j_13, %while.end_4 ], [ %postfix_dec_3, %while.body_6 ]
+	%a_10 = load i32*, i32** @a, align 4
+	%elementPtr_10 = getelementptr i32, i32* %a_10, i32 %j_14
+	%arrayElement_10 = load i32, i32* %elementPtr_10, align 4
+	%sgt_2 = icmp sgt i32 %arrayElement_10, %arrayElement_8
+	br i1 %sgt_2, label %while.body_6, label %while.end_5
+
+while.body_6:
+	%postfix_dec_3 = sub i32 %j_14, 1
+	br label %while.cond_6
+
+while.end_5:
+	%sle_4 = icmp sle i32 %i_14, %j_14
+	br i1 %sle_4, label %if.then_4, label %if.end_4
 
 if.then_4:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0)
+	%a_11 = load i32*, i32** @a, align 4
+	%elementPtr_11 = getelementptr i32, i32* %a_11, i32 %i_14
+	%arrayElement_11 = load i32, i32* %elementPtr_11, align 4
+	%a_12 = load i32*, i32** @a, align 4
+	%elementPtr_12 = getelementptr i32, i32* %a_12, i32 %i_14
+	%a_13 = load i32*, i32** @a, align 4
+	%elementPtr_13 = getelementptr i32, i32* %a_13, i32 %j_14
+	%arrayElement_12 = load i32, i32* %elementPtr_13, align 4
+	store i32 %arrayElement_12, i32* %elementPtr_12, align 4
+	%a_14 = load i32*, i32** @a, align 4
+	%elementPtr_14 = getelementptr i32, i32* %a_14, i32 %j_14
+	store i32 %arrayElement_11, i32* %elementPtr_14, align 4
+	%postfix_inc_4 = add i32 %i_14, 1
+	%postfix_dec_4 = sub i32 %j_14, 1
 	br label %if.end_4
 
 if.end_4:
-	%Slice_int.storage.addr_29 = bitcast %class.Slice_int* %l to i32**
-	%Slice_int.storage_6 = load i32*, i32** %Slice_int.storage.addr_29, align 4
-	%Slice_int.beg.addr_15 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_15 = load i32, i32* %Slice_int.beg.addr_15, align 4
-	%elementPtr_7 = getelementptr i32, i32* %Slice_int.storage_6, i32 %Slice_int.beg_15
-	%arrayElement_5 = load i32, i32* %elementPtr_7, align 4
-	%Slice_int.storage.addr_30 = bitcast %class.Slice_int* %r to i32**
-	%Slice_int.storage_7 = load i32*, i32** %Slice_int.storage.addr_30, align 4
-	%Slice_int.beg.addr_16 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_16 = load i32, i32* %Slice_int.beg.addr_16, align 4
-	%elementPtr_8 = getelementptr i32, i32* %Slice_int.storage_7, i32 %Slice_int.beg_16
-	%arrayElement_6 = load i32, i32* %elementPtr_8, align 4
-	%slt = icmp slt i32 %arrayElement_5, %arrayElement_6
-	br i1 %slt, label %if.then_3, label %if.else
+	%j_15 = phi i32 [ %postfix_dec_4, %if.then_4 ], [ %j_14, %while.end_5 ]
+	%i_15 = phi i32 [ %postfix_inc_4, %if.then_4 ], [ %i_14, %while.end_5 ]
+	br label %while.cond_4
 
-if.then_3:
-	%Slice_int.storage.addr_31 = bitcast %class.Slice_int* %l to i32**
-	%Slice_int.storage_8 = load i32*, i32** %Slice_int.storage.addr_31, align 4
-	%Slice_int.beg.addr_17 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 1
-	%Slice_int.beg_17 = load i32, i32* %Slice_int.beg.addr_17, align 4
-	%elementPtr_9 = getelementptr i32, i32* %Slice_int.storage_8, i32 %Slice_int.beg_17
-	%arrayElement_7 = load i32, i32* %elementPtr_9, align 4
-	store i32 %arrayElement_7, i32* %arrayHeadPtrUnguarded, align 4
-	%Slice_int.end.addr_13 = getelementptr %class.Slice_int, %class.Slice_int* %l, i32 0, i32 2
-	%Slice_int.end_11 = load i32, i32* %Slice_int.end.addr_13, align 4
-	%Slice_int.beg_18 = load i32, i32* %Slice_int.beg.addr_17, align 4
-	%sub_10 = sub i32 %Slice_int.end_11, %Slice_int.beg_18
-	%malloc_6 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_3 = bitcast i8* %malloc_6 to %class.Slice_int*
-	%Slice_int.storage.addr_32 = bitcast %class.Slice_int* %castToClassPtr_3 to i32**
-	%Slice_int.storage_9 = load i32*, i32** %Slice_int.storage.addr_31, align 4
-	store i32* %Slice_int.storage_9, i32** %Slice_int.storage.addr_32, align 4
-	%Slice_int.beg.addr_19 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 1
-	%Slice_int.beg_19 = load i32, i32* %Slice_int.beg.addr_17, align 4
-	%add_9 = add i32 %Slice_int.beg_19, 1
-	store i32 %add_9, i32* %Slice_int.beg.addr_19, align 4
-	%Slice_int.end.addr_14 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 2
-	%Slice_int.beg_20 = load i32, i32* %Slice_int.beg.addr_17, align 4
-	%add_10 = add i32 %Slice_int.beg_20, %sub_10
-	store i32 %add_10, i32* %Slice_int.end.addr_14, align 4
-	%Slice_int.beg_21 = load i32, i32* %Slice_int.beg.addr_19, align 4
-	%Slice_int.storage_10 = load i32*, i32** %Slice_int.storage.addr_31, align 4
-	%arrayElemPtr_4 = getelementptr i32, i32* %Slice_int.storage_10, i32 -1
-	%arraySize_4 = load i32, i32* %arrayElemPtr_4, align 4
-	%sgt_3 = icmp sgt i32 %Slice_int.beg_21, %arraySize_4
-	br i1 %sgt_3, label %logical_or_end_2, label %logical_or_branch_2
-
-logical_or_branch_2:
-	%Slice_int.end.addr_15 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 2
-	%Slice_int.end_12 = load i32, i32* %Slice_int.end.addr_15, align 4
-	%Slice_int.storage.addr_34 = bitcast %class.Slice_int* %l to i32**
-	%Slice_int.storage_11 = load i32*, i32** %Slice_int.storage.addr_34, align 4
-	%arrayElemPtr_5 = getelementptr i32, i32* %Slice_int.storage_11, i32 -1
-	%arraySize_5 = load i32, i32* %arrayElemPtr_5, align 4
-	%sgt_4 = icmp sgt i32 %Slice_int.end_12, %arraySize_5
-	br label %logical_or_end_2
-
-logical_or_end_2:
-	%logicalOr_2 = phi i1 [ 1, %if.then_3 ], [ %sgt_4, %logical_or_branch_2 ]
-	br i1 %logicalOr_2, label %if.then_5, label %if.end_5
+while.end_6:
+	%slt_5 = icmp slt i32 %l, %j_13
+	br i1 %slt_5, label %if.then_5, label %if.end_5
 
 if.then_5:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_2 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_2)
+	%funcCallRet_3 = call i32 @_qsrt$$YGHHH$Z(i32 %l, i32 %j_13)
 	br label %if.end_5
 
 if.end_5:
-	%funcCallRet_13 = call i32* @_merge$$YGPAHUSlice_int$$USlice_int$$$Z(%class.Slice_int* %castToClassPtr_3, %class.Slice_int* %r)
-	%malloc_7 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_4 = bitcast i8* %malloc_7 to %class.Slice_int*
-	%Slice_int.storage.addr_35 = bitcast %class.Slice_int* %castToClassPtr_4 to i32**
-	store i32* %funcCallRet_13, i32** %Slice_int.storage.addr_35, align 4
-	%Slice_int.beg.addr_21 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 1
-	store i32 0, i32* %Slice_int.beg.addr_21, align 4
-	%Slice_int.end.addr_16 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 2
-	%arrayElemPtr_6 = getelementptr i32, i32* %funcCallRet_13, i32 -1
-	%arraySize_6 = load i32, i32* %arrayElemPtr_6, align 4
-	store i32 %arraySize_6, i32* %Slice_int.end.addr_16, align 4
-	%Slice_int.end.addr_17 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.end_13 = load i32, i32* %Slice_int.end.addr_17, align 4
-	%Slice_int.beg.addr_22 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg_22 = load i32, i32* %Slice_int.beg.addr_22, align 4
-	%sub_11 = sub i32 %Slice_int.end_13, %Slice_int.beg_22
-	%Slice_int.end_14 = load i32, i32* %Slice_int.end.addr_16, align 4
-	%Slice_int.beg_23 = load i32, i32* %Slice_int.beg.addr_21, align 4
-	%sub_12 = sub i32 %Slice_int.end_14, %Slice_int.beg_23
-	%slt_4 = icmp slt i32 %sub_11, %sub_12
-	br i1 %slt_4, label %if.then_6, label %if.end_6
+	%slt_6 = icmp slt i32 %i_13, %j_12
+	br i1 %slt_6, label %if.then_6, label %if.end_6
 
 if.then_6:
-	%$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1 = getelementptr [46 x i8], [46 x i8]* @$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1)
+	%funcCallRet_4 = call i32 @_qsrt$$YGHHH$Z(i32 %i_13, i32 %j_12)
 	br label %if.end_6
 
 if.end_6:
-	br label %for.cond_3
-
-for.cond_3:
-	%i_3 = phi i32 [ 0, %if.end_6 ], [ %prefix_inc_3, %for.body_3 ]
-	%Slice_int.end.addr_19 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 2
-	%Slice_int.end_15 = load i32, i32* %Slice_int.end.addr_19, align 4
-	%Slice_int.beg.addr_24 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 1
-	%Slice_int.beg_24 = load i32, i32* %Slice_int.beg.addr_24, align 4
-	%sub_13 = sub i32 %Slice_int.end_15, %Slice_int.beg_24
-	%slt_5 = icmp slt i32 %i_3, %sub_13
-	br i1 %slt_5, label %for.body_3, label %for.end_3
-
-for.body_3:
-	%Slice_int.storage.addr_36 = bitcast %class.Slice_int* %castToClassPtr_2 to i32**
-	%Slice_int.storage_12 = load i32*, i32** %Slice_int.storage.addr_36, align 4
-	%Slice_int.beg.addr_25 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg_25 = load i32, i32* %Slice_int.beg.addr_25, align 4
-	%add_11 = add i32 %Slice_int.beg_25, %i_3
-	%elementPtr_10 = getelementptr i32, i32* %Slice_int.storage_12, i32 %add_11
-	%Slice_int.storage.addr_37 = bitcast %class.Slice_int* %castToClassPtr_4 to i32**
-	%Slice_int.storage_13 = load i32*, i32** %Slice_int.storage.addr_37, align 4
-	%Slice_int.beg.addr_26 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 1
-	%Slice_int.beg_26 = load i32, i32* %Slice_int.beg.addr_26, align 4
-	%add_12 = add i32 %Slice_int.beg_26, %i_3
-	%elementPtr_11 = getelementptr i32, i32* %Slice_int.storage_13, i32 %add_12
-	%arrayElement_8 = load i32, i32* %elementPtr_11, align 4
-	store i32 %arrayElement_8, i32* %elementPtr_10, align 4
-	%prefix_inc_3 = add i32 %i_3, 1
-	br label %for.cond_3
-
-for.end_3:
-	br label %if.end_3
-
-if.else:
-	%Slice_int.storage.addr_38 = bitcast %class.Slice_int* %r to i32**
-	%Slice_int.storage_14 = load i32*, i32** %Slice_int.storage.addr_38, align 4
-	%Slice_int.beg.addr_27 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 1
-	%Slice_int.beg_27 = load i32, i32* %Slice_int.beg.addr_27, align 4
-	%elementPtr_12 = getelementptr i32, i32* %Slice_int.storage_14, i32 %Slice_int.beg_27
-	%arrayElement_9 = load i32, i32* %elementPtr_12, align 4
-	store i32 %arrayElement_9, i32* %arrayHeadPtrUnguarded, align 4
-	%Slice_int.end.addr_20 = getelementptr %class.Slice_int, %class.Slice_int* %r, i32 0, i32 2
-	%Slice_int.end_16 = load i32, i32* %Slice_int.end.addr_20, align 4
-	%Slice_int.beg_28 = load i32, i32* %Slice_int.beg.addr_27, align 4
-	%sub_14 = sub i32 %Slice_int.end_16, %Slice_int.beg_28
-	%malloc_8 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_5 = bitcast i8* %malloc_8 to %class.Slice_int*
-	%Slice_int.storage.addr_39 = bitcast %class.Slice_int* %castToClassPtr_5 to i32**
-	%Slice_int.storage_15 = load i32*, i32** %Slice_int.storage.addr_38, align 4
-	store i32* %Slice_int.storage_15, i32** %Slice_int.storage.addr_39, align 4
-	%Slice_int.beg.addr_29 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 1
-	%Slice_int.beg_29 = load i32, i32* %Slice_int.beg.addr_27, align 4
-	%add_14 = add i32 %Slice_int.beg_29, 1
-	store i32 %add_14, i32* %Slice_int.beg.addr_29, align 4
-	%Slice_int.end.addr_21 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 2
-	%Slice_int.beg_30 = load i32, i32* %Slice_int.beg.addr_27, align 4
-	%add_15 = add i32 %Slice_int.beg_30, %sub_14
-	store i32 %add_15, i32* %Slice_int.end.addr_21, align 4
-	%Slice_int.beg_31 = load i32, i32* %Slice_int.beg.addr_29, align 4
-	%Slice_int.storage_16 = load i32*, i32** %Slice_int.storage.addr_38, align 4
-	%arrayElemPtr_7 = getelementptr i32, i32* %Slice_int.storage_16, i32 -1
-	%arraySize_7 = load i32, i32* %arrayElemPtr_7, align 4
-	%sgt_5 = icmp sgt i32 %Slice_int.beg_31, %arraySize_7
-	br i1 %sgt_5, label %logical_or_end_3, label %logical_or_branch_3
-
-logical_or_branch_3:
-	%Slice_int.end.addr_22 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 2
-	%Slice_int.end_17 = load i32, i32* %Slice_int.end.addr_22, align 4
-	%Slice_int.storage.addr_41 = bitcast %class.Slice_int* %r to i32**
-	%Slice_int.storage_17 = load i32*, i32** %Slice_int.storage.addr_41, align 4
-	%arrayElemPtr_8 = getelementptr i32, i32* %Slice_int.storage_17, i32 -1
-	%arraySize_8 = load i32, i32* %arrayElemPtr_8, align 4
-	%sgt_6 = icmp sgt i32 %Slice_int.end_17, %arraySize_8
-	br label %logical_or_end_3
-
-logical_or_end_3:
-	%logicalOr_3 = phi i1 [ 1, %if.else ], [ %sgt_6, %logical_or_branch_3 ]
-	br i1 %logicalOr_3, label %if.then_7, label %if.end_7
-
-if.then_7:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_3 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_3)
-	br label %if.end_7
-
-if.end_7:
-	%funcCallRet_17 = call i32* @_merge$$YGPAHUSlice_int$$USlice_int$$$Z(%class.Slice_int* %l, %class.Slice_int* %castToClassPtr_5)
-	%malloc_9 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_6 = bitcast i8* %malloc_9 to %class.Slice_int*
-	%Slice_int.storage.addr_42 = bitcast %class.Slice_int* %castToClassPtr_6 to i32**
-	store i32* %funcCallRet_17, i32** %Slice_int.storage.addr_42, align 4
-	%Slice_int.beg.addr_31 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_6, i32 0, i32 1
-	store i32 0, i32* %Slice_int.beg.addr_31, align 4
-	%Slice_int.end.addr_23 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_6, i32 0, i32 2
-	%arrayElemPtr_9 = getelementptr i32, i32* %funcCallRet_17, i32 -1
-	%arraySize_9 = load i32, i32* %arrayElemPtr_9, align 4
-	store i32 %arraySize_9, i32* %Slice_int.end.addr_23, align 4
-	%Slice_int.end.addr_24 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.end_18 = load i32, i32* %Slice_int.end.addr_24, align 4
-	%Slice_int.beg.addr_32 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg_32 = load i32, i32* %Slice_int.beg.addr_32, align 4
-	%sub_15 = sub i32 %Slice_int.end_18, %Slice_int.beg_32
-	%Slice_int.end_19 = load i32, i32* %Slice_int.end.addr_23, align 4
-	%Slice_int.beg_33 = load i32, i32* %Slice_int.beg.addr_31, align 4
-	%sub_16 = sub i32 %Slice_int.end_19, %Slice_int.beg_33
-	%slt_6 = icmp slt i32 %sub_15, %sub_16
-	br i1 %slt_6, label %if.then_8, label %if.end_8
-
-if.then_8:
-	%$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1_2 = getelementptr [46 x i8], [46 x i8]* @$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1_2)
-	br label %if.end_8
-
-if.end_8:
-	br label %for.cond_4
-
-for.cond_4:
-	%i_4 = phi i32 [ 0, %if.end_8 ], [ %prefix_inc_4, %for.body_4 ]
-	%Slice_int.end.addr_26 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_6, i32 0, i32 2
-	%Slice_int.end_20 = load i32, i32* %Slice_int.end.addr_26, align 4
-	%Slice_int.beg.addr_34 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_6, i32 0, i32 1
-	%Slice_int.beg_34 = load i32, i32* %Slice_int.beg.addr_34, align 4
-	%sub_17 = sub i32 %Slice_int.end_20, %Slice_int.beg_34
-	%slt_7 = icmp slt i32 %i_4, %sub_17
-	br i1 %slt_7, label %for.body_4, label %for.end_4
-
-for.body_4:
-	%Slice_int.storage.addr_43 = bitcast %class.Slice_int* %castToClassPtr_2 to i32**
-	%Slice_int.storage_18 = load i32*, i32** %Slice_int.storage.addr_43, align 4
-	%Slice_int.beg.addr_35 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg_35 = load i32, i32* %Slice_int.beg.addr_35, align 4
-	%add_16 = add i32 %Slice_int.beg_35, %i_4
-	%elementPtr_13 = getelementptr i32, i32* %Slice_int.storage_18, i32 %add_16
-	%Slice_int.storage.addr_44 = bitcast %class.Slice_int* %castToClassPtr_6 to i32**
-	%Slice_int.storage_19 = load i32*, i32** %Slice_int.storage.addr_44, align 4
-	%Slice_int.beg.addr_36 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_6, i32 0, i32 1
-	%Slice_int.beg_36 = load i32, i32* %Slice_int.beg.addr_36, align 4
-	%add_17 = add i32 %Slice_int.beg_36, %i_4
-	%elementPtr_14 = getelementptr i32, i32* %Slice_int.storage_19, i32 %add_17
-	%arrayElement_10 = load i32, i32* %elementPtr_14, align 4
-	store i32 %arrayElement_10, i32* %elementPtr_13, align 4
-	%prefix_inc_4 = add i32 %i_4, 1
-	br label %for.cond_4
-
-for.end_4:
-	br label %if.end_3
-
-if.end_3:
-	br label %return
-
-return:
-	%retval_2 = phi i32* [ %arrayHeadPtrUnguarded_2, %for.end ], [ %arrayHeadPtrUnguarded_3, %for.end_2 ], [ %arrayHeadPtrUnguarded, %if.end_3 ]
-	ret i32* %retval_2
-}
-
-define void @_mergeSort$$YGXUSlice_int$$$Z(%class.Slice_int* %a) {
-entry:
-	%Slice_int.end.addr = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 2
-	%Slice_int.end = load i32, i32* %Slice_int.end.addr, align 4
-	%Slice_int.beg.addr = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg = load i32, i32* %Slice_int.beg.addr, align 4
-	%sub = sub i32 %Slice_int.end, %Slice_int.beg
-	%eq = icmp eq i32 %sub, 1
-	br i1 %eq, label %if.then, label %if.end
-
-if.then:
-	br label %return
-
-if.end:
-	%Slice_int.end.addr_2 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 2
-	%Slice_int.end_2 = load i32, i32* %Slice_int.end.addr_2, align 4
-	%Slice_int.beg.addr_2 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_2 = load i32, i32* %Slice_int.beg.addr_2, align 4
-	%sub_2 = sub i32 %Slice_int.end_2, %Slice_int.beg_2
-	%sdiv = sdiv i32 %sub_2, 2
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr = bitcast i8* %malloc to %class.Slice_int*
-	%Slice_int.storage.addr_16 = bitcast %class.Slice_int* %castToClassPtr to i32**
-	%Slice_int.storage.addr_17 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage = load i32*, i32** %Slice_int.storage.addr_17, align 4
-	store i32* %Slice_int.storage, i32** %Slice_int.storage.addr_16, align 4
-	%Slice_int.beg.addr_3 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 1
-	%Slice_int.beg_3 = load i32, i32* %Slice_int.beg.addr_2, align 4
-	store i32 %Slice_int.beg_3, i32* %Slice_int.beg.addr_3, align 4
-	%Slice_int.end.addr_3 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 2
-	%Slice_int.beg_4 = load i32, i32* %Slice_int.beg.addr_2, align 4
-	%add_2 = add i32 %Slice_int.beg_4, %sdiv
-	store i32 %add_2, i32* %Slice_int.end.addr_3, align 4
-	%Slice_int.beg_5 = load i32, i32* %Slice_int.beg.addr_3, align 4
-	%Slice_int.storage_2 = load i32*, i32** %Slice_int.storage.addr_17, align 4
-	%arrayElemPtr = getelementptr i32, i32* %Slice_int.storage_2, i32 -1
-	%arraySize = load i32, i32* %arrayElemPtr, align 4
-	%sgt = icmp sgt i32 %Slice_int.beg_5, %arraySize
-	br i1 %sgt, label %logical_or_end, label %logical_or_branch
-
-logical_or_branch:
-	%Slice_int.end.addr_4 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr, i32 0, i32 2
-	%Slice_int.end_3 = load i32, i32* %Slice_int.end.addr_4, align 4
-	%Slice_int.storage.addr_18 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_3 = load i32*, i32** %Slice_int.storage.addr_18, align 4
-	%arrayElemPtr_2 = getelementptr i32, i32* %Slice_int.storage_3, i32 -1
-	%arraySize_2 = load i32, i32* %arrayElemPtr_2, align 4
-	%sgt_2 = icmp sgt i32 %Slice_int.end_3, %arraySize_2
-	br label %logical_or_end
-
-logical_or_end:
-	%logicalOr = phi i1 [ 1, %if.end ], [ %sgt_2, %logical_or_branch ]
-	br i1 %logicalOr, label %if.then_2, label %if.end_2
-
-if.then_2:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0)
 	br label %if.end_2
 
 if.end_2:
-	call void @_mergeSort$$YGXUSlice_int$$$Z(%class.Slice_int* %castToClassPtr)
-	%malloc_2 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_2 = bitcast i8* %malloc_2 to %class.Slice_int*
-	%Slice_int.storage.addr_19 = bitcast %class.Slice_int* %castToClassPtr_2 to i32**
-	%Slice_int.storage.addr_20 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_4 = load i32*, i32** %Slice_int.storage.addr_20, align 4
-	store i32* %Slice_int.storage_4, i32** %Slice_int.storage.addr_19, align 4
-	%Slice_int.beg.addr_5 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 1
-	%Slice_int.beg.addr_6 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_6 = load i32, i32* %Slice_int.beg.addr_6, align 4
-	%add_3 = add i32 %Slice_int.beg_6, %sdiv
-	store i32 %add_3, i32* %Slice_int.beg.addr_5, align 4
-	%Slice_int.end.addr_5 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.beg_7 = load i32, i32* %Slice_int.beg.addr_6, align 4
-	%add_4 = add i32 %Slice_int.beg_7, %sub_2
-	store i32 %add_4, i32* %Slice_int.end.addr_5, align 4
-	%Slice_int.beg_8 = load i32, i32* %Slice_int.beg.addr_5, align 4
-	%Slice_int.storage_5 = load i32*, i32** %Slice_int.storage.addr_20, align 4
-	%arrayElemPtr_3 = getelementptr i32, i32* %Slice_int.storage_5, i32 -1
-	%arraySize_3 = load i32, i32* %arrayElemPtr_3, align 4
-	%sgt_3 = icmp sgt i32 %Slice_int.beg_8, %arraySize_3
-	br i1 %sgt_3, label %logical_or_end_2, label %logical_or_branch_2
-
-logical_or_branch_2:
-	%Slice_int.end.addr_6 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_2, i32 0, i32 2
-	%Slice_int.end_4 = load i32, i32* %Slice_int.end.addr_6, align 4
-	%Slice_int.storage.addr_21 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_6 = load i32*, i32** %Slice_int.storage.addr_21, align 4
-	%arrayElemPtr_4 = getelementptr i32, i32* %Slice_int.storage_6, i32 -1
-	%arraySize_4 = load i32, i32* %arrayElemPtr_4, align 4
-	%sgt_4 = icmp sgt i32 %Slice_int.end_4, %arraySize_4
-	br label %logical_or_end_2
-
-logical_or_end_2:
-	%logicalOr_2 = phi i1 [ 1, %if.end_2 ], [ %sgt_4, %logical_or_branch_2 ]
-	br i1 %logicalOr_2, label %if.then_3, label %if.end_3
+	%slt_3 = icmp slt i32 %i_12, %r
+	br i1 %slt_3, label %if.then_3, label %if.end_3
 
 if.then_3:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_2 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_2)
+	%a_15 = load i32*, i32** @a, align 4
+	%add_3 = add i32 %i_12, %r
+	%sdiv_3 = sdiv i32 %add_3, 2
+	%elementPtr_15 = getelementptr i32, i32* %a_15, i32 %sdiv_3
+	%arrayElement_13 = load i32, i32* %elementPtr_15, align 4
+	br label %while.cond_7
+
+while.cond_7:
+	%j_16 = phi i32 [ %r, %if.then_3 ], [ %j_18, %if.end_7 ]
+	%i_16 = phi i32 [ %i_12, %if.then_3 ], [ %i_18, %if.end_7 ]
+	%sle_5 = icmp sle i32 %i_16, %j_16
+	br i1 %sle_5, label %while.body_7, label %while.end_9
+
+while.body_7:
+	br label %while.cond_8
+
+while.cond_8:
+	%i_17 = phi i32 [ %i_16, %while.body_7 ], [ %postfix_inc_5, %while.body_8 ]
+	%a_16 = load i32*, i32** @a, align 4
+	%elementPtr_16 = getelementptr i32, i32* %a_16, i32 %i_17
+	%arrayElement_14 = load i32, i32* %elementPtr_16, align 4
+	%slt_7 = icmp slt i32 %arrayElement_14, %arrayElement_13
+	br i1 %slt_7, label %while.body_8, label %while.end_7
+
+while.body_8:
+	%postfix_inc_5 = add i32 %i_17, 1
+	br label %while.cond_8
+
+while.end_7:
+	br label %while.cond_9
+
+while.cond_9:
+	%j_17 = phi i32 [ %j_16, %while.end_7 ], [ %postfix_dec_5, %while.body_9 ]
+	%a_17 = load i32*, i32** @a, align 4
+	%elementPtr_17 = getelementptr i32, i32* %a_17, i32 %j_17
+	%arrayElement_15 = load i32, i32* %elementPtr_17, align 4
+	%sgt_3 = icmp sgt i32 %arrayElement_15, %arrayElement_13
+	br i1 %sgt_3, label %while.body_9, label %while.end_8
+
+while.body_9:
+	%postfix_dec_5 = sub i32 %j_17, 1
+	br label %while.cond_9
+
+while.end_8:
+	%sle_6 = icmp sle i32 %i_17, %j_17
+	br i1 %sle_6, label %if.then_7, label %if.end_7
+
+if.then_7:
+	%a_18 = load i32*, i32** @a, align 4
+	%elementPtr_18 = getelementptr i32, i32* %a_18, i32 %i_17
+	%arrayElement_16 = load i32, i32* %elementPtr_18, align 4
+	%a_19 = load i32*, i32** @a, align 4
+	%elementPtr_19 = getelementptr i32, i32* %a_19, i32 %i_17
+	%a_20 = load i32*, i32** @a, align 4
+	%elementPtr_20 = getelementptr i32, i32* %a_20, i32 %j_17
+	%arrayElement_17 = load i32, i32* %elementPtr_20, align 4
+	store i32 %arrayElement_17, i32* %elementPtr_19, align 4
+	%a_21 = load i32*, i32** @a, align 4
+	%elementPtr_21 = getelementptr i32, i32* %a_21, i32 %j_17
+	store i32 %arrayElement_16, i32* %elementPtr_21, align 4
+	%postfix_inc_6 = add i32 %i_17, 1
+	%postfix_dec_6 = sub i32 %j_17, 1
+	br label %if.end_7
+
+if.end_7:
+	%j_18 = phi i32 [ %postfix_dec_6, %if.then_7 ], [ %j_17, %while.end_8 ]
+	%i_18 = phi i32 [ %postfix_inc_6, %if.then_7 ], [ %i_17, %while.end_8 ]
+	br label %while.cond_7
+
+while.end_9:
+	%slt_8 = icmp slt i32 %i_12, %j_16
+	br i1 %slt_8, label %if.then_8, label %if.end_11
+
+if.then_8:
+	%a_22 = load i32*, i32** @a, align 4
+	%add_4 = add i32 %i_12, %j_16
+	%sdiv_4 = sdiv i32 %add_4, 2
+	%elementPtr_22 = getelementptr i32, i32* %a_22, i32 %sdiv_4
+	%arrayElement_18 = load i32, i32* %elementPtr_22, align 4
+	br label %while.cond_10
+
+while.cond_10:
+	%j_19 = phi i32 [ %j_16, %if.then_8 ], [ %j_21, %if.end_8 ]
+	%i_19 = phi i32 [ %i_12, %if.then_8 ], [ %i_21, %if.end_8 ]
+	%sle_7 = icmp sle i32 %i_19, %j_19
+	br i1 %sle_7, label %while.body_10, label %while.end_12
+
+while.body_10:
+	br label %while.cond_11
+
+while.cond_11:
+	%i_20 = phi i32 [ %i_19, %while.body_10 ], [ %postfix_inc_7, %while.body_11 ]
+	%a_23 = load i32*, i32** @a, align 4
+	%elementPtr_23 = getelementptr i32, i32* %a_23, i32 %i_20
+	%arrayElement_19 = load i32, i32* %elementPtr_23, align 4
+	%slt_9 = icmp slt i32 %arrayElement_19, %arrayElement_18
+	br i1 %slt_9, label %while.body_11, label %while.end_10
+
+while.body_11:
+	%postfix_inc_7 = add i32 %i_20, 1
+	br label %while.cond_11
+
+while.end_10:
+	br label %while.cond_12
+
+while.cond_12:
+	%j_20 = phi i32 [ %j_19, %while.end_10 ], [ %postfix_dec_7, %while.body_12 ]
+	%a_24 = load i32*, i32** @a, align 4
+	%elementPtr_24 = getelementptr i32, i32* %a_24, i32 %j_20
+	%arrayElement_20 = load i32, i32* %elementPtr_24, align 4
+	%sgt_4 = icmp sgt i32 %arrayElement_20, %arrayElement_18
+	br i1 %sgt_4, label %while.body_12, label %while.end_11
+
+while.body_12:
+	%postfix_dec_7 = sub i32 %j_20, 1
+	br label %while.cond_12
+
+while.end_11:
+	%sle_8 = icmp sle i32 %i_20, %j_20
+	br i1 %sle_8, label %if.then_9, label %if.end_8
+
+if.then_9:
+	%a_25 = load i32*, i32** @a, align 4
+	%elementPtr_25 = getelementptr i32, i32* %a_25, i32 %i_20
+	%arrayElement_21 = load i32, i32* %elementPtr_25, align 4
+	%a_26 = load i32*, i32** @a, align 4
+	%elementPtr_26 = getelementptr i32, i32* %a_26, i32 %i_20
+	%a_27 = load i32*, i32** @a, align 4
+	%elementPtr_27 = getelementptr i32, i32* %a_27, i32 %j_20
+	%arrayElement_22 = load i32, i32* %elementPtr_27, align 4
+	store i32 %arrayElement_22, i32* %elementPtr_26, align 4
+	%a_28 = load i32*, i32** @a, align 4
+	%elementPtr_28 = getelementptr i32, i32* %a_28, i32 %j_20
+	store i32 %arrayElement_21, i32* %elementPtr_28, align 4
+	%postfix_inc_8 = add i32 %i_20, 1
+	%postfix_dec_8 = sub i32 %j_20, 1
+	br label %if.end_8
+
+if.end_8:
+	%j_21 = phi i32 [ %postfix_dec_8, %if.then_9 ], [ %j_20, %while.end_11 ]
+	%i_21 = phi i32 [ %postfix_inc_8, %if.then_9 ], [ %i_20, %while.end_11 ]
+	br label %while.cond_10
+
+while.end_12:
+	%slt_10 = icmp slt i32 %i_12, %j_19
+	br i1 %slt_10, label %if.then_10, label %if.end_9
+
+if.then_10:
+	%funcCallRet_5 = call i32 @_qsrt$$YGHHH$Z(i32 %i_12, i32 %j_19)
+	br label %if.end_9
+
+if.end_9:
+	%slt_11 = icmp slt i32 %i_19, %j_16
+	br i1 %slt_11, label %if.then_11, label %if.end_10
+
+if.then_11:
+	%funcCallRet_6 = call i32 @_qsrt$$YGHHH$Z(i32 %i_19, i32 %j_16)
+	br label %if.end_10
+
+if.end_10:
+	br label %if.end_11
+
+if.end_11:
+	%slt_12 = icmp slt i32 %i_16, %r
+	br i1 %slt_12, label %if.then_12, label %if.end_12
+
+if.then_12:
+	%funcCallRet_7 = call i32 @_qsrt$$YGHHH$Z(i32 %i_16, i32 %r)
+	br label %if.end_12
+
+if.end_12:
 	br label %if.end_3
 
 if.end_3:
-	call void @_mergeSort$$YGXUSlice_int$$$Z(%class.Slice_int* %castToClassPtr_2)
-	%malloc_3 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_3 = bitcast i8* %malloc_3 to %class.Slice_int*
-	%Slice_int.storage.addr_22 = bitcast %class.Slice_int* %castToClassPtr_3 to i32**
-	%Slice_int.storage.addr_23 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_7 = load i32*, i32** %Slice_int.storage.addr_23, align 4
-	store i32* %Slice_int.storage_7, i32** %Slice_int.storage.addr_22, align 4
-	%Slice_int.beg.addr_7 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 1
-	%Slice_int.beg.addr_8 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_9 = load i32, i32* %Slice_int.beg.addr_8, align 4
-	store i32 %Slice_int.beg_9, i32* %Slice_int.beg.addr_7, align 4
-	%Slice_int.end.addr_7 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 2
-	%Slice_int.beg_10 = load i32, i32* %Slice_int.beg.addr_8, align 4
-	%add_6 = add i32 %Slice_int.beg_10, %sdiv
-	store i32 %add_6, i32* %Slice_int.end.addr_7, align 4
-	%Slice_int.beg_11 = load i32, i32* %Slice_int.beg.addr_7, align 4
-	%Slice_int.storage_8 = load i32*, i32** %Slice_int.storage.addr_23, align 4
-	%arrayElemPtr_5 = getelementptr i32, i32* %Slice_int.storage_8, i32 -1
-	%arraySize_5 = load i32, i32* %arrayElemPtr_5, align 4
-	%sgt_5 = icmp sgt i32 %Slice_int.beg_11, %arraySize_5
-	br i1 %sgt_5, label %logical_or_end_3, label %logical_or_branch_3
+	ret i32 0
+}
 
-logical_or_branch_3:
-	%Slice_int.end.addr_8 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_3, i32 0, i32 2
-	%Slice_int.end_5 = load i32, i32* %Slice_int.end.addr_8, align 4
-	%Slice_int.storage.addr_24 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_9 = load i32*, i32** %Slice_int.storage.addr_24, align 4
-	%arrayElemPtr_6 = getelementptr i32, i32* %Slice_int.storage_9, i32 -1
-	%arraySize_6 = load i32, i32* %arrayElemPtr_6, align 4
-	%sgt_6 = icmp sgt i32 %Slice_int.end_5, %arraySize_6
-	br label %logical_or_end_3
-
-logical_or_end_3:
-	%logicalOr_3 = phi i1 [ 1, %if.end_3 ], [ %sgt_6, %logical_or_branch_3 ]
-	br i1 %logicalOr_3, label %if.then_4, label %if.end_4
-
-if.then_4:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_3 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_3)
-	br label %if.end_4
-
-if.end_4:
-	%malloc_4 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_4 = bitcast i8* %malloc_4 to %class.Slice_int*
-	%Slice_int.storage.addr_25 = bitcast %class.Slice_int* %castToClassPtr_4 to i32**
-	%Slice_int.storage.addr_26 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_10 = load i32*, i32** %Slice_int.storage.addr_26, align 4
-	store i32* %Slice_int.storage_10, i32** %Slice_int.storage.addr_25, align 4
-	%Slice_int.beg.addr_9 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 1
-	%Slice_int.beg.addr_10 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_12 = load i32, i32* %Slice_int.beg.addr_10, align 4
-	%add_7 = add i32 %Slice_int.beg_12, %sdiv
-	store i32 %add_7, i32* %Slice_int.beg.addr_9, align 4
-	%Slice_int.end.addr_9 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 2
-	%Slice_int.beg_13 = load i32, i32* %Slice_int.beg.addr_10, align 4
-	%add_8 = add i32 %Slice_int.beg_13, %sub_2
-	store i32 %add_8, i32* %Slice_int.end.addr_9, align 4
-	%Slice_int.beg_14 = load i32, i32* %Slice_int.beg.addr_9, align 4
-	%Slice_int.storage_11 = load i32*, i32** %Slice_int.storage.addr_26, align 4
-	%arrayElemPtr_7 = getelementptr i32, i32* %Slice_int.storage_11, i32 -1
-	%arraySize_7 = load i32, i32* %arrayElemPtr_7, align 4
-	%sgt_7 = icmp sgt i32 %Slice_int.beg_14, %arraySize_7
-	br i1 %sgt_7, label %logical_or_end_4, label %logical_or_branch_4
-
-logical_or_branch_4:
-	%Slice_int.end.addr_10 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_4, i32 0, i32 2
-	%Slice_int.end_6 = load i32, i32* %Slice_int.end.addr_10, align 4
-	%Slice_int.storage.addr_27 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_12 = load i32*, i32** %Slice_int.storage.addr_27, align 4
-	%arrayElemPtr_8 = getelementptr i32, i32* %Slice_int.storage_12, i32 -1
-	%arraySize_8 = load i32, i32* %arrayElemPtr_8, align 4
-	%sgt_8 = icmp sgt i32 %Slice_int.end_6, %arraySize_8
-	br label %logical_or_end_4
-
-logical_or_end_4:
-	%logicalOr_4 = phi i1 [ 1, %if.end_4 ], [ %sgt_8, %logical_or_branch_4 ]
-	br i1 %logicalOr_4, label %if.then_5, label %if.end_5
-
-if.then_5:
-	%$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_4 = getelementptr [40 x i8], [40 x i8]* @$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._slice$Slice_int$$QEAUSlice_int$$HH$Z.str0_4)
-	br label %if.end_5
-
-if.end_5:
-	%funcCallRet_6 = call i32* @_merge$$YGPAHUSlice_int$$USlice_int$$$Z(%class.Slice_int* %castToClassPtr_3, %class.Slice_int* %castToClassPtr_4)
-	%malloc_5 = call i8* @_malloc$$YGPADH$Z(i32 12)
-	%castToClassPtr_5 = bitcast i8* %malloc_5 to %class.Slice_int*
-	%Slice_int.storage.addr_28 = bitcast %class.Slice_int* %castToClassPtr_5 to i32**
-	store i32* %funcCallRet_6, i32** %Slice_int.storage.addr_28, align 4
-	%Slice_int.beg.addr_11 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 1
-	store i32 0, i32* %Slice_int.beg.addr_11, align 4
-	%Slice_int.end.addr_11 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 2
-	%arrayElemPtr_9 = getelementptr i32, i32* %funcCallRet_6, i32 -1
-	%arraySize_9 = load i32, i32* %arrayElemPtr_9, align 4
-	store i32 %arraySize_9, i32* %Slice_int.end.addr_11, align 4
-	%Slice_int.end.addr_12 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 2
-	%Slice_int.end_7 = load i32, i32* %Slice_int.end.addr_12, align 4
-	%Slice_int.beg.addr_12 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_15 = load i32, i32* %Slice_int.beg.addr_12, align 4
-	%sub_3 = sub i32 %Slice_int.end_7, %Slice_int.beg_15
-	%Slice_int.end_8 = load i32, i32* %Slice_int.end.addr_11, align 4
-	%Slice_int.beg_16 = load i32, i32* %Slice_int.beg.addr_11, align 4
-	%sub_4 = sub i32 %Slice_int.end_8, %Slice_int.beg_16
-	%slt = icmp slt i32 %sub_3, %sub_4
-	br i1 %slt, label %if.then_6, label %if.end_6
-
-if.then_6:
-	%$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1 = getelementptr [46 x i8], [46 x i8]* @$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1, i32 0, i32 0
-	call void @_println$$YGXPAD$Z(i8* %$const._copy$Slice_int$$QEAXUSlice_int$$$Z.str1)
-	br label %if.end_6
-
-if.end_6:
+define i32 @main() {
+entry:
+	%malloc = call i8* @_malloc$$YGPADH$Z(i32 40404)
+	%mallocInt32Ptr = bitcast i8* %malloc to i32*
+	store i32 10100, i32* %mallocInt32Ptr, align 4
+	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
+	store i32* %arrayHeadPtrUnguarded, i32** @a, align 4
 	br label %for.cond
 
 for.cond:
-	%i = phi i32 [ 0, %if.end_6 ], [ %prefix_inc, %for.body ]
-	%Slice_int.end.addr_14 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 2
-	%Slice_int.end_9 = load i32, i32* %Slice_int.end.addr_14, align 4
-	%Slice_int.beg.addr_14 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 1
-	%Slice_int.beg_17 = load i32, i32* %Slice_int.beg.addr_14, align 4
-	%sub_5 = sub i32 %Slice_int.end_9, %Slice_int.beg_17
-	%slt_2 = icmp slt i32 %i, %sub_5
-	br i1 %slt_2, label %for.body, label %for.end
+	%i_10 = phi i32 [ 1, %entry ], [ %postfix_inc, %for.body ]
+	%n = load i32, i32* @n, align 4
+	%sle = icmp sle i32 %i_10, %n
+	br i1 %sle, label %for.body, label %for.end
 
 for.body:
-	%Slice_int.storage.addr_29 = bitcast %class.Slice_int* %a to i32**
-	%Slice_int.storage_13 = load i32*, i32** %Slice_int.storage.addr_29, align 4
-	%Slice_int.beg.addr_15 = getelementptr %class.Slice_int, %class.Slice_int* %a, i32 0, i32 1
-	%Slice_int.beg_18 = load i32, i32* %Slice_int.beg.addr_15, align 4
-	%add_9 = add i32 %Slice_int.beg_18, %i
-	%elementPtr = getelementptr i32, i32* %Slice_int.storage_13, i32 %add_9
-	%Slice_int.storage.addr_30 = bitcast %class.Slice_int* %castToClassPtr_5 to i32**
-	%Slice_int.storage_14 = load i32*, i32** %Slice_int.storage.addr_30, align 4
-	%Slice_int.beg.addr_16 = getelementptr %class.Slice_int, %class.Slice_int* %castToClassPtr_5, i32 0, i32 1
-	%Slice_int.beg_19 = load i32, i32* %Slice_int.beg.addr_16, align 4
-	%add_10 = add i32 %Slice_int.beg_19, %i
-	%elementPtr_2 = getelementptr i32, i32* %Slice_int.storage_14, i32 %add_10
-	%arrayElement = load i32, i32* %elementPtr_2, align 4
-	store i32 %arrayElement, i32* %elementPtr, align 4
-	%prefix_inc = add i32 %i, 1
+	%a = load i32*, i32** @a, align 4
+	%elementPtr = getelementptr i32, i32* %a, i32 %i_10
+	%n_2 = load i32, i32* @n, align 4
+	%add = add i32 %n_2, 1
+	%sub = sub i32 %add, %i_10
+	store i32 %sub, i32* %elementPtr, align 4
+	%postfix_inc = add i32 %i_10, 1
 	br label %for.cond
 
 for.end:
-	br label %return
+	%n_3 = load i32, i32* @n, align 4
+	%funcCallRet = call i32 @_qsrt$$YGHHH$Z(i32 1, i32 %n_3)
+	br label %for.cond_2
 
-return:
-	ret void
+for.cond_2:
+	%i_11 = phi i32 [ 1, %for.end ], [ %postfix_inc_2, %for.body_2 ]
+	%n_4 = load i32, i32* @n, align 4
+	%sle_2 = icmp sle i32 %i_11, %n_4
+	br i1 %sle_2, label %for.body_2, label %for.end_2
+
+for.body_2:
+	%a_2 = load i32*, i32** @a, align 4
+	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %i_11
+	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
+	%funcCallRet_2 = call i8* @_toString$$YGPADH$Z(i32 %arrayElement_2)
+	call void @_print$$YGXPAD$Z(i8* %funcCallRet_2)
+	%.const.main.str0 = getelementptr [2 x i8], [2 x i8]* @.const.main.str0, i32 0, i32 0
+	call void @_print$$YGXPAD$Z(i8* %.const.main.str0)
+	%postfix_inc_2 = add i32 %i_11, 1
+	br label %for.cond_2
+
+for.end_2:
+	%.const.main.str1 = getelementptr [2 x i8], [2 x i8]* @.const.main.str1, i32 0, i32 0
+	call void @_print$$YGXPAD$Z(i8* %.const.main.str1)
+	ret i32 0
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)
