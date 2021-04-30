@@ -45,31 +45,36 @@ public class AliasAnalysis extends Pass {
             return name;
         }
     }
-    private Map<Operand, MemNode> pts; // point to
+    private Map<Operand, MemNode> ptrMap; // point to
     private Set<MemNode> nodes;
 
     private final InterProceduralAnalysis interProc;
+    private final LoopAnalysis lpa;
     private Map<Function, Set<MemNode>> funcSTs;
     private Set<MemNode> loopSTs;
     private Set<Operand> loopSAs; // addresses of stores
 
-    public AliasAnalysis(IRModule module, InterProceduralAnalysis interProc) {
+    public AliasAnalysis(IRModule module, InterProceduralAnalysis interProc, LoopAnalysis lpa) {
         super(module);
         this.interProc = interProc;
+        this.lpa = lpa;
     }
 
     public boolean mayAlias(Operand src1, Operand src2) {
         if (src1 instanceof Null || src2 instanceof Null) return false;
         if (!src1.getType().equals(src2.getType())) return false;
-        Set<MemNode> pts1 = pts.get(src1).basicConstrains,
-                pts2 = pts.get(src2).basicConstrains;
-        return Collections.disjoint(pts1, pts2);
+        if (src1==src2) return true;
+        MemNode s1 = ptrMap.get(src1), s2 = ptrMap.get(src2);
+        Set<MemNode> eq1 = s1.simpleConstrains, eq2 = s2.simpleConstrains;
+        if (eq1.contains(s2)||eq2.contains(s1)) return true;
+        Set<MemNode> pts1 = s1.basicConstrains, pts2 = s2.basicConstrains;
+        return !Collections.disjoint(pts1, pts2);
     }
 
     @Override
     public boolean run() {
         nodes = new HashSet<>();
-        pts = new HashMap<>();
+        ptrMap = new HashMap<>();
         funcSTs = new HashMap<>();
         loopSTs = new HashSet<>();
         loopSAs = new HashSet<>();
@@ -87,7 +92,7 @@ public class AliasAnalysis extends Pass {
             MemNode global = new MemNode("g_"+gv.getName());
             MemNode pt = new MemNode(global.name+"_pointTo");
             global.basicConstrains.add(pt);
-            pts.put(gv, global);
+            ptrMap.put(gv, global);
             nodes.add(global);
             nodes.add(pt);
         }
@@ -96,7 +101,7 @@ public class AliasAnalysis extends Pass {
                 if (p.getType() instanceof PointerType) {
                     MemNode para = new MemNode("p_"
                             +p.getName()+f.getName() );
-                    pts.put(p, para);
+                    ptrMap.put(p, para);
                     nodes.add(para);
                 }
             }
@@ -107,7 +112,7 @@ public class AliasAnalysis extends Pass {
                     if (t.getType() instanceof PointerType) {
                         MemNode tmp = new MemNode("l_"
                                 +t.getName()+f.getName() );
-                        pts.put(t, tmp);
+                        ptrMap.put(t, tmp);
                         nodes.add(tmp);
                     }
                 }
@@ -128,55 +133,47 @@ public class AliasAnalysis extends Pass {
         if (inst instanceof BitCast) {
             BitCast i = (BitCast) inst;
             if (!(i.getSrc() instanceof Null)) {
-                pts.get(i.getSrc()).simpleConstrains.add(pts.get(i.getDst()));
+                ptrMap.get(i.getSrc()).simpleConstrains.add(ptrMap.get(i.getDst()));
             }
         }
         else if (inst instanceof Call) {
             Call i = (Call) inst;
-            if (module.hasNoFunction(i.getCallee().getName())) {
-                if (i.getDst().getType() instanceof PointerType) {
-                    MemNode retPtr = pts.get(i.getDst());
-                    MemNode pt = new MemNode(retPtr.name+"_pointTo");
-                    retPtr.basicConstrains.add(pt);
-                    nodes.add(pt);
-                }
-            }
-            else {
+            if (!module.hasNoFunction(i.getCallee().getName())) {
                 for (int it = 0, itt = i.getParameterList().size(); it < itt; ++it) {
                     // actual arg
                     Operand aa = i.getParameterList().get(it);
                     if (aa.getType() instanceof PointerType
                             && !(aa instanceof Null)) {
                         // formal arg
-                        MemNode fa = pts.get(i.getCallee().getParameterList().get(it));
-                        pts.get(aa).simpleConstrains.add(fa);
+                        MemNode fa = ptrMap.get(i.getCallee().getParameterList().get(it));
+                        ptrMap.get(aa).simpleConstrains.add(fa);
                     }
                 }
                 if (i.getDst().getType() instanceof PointerType) {
                     Operand retVal = ((Ret)i.getCallee().getReturnBlock().getTailInst()).getRetValue();
-                    pts.get(retVal).simpleConstrains.add(pts.get(i.getDst()));
+                    ptrMap.get(retVal).simpleConstrains.add(ptrMap.get(i.getDst()));
                 }
             }
         }
         else if (inst instanceof GetElementPtr) {
             GetElementPtr i = (GetElementPtr) inst;
             if (!(i.getPtr() instanceof Null)) {
-                pts.get(i.getPtr()).simpleConstrains.add(pts.get(i.getDst()));
+                ptrMap.get(i.getPtr()).simpleConstrains.add(ptrMap.get(i.getDst()));
             }
         }
         else if (inst instanceof Load) {
             Load i = (Load) inst;
             if (i.getDst().getType() instanceof PointerType
                     && !(i.getAddr() instanceof Null) ) {
-                pts.get(i.getAddr()).complexUConstrains.add(pts.get(i.getDst()));
+                ptrMap.get(i.getAddr()).complexUConstrains.add(ptrMap.get(i.getDst()));
             }
         }
         else if (inst instanceof Phi) {
             Phi i = (Phi) inst;
             if (i.getDst().getType() instanceof PointerType) {
-                MemNode ph = pts.get(i.getDst());
+                MemNode ph = ptrMap.get(i.getDst());
                 i.getValues().stream().filter(v -> !(v instanceof Null)).forEach(
-                        v -> pts.get(v).simpleConstrains.add(ph)
+                        v -> ptrMap.get(v).simpleConstrains.add(ph)
                 );
             }
         }
@@ -184,7 +181,7 @@ public class AliasAnalysis extends Pass {
             Store i = (Store) inst;
             if (i.getValue().getType() instanceof PointerType
                     && !(i.getValue() instanceof Null) ) {
-                pts.get(i.getAddr()).complexDConstrains.add(pts.get(i.getValue()));
+                ptrMap.get(i.getAddr()).complexDConstrains.add(ptrMap.get(i.getValue()));
             }
         }
     }
@@ -202,7 +199,7 @@ public class AliasAnalysis extends Pass {
             MemNode v = W.poll();
             active.remove(v);
             for (var a: v.basicConstrains) {
-                for (var p: a.complexUConstrains) {
+                for (var p: v.complexUConstrains) {
                     if (!a.simpleConstrains.contains(p)) {
                         a.simpleConstrains.add(p);
                         if (!active.contains(a)) {
@@ -211,7 +208,7 @@ public class AliasAnalysis extends Pass {
                         }
                     }
                 }
-                for (var q: a.complexDConstrains) {
+                for (var q: v.complexDConstrains) {
                     if (!q.simpleConstrains.contains(a)) {
                         q.simpleConstrains.add(a);
                         if (!active.contains(q)) {
@@ -240,22 +237,59 @@ public class AliasAnalysis extends Pass {
             for (var b: BPO) {
                 for (var i: b.getAllInst()) {
                     if (i instanceof Store) {
-                        STs.addAll(pts.get(((Store)i).getAddr()).basicConstrains);
+                        STs.addAll(ptrMap.get(((Store)i).getAddr()).basicConstrains);
                     }
                 }
             }
             funcSTs.put(f, STs);
         }
-        for (var f: PO) {
-            Set<MemNode> STs = funcSTs.get(f);
-            for (var caller: interProc.getDirectCallers(f)) {
-                funcSTs.get(caller).addAll(STs);
+        boolean loopCond = true;
+        while (loopCond) {
+            loopCond = false;
+            for (var f: PO) {
+                Set<MemNode> STs = funcSTs.get(f);
+                if (STs.isEmpty()) continue;
+                for (var caller: interProc.getDirectCallers(f)) {
+                    loopCond |= funcSTs.get(caller).addAll(STs);
+                }
             }
+        }
+    }
+
+    private void stabilize(IRLoop loop) {
+        if (!loop.getChildren().isEmpty()) {
+            loop.getChildren().forEach(this::stabilize);
+        }
+        Set<MemNode> chord = new HashSet<>();
+        for (var inst: loop.getPreHeader().getAllInst()) {
+            if (inst.getDst().getType() instanceof PointerType) {
+                MemNode mem = ptrMap.get(inst.getDst());
+                if (!mem.simpleConstrains.isEmpty()) {
+                    chord.add(mem);
+                    chord.addAll(mem.simpleConstrains);
+                }
+            }
+        }
+        for (var b: loop.getBlocks()) {
+            for (var inst : b.getAllInst()) {
+                if (inst.getDst().getType() instanceof PointerType) {
+                    MemNode mem = ptrMap.get(inst.getDst());
+                    if (!mem.simpleConstrains.isEmpty()) {
+                        chord.add(mem);
+                        chord.addAll(mem.simpleConstrains);
+                    }
+                }
+            }
+        }
+        for (var c: chord) {
+            c.simpleConstrains.addAll(chord);
         }
     }
 
     public void buildST(IRLoop loop) {
         loopSTs.clear();
+        loopSAs.clear();
+        stabilize(loop);
         for (var b: loop.getBlocks()) {
             for (var inst: b.getAllInst()) {
                 if (inst instanceof Store) {
@@ -263,7 +297,7 @@ public class AliasAnalysis extends Pass {
                 }
                 else if (inst instanceof Call) {
                     Call i = (Call) inst;
-                    if (module.hasNoFunction(i.getCallee().getName())) {
+                    if (!module.hasNoFunction(i.getCallee().getName())) {
                         loopSTs.addAll(funcSTs.get(i.getCallee()));
                     }
                 }
@@ -273,7 +307,7 @@ public class AliasAnalysis extends Pass {
 
     public boolean useLoopST(Load i) {
         Operand addr = i.getAddr();
-        Set<MemNode> pointTo = new HashSet<>(pts.get(addr).basicConstrains);
+        Set<MemNode> pointTo = new HashSet<>(ptrMap.get(addr).basicConstrains);
         if (!Collections.disjoint(pointTo, loopSTs)) return true;
         for (var sa: loopSAs) {
             if (mayAlias(sa, addr)) return true;

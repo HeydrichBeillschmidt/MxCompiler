@@ -57,6 +57,7 @@ public class IRBlock {
     public String getOriginalName() {
         if (name.contains("_")) {
             String[] ss = name.split("_");
+            if (!Character.isDigit(ss[ss.length-1].charAt(0))) return name;
             StringBuilder ans = new StringBuilder(ss[0]);
             for (int i = 1; i < ss.length-1; ++i) {
                 ans.append("_").append(ss[i]);
@@ -316,8 +317,10 @@ public class IRBlock {
     }
     public boolean isDomed(IRBlock query) {
         IRBlock dom = iDom;
+        if (iDom==this) return this==query;
         while (dom!=null) {
             if (dom==query) return true;
+            if (dom==dom.iDom) return false;
             dom = dom.iDom;
         }
         return false;
@@ -338,14 +341,6 @@ public class IRBlock {
     }
     public void setPostIDom(IRBlock postIDom) {
         this.postIDom = postIDom;
-    }
-    public boolean isPostDomed(IRBlock query) {
-        IRBlock dom = postIDom;
-        while (dom!=null) {
-            if (dom==query) return true;
-            dom = dom.postIDom;
-        }
-        return false;
     }
 
     // for ADCE

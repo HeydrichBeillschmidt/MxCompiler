@@ -110,7 +110,8 @@ public class Function {
     public void addPrevBlock(IRBlock target, IRBlock blockToAdd) {
         if (target==entranceBlock) {
             entranceBlock = blockToAdd;
-            blockToAdd.addBlock(target);
+            blockToAdd.setNextBlock(target);
+            target.setPrevBlock(blockToAdd);
         }
         else target.getPrevBlock().addBlock(blockToAdd);
         addSymbol(blockToAdd);
@@ -215,7 +216,7 @@ public class Function {
         symbolTable.putIR(r.getOriginalName(), r);
     }
     public void addSymbol(Parameter p) {
-        symbolTable.putIR(p);
+        symbolTable.putIR(p.getOriginalName(), p);
     }
     public void addSymbol(IRBlock b) {
         symbolTable.putIR(b.getOriginalName(), b);
@@ -267,16 +268,6 @@ public class Function {
         Collections.reverse(order);
         return order;
     }
-    private void _dfsRecursive(IRBlock block, ArrayList<IRBlock> order,
-                               Set<IRBlock> visited) {
-        visited.add(block);
-        for (var s: block.getSuccessors()) {
-            if (!visited.contains(s)) {
-                _dfsRecursive(s, order, visited);
-            }
-        }
-        order.add(block);
-    }
     // post-order & reversed post-order on reversed CFG
     public ArrayList<IRBlock> getBackwardPO() {
         Set<IRBlock> visited = new HashSet<>();
@@ -305,16 +296,6 @@ public class Function {
         ArrayList<IRBlock> order = getBackwardPO();
         Collections.reverse(order);
         return order;
-    }
-    private void _reverseDFSRecursive(IRBlock block, ArrayList<IRBlock> order,
-                                      Set<IRBlock> visited) {
-        visited.add(block);
-        for (var p: block.getPredecessors()) {
-            if (!visited.contains(p)) {
-                _reverseDFSRecursive(p, order, visited);
-            }
-        }
-        order.add(block);
     }
     // for dominance analysis
     //     forward control flow analysis

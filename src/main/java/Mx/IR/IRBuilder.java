@@ -126,7 +126,7 @@ public class IRBuilder implements ASTVisitor {
     public void visit(StringLiteralNode node) {
         String funcName = curFunc==null ? "" :
                 curFunc.getName().equals("_main$$YGHXZ") ? "main" : curFunc.getName();
-        String name = "_const." + funcName + ".str" + module.getConstStrings().size();
+        String name = "$const." + funcName + ".str" + module.getConstStrings().size();
         Register dst = new Register(IRModule.stringT, name);
         curFunc.addSymbol(dst);
         GlobalVariable str = module.addConstString(node.getValue(), name);

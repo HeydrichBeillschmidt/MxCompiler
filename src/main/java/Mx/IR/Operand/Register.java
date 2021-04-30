@@ -26,6 +26,7 @@ public class Register extends Operand {
     public String getOriginalName() {
         if (name.contains("_")) {
             String[] ss = name.split("_");
+            if (!Character.isDigit(ss[ss.length-1].charAt(0))) return name;
             StringBuilder ans = new StringBuilder(ss[0]);
             for (int i = 1; i < ss.length-1; ++i) {
                 ans.append("_").append(ss[i]);

@@ -99,6 +99,7 @@ public class GetElementPtr extends IRInst {
     @Override
     public void refresh(Map<Operand, Operand> os, Map<IRBlock, IRBlock> bs) {
         if (ptr instanceof Parameter || ptr instanceof Register) ptr = os.get(ptr);
+        ptr.addUse(this);
         for (int i = 0, it = index.size(); i < it; ++i) {
             Operand idx = index.get(i);
             if (idx instanceof Parameter || idx instanceof Register) index.set(i, os.get(idx));

@@ -11,7 +11,7 @@ import Mx.IR.TypeSystem.PointerType;
 
 import java.util.*;
 
-// Whale Ch12.3 / "Engineering a Compiler"Ch8.4.2
+// Whale Ch12.3
 
 public class AlgebraicSimplifier extends Pass {
     private Queue<IRInst> W;
@@ -34,7 +34,6 @@ public class AlgebraicSimplifier extends Pass {
     private void runForFn(Function f) {
         curFunc = f;
         ArrayList<IRBlock> RPO = f.getRPO();
-        RPO.forEach(this::treeBalance);
         for (var b: RPO) {
             for (var i: b.getAllInst()) {
                 if (i.hasNoSideEffect()) {
@@ -52,142 +51,6 @@ public class AlgebraicSimplifier extends Pass {
             else if (i instanceof BitCast) changed |= checkCast((BitCast) i);
             else if (i instanceof Icmp) changed |= checkCmp((Icmp) i);
             else if (i instanceof GetElementPtr) changed |= checkGEP((GetElementPtr) i);
-        }
-    }
-
-    private Set<Register> isRoot;
-    private Map<Operand, Integer> rank;
-    private Set<Operand> UEVar;
-    private void treeBalance(IRBlock block) {
-        UEVar = new HashSet<>();
-        Set<Operand> VarKills = new HashSet<>();
-        ArrayList<IRInst> instList = block.getAllInst();
-        for (var i: instList) {
-            Set<Operand> curUse = i.getUses();
-            curUse.removeAll(VarKills);
-            UEVar.addAll(curUse);
-            if (i instanceof BinaryOp) VarKills.add(i.getDst());
-        }
-
-        Queue<Register> roots = new LinkedList<>();
-        isRoot = new HashSet<>();
-        rank = new HashMap<>();
-        for (var i: instList) {
-            if (i instanceof BinaryOp) {
-                BinaryOp inst = (BinaryOp) i;
-                Register dst = inst.getDst();
-                rank.put(dst, -1);
-                Set<IRInst> uses = dst.getUses();
-                if (inst.isCommutable() && uses.size()>=1) {
-                    if (uses.size()==1) {
-                        IRInst instUse = uses.iterator().next();
-                        if (!(instUse instanceof BinaryOp) ||
-                                ((BinaryOp)instUse).getOpName()==inst.getOpName()) break;
-                    }
-                    isRoot.add(dst);
-                    roots.offer(dst);
-                }
-            }
-        }
-        while (!roots.isEmpty()) {
-            Register var = roots.poll();
-            balance(var);
-        }
-    }
-    private void balance(Register root) {
-        if (rank.get(root)>=0) return;
-        Queue<Operand> q = new LinkedList<>();
-        BinaryOp op = (BinaryOp) root.getDef();
-        rank.put(root, flatten(op.getOp1(),q)+flatten(op.getOp2(),q));
-        rebuild(q, op.getOpName(), root);
-    }
-    private int flatten(Operand var, Queue<Operand> q) {
-        if (var instanceof Constant) { // cannot recur further
-            rank.put(var, 0);
-            q.offer(var);
-        }
-        else if (UEVar.contains(var)) { // cannot recur past top of block
-            rank.put(var, 1);
-            q.offer(var);
-        }
-        else if (var instanceof Register) {
-            if (isRoot.contains(var)) {
-                balance((Register) var);
-                q.offer(var);
-            }
-            else {
-                IRInst inst = ((Register)var).getDef();
-                if (inst instanceof BinaryOp) {
-                    BinaryOp bi = (BinaryOp) inst;
-                    flatten(bi.getOp1(), q);
-                    flatten(bi.getOp2(), q);
-                }
-            }
-        }
-        return rank.get(var);
-    }
-    private void rebuild(Queue<Operand> q, BinaryOp.BinaryOpName op, Register root) {
-        while (!q.isEmpty()) {
-            Operand NL = q.poll();
-            Operand NR = q.poll();
-            if (NL instanceof Constant && NR instanceof Constant) {
-                Constant NT = fold(op, (Constant)NL, (Constant)NR);
-                if (q.isEmpty()) {
-                    root.replaceUse(NT);
-                    rank.put(root, 0);
-                }
-                else {
-                    q.offer(NT);
-                    rank.put(NT, 0);
-                }
-            }
-            else {
-                Register NT;
-                if (q.isEmpty()) NT = root;
-                else {
-                    NT = new Register(root.getType(), "NT");
-                    curFunc.addSymbol(NT);
-                }
-                IRInst instDef = root.getDef();
-                IRBlock blockDef = instDef.getBlock();
-                assert NR != null;
-                blockDef.addPrevInst(instDef, new BinaryOp(blockDef, NT, op, NL, NR));
-                rank.put(NT, rank.get(NL) + rank.get(NR));
-                if (!q.isEmpty()) q.offer(NT);
-            }
-        }
-    }
-    private Constant fold(BinaryOp.BinaryOpName opName, Constant NL, Constant NR) {
-        if (NL instanceof ConstInt) {
-            assert NR instanceof ConstInt;
-            int vt;
-            int vl = ((ConstInt) NL).getValue(), vr = ((ConstInt) NR).getValue();
-            switch (opName) {
-                case add: vt = vl + vr; break;
-                case sub: vt = vl - vr; break;
-                case mul: vt = vl * vr; break;
-                case sdiv:vt = vl / vr; break;
-                case srem:vt = vl % vr; break;
-                case shl: vt = vl << vr;break;
-                case ashr:vt = vl >> vr;break;
-                case and: vt = vl & vr; break;
-                case or:  vt = vl | vr; break;
-                default:  vt = vl ^ vr;
-            }
-            return new ConstInt(vt, 4);
-        }
-        else {
-            assert NL instanceof ConstBool;
-            assert NR instanceof ConstBool;
-            boolean vt;
-            boolean vl = ((ConstBool) NL).getValue(), vr = ((ConstBool) NR).getValue();
-            switch (opName) {
-                case and: vt = vl & vr;break;
-                case or:  vt = vl | vr;break;
-                case xor: vt = vl ^ vr;break;
-                default: throw new RuntimeException();
-            }
-            return new ConstBool(vt);
         }
     }
 
@@ -210,13 +73,17 @@ public class AlgebraicSimplifier extends Pass {
                 return true;
             }
             if (i.getOp1().equals(new ConstInt(0, 4))) {
-                i.replaceOp1(i.getOp2());
+                i.getDst().replaceUse(i.getOp2());
                 exploit(i);
+                i.severDF();
+                i.removeFromBlock();
                 return true;
             }
             if (i.getOp2().equals(new ConstInt(0, 4))) {
-                i.replaceOp2(i.getOp1());
+                i.getDst().replaceUse(i.getOp1());
                 exploit(i);
+                i.severDF();
+                i.removeFromBlock();
                 return true;
             }
             return false;
@@ -290,7 +157,7 @@ public class AlgebraicSimplifier extends Pass {
                 break;
             }
             case and: {
-                if (i.getOp2().equals(new ConstInt(0, 4))) src = i.getOp1();
+                if (i.getOp2().equals(new ConstInt(0, 4))) src = new ConstInt(0, 4);
                 else if (i.getOp2().equals(new ConstInt(-1, 4))
                         || i.getOp2()==i.getOp1()) src = i.getOp1();
                 break;
@@ -306,7 +173,7 @@ public class AlgebraicSimplifier extends Pass {
                 if (i.getOp2().equals(new ConstInt(0, 4))) src = i.getOp1();
                 else if (i.getOp2()==i.getOp1()) src = new ConstInt(0, 4);
             }
-            default:;
+            default:
         }
         if (src!=null) {
             i.getDst().replaceUse(src);

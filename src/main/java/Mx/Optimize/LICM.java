@@ -10,10 +10,7 @@ import Mx.IR.Operand.Register;
 import Mx.Optimize.FlowAnalysis.AliasAnalysis;
 import Mx.Optimize.FlowAnalysis.LoopAnalysis;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 // loop invariant code motion
 public class LICM extends Pass {
@@ -45,19 +42,43 @@ public class LICM extends Pass {
 
         alias.buildST(loop);
 
-        Queue<IRInst> W = new LinkedList<>();
-        for (var b: loop.getUniqueBlocks()) {
+        Set<Register> loopDef = new HashSet<>();
+        for (var b: loop.getBlocks()) {
             for (var i: b.getAllInst()) {
-                if (checkLPI(i, loop)) {
-                    W.offer(i);
-                    changed = true;
-                }
+                if (i.hasDst()) loopDef.add(i.getDst());
             }
         }
+        Queue<IRInst> W = new LinkedList<>();
+        for (var b: loop.getBlocks()) {
+            for (var i: b.getAllInst()) checkHoist(i, loopDef, W);
+        }
+        changed |= !W.isEmpty();
+
         while (!W.isEmpty()) {
             IRInst inst = W.poll();
-            if (canHoist(inst, loop)) hoistInst(loop.getPreHeader(), inst);
-            else W.offer(inst);
+            hoistInst(loop.getPreHeader(), inst);
+            for (var u: inst.getDst().getUses()) {
+                if (loopDef.contains(u.getDst())) checkHoist(u, loopDef, W);
+            }
+        }
+    }
+
+    private void checkHoist(IRInst inst, Set<Register> loopDef, Queue<IRInst> W) {
+        if (inst instanceof Load) {
+            Set<Operand> uses = inst.getUses();
+            uses.retainAll(loopDef);
+            if (uses.isEmpty() && !alias.useLoopST((Load) inst)) {
+                loopDef.remove(inst.getDst());
+                W.offer(inst);
+            }
+        }
+        else if (inst.hasNoSideEffect()) {
+            Set<Operand> uses = inst.getUses();
+            uses.retainAll(loopDef);
+            if (uses.isEmpty()) {
+                loopDef.remove(inst.getDst());
+                W.offer(inst);
+            }
         }
     }
 
@@ -66,14 +87,12 @@ public class LICM extends Pass {
         if (inst.hasNoSideEffect()
                 || inst instanceof Call
                 || inst instanceof Load) {
-            if (isLPI(inst.getDst(), loop)) return true;
+            if (isLPI(inst.getDst(), loop)) return false;
 
             if (inst instanceof Call) {
                 Call i = (Call) inst;
                 if (i.isVoidCall()) return false;
-                if (i.getCallee().hasSideEffect()) {
-                    return false;
-                }
+                if (i.getCallee().hasSideEffect()) return false;
             }
             else if (inst instanceof Load) {
                 if (alias.useLoopST((Load) inst)) return false;
@@ -119,7 +138,10 @@ public class LICM extends Pass {
         inst.setBlock(preHeader);
 
         IRInst tail = preHeader.getTailInst();
-        if (tail.getPrevInst()==null) preHeader.setHeadInst(inst);
+        if (tail.getPrevInst()==null) {
+            preHeader.setHeadInst(inst);
+            inst.setPrevInst(null);
+        }
         else {
             tail.getPrevInst().setNextInst(inst);
             inst.setPrevInst(tail.getPrevInst());

@@ -55,9 +55,7 @@ public class LoopAnalysis extends Pass {
         // prepare pre-headers for followup opt
         loopMap.forEach(this::addPreHeader);
 
-        RPO = f.getRPO();
-        Stack<IRLoop> loopStack = new Stack<>();
-        RPO.forEach(b -> solveLoopDepth(b, loopStack));
+        solveLoopDepth(f.getEntranceBlock(), new Stack<>(), new HashSet<>());
 
         exteriorLoops.forEach(IRLoop::solveUniqueBlocks);
     }
@@ -128,7 +126,9 @@ public class LoopAnalysis extends Pass {
         }
     }
 
-    private void solveLoopDepth(IRBlock block, Stack<IRLoop> stack) {
+    private void solveLoopDepth(IRBlock block, Stack<IRLoop> stack, Set<IRBlock> visited) {
+        visited.add(block);
+
         while (!stack.isEmpty() &&
                 !stack.peek().getBlocks().contains(block)) {
             stack.pop();
@@ -140,5 +140,11 @@ public class LoopAnalysis extends Pass {
             stack.push(loop);
         }
         block.setLoopDepth(stack.size());
+
+        for (var s: block.getSuccessors()) {
+            if (!visited.contains(s)) {
+                solveLoopDepth(s, stack, visited);
+            }
+        }
     }
 }

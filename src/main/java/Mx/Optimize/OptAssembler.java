@@ -18,8 +18,8 @@ public class OptAssembler {
 
             InterProceduralAnalysis interProc = new InterProceduralAnalysis(module);
             SideEffectAnalysis sideEffect = new SideEffectAnalysis(module, interProc);
-            AliasAnalysis alias = new AliasAnalysis(module, interProc);
             LoopAnalysis loop = new LoopAnalysis(module);
+            AliasAnalysis alias = new AliasAnalysis(module, interProc, loop);
 
             boolean changed = new SCCP(module).run();
             changed |= new CFGSimplifier(module).run();
@@ -30,12 +30,11 @@ public class OptAssembler {
             changed |= new CSE(module).run();
             interProc.run();
             //sideEffect.run();
-            //alias.run();
             //loop.run();
+            //alias.run();
             //changed |= new LICM(module, alias, loop).run();
-            //new IRPrinter("inOpt_"+(10-cnt)+".ll").run(module);
             changed |= new Inliner(module, interProc).run();
-            //changed |= new AlgebraicSimplifier(module).run();
+            changed |= new AlgebraicSimplifier(module).run();
             changed |= new CFGSimplifier(module).run();
 
             if (!changed) break;
