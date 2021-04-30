@@ -2,6 +2,7 @@ package Mx.IR.Instruction;
 
 import Mx.IR.IRBlock;
 import Mx.IR.IRVisitor;
+import Mx.IR.Operand.Constant;
 import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Parameter;
 import Mx.IR.Operand.Register;
@@ -19,7 +20,7 @@ public class BinaryOp extends IRInst {
     private BinaryOpName opName;
     private Operand op1;
     private Operand op2;
-    private final boolean commutable;
+    private boolean commutable;
 
     public BinaryOp(IRBlock block, Register dst, BinaryOpName opName,
                     Operand op1, Operand op2) {
@@ -45,6 +46,9 @@ public class BinaryOp extends IRInst {
     }
     public void setOpName(BinaryOpName opName) {
         this.opName = opName;
+        this.commutable = opName==BinaryOpName.add || opName==BinaryOpName.mul
+                || opName==BinaryOpName.and || opName==BinaryOpName.or
+                || opName==BinaryOpName.xor;
     }
     public Operand getOp1() {
         return op1;
@@ -70,6 +74,9 @@ public class BinaryOp extends IRInst {
     }
     public void rewrite(BinaryOpName opName, Operand op1, Operand op2) {
         this.opName = opName;
+        this.commutable = opName==BinaryOpName.add || opName==BinaryOpName.mul
+                || opName==BinaryOpName.and || opName==BinaryOpName.or
+                || opName==BinaryOpName.xor;
         this.op1.removeUse(this);
         this.op2.removeUse(this);
         this.op1 = op1;
@@ -79,6 +86,14 @@ public class BinaryOp extends IRInst {
     }
     public boolean isCommutable() {
         return commutable;
+    }
+    public void skewToLeft() {
+        if (!commutable) return;
+        if (op1 instanceof Constant && !(op2 instanceof Constant)) {
+            Operand t = op1;
+            op1 = op2;
+            op2 = t;
+        }
     }
 
     @Override

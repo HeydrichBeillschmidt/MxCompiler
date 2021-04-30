@@ -35,6 +35,7 @@ public class OptAssembler {
             //changed |= new LICM(module, alias, loop).run();
             changed |= new Inliner(module, interProc).run();
             changed |= new AlgebraicSimplifier(module).run();
+            changed |= new PeepholeOpt(module).run();
             changed |= new CFGSimplifier(module).run();
 
             if (!changed) break;

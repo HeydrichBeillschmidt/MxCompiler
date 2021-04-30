@@ -1,161 +1,296 @@
-@a = global i32* null, align 4
-@.const.main.str1 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
-@.const.main.str0 = private unnamed_addr constant [2 x i8] c" \00", align 1
-@n = global i32 10000, align 4
+@w = global i32 0, align 4
+@N = global i32 1, align 4
 
-define void @___init__$$YGXXZ() {
+define i32 @_bblock$$YGHXZ() {
 entry:
-	%sizeTmp = mul i32 10100, 4
-	%size = add i32 %sizeTmp, 4
-	%malloc = call i8* @_malloc$$YGPADH$Z(i32 %size)
-	%mallocInt32Ptr = bitcast i8* %malloc to i32*
-	store i32 10100, i32* %mallocInt32Ptr, align 4
-	%arrayHeadPtrUnguarded = getelementptr i32, i32* %mallocInt32Ptr, i32 1
-	%arrayHeadPtr = bitcast i32* %arrayHeadPtrUnguarded to i32*
-	store i32* %arrayHeadPtr, i32** @a, align 4
-	ret void
+	%funcCallRet = call i32 @_wpppp$$YGHXZ()
+	%funcCallRet_2 = call i32 @_wpppp$$YGHXZ()
+	%funcCallRet_3 = call i32 @_bblock$$YGHXZ()
+	%funcCallRet_4 = call i32 @_bblock$$YGHXZ()
+	ret i32 %funcCallRet_4
 }
 
-define i32 @_qsrt$$YGHHH$Z(i32 %l, i32 %r) {
+define i32 @_wpp$$YGHXZ() {
 entry:
-	%a = load i32*, i32** @a, align 4
-	%add = add i32 %l, %r
-	%sdiv = sdiv i32 %add, 2
-	%elementPtr = getelementptr i32, i32* %a, i32 %sdiv
-	%arrayElement = load i32, i32* %elementPtr, align 4
-	br label %while.cond
+	%w = load i32, i32* @w, align 4
+	%postfix_inc = add i32 %w, 1
+	store i32 %postfix_inc, i32* @w, align 4
+	%w_2 = load i32, i32* @w, align 4
+	%prefix_inc = add i32 %w_2, 1
+	store i32 %prefix_inc, i32* @w, align 4
+	ret i32 %prefix_inc
+}
 
-while.cond:
-	%j_12 = phi i32 [ %r, %entry ], [ %j_10, %if.end ]
-	%temp_3 = phi i32 [ 0, %entry ], [ %temp_2, %if.end ]
-	%i_12 = phi i32 [ %l, %entry ], [ %i_10, %if.end ]
-	%sle = icmp sle i32 %i_12, %j_12
-	br i1 %sle, label %while.body_3, label %while.end_3
+define i32 @_add128$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add64$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add64$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-while.cond_2:
-	%i_11 = phi i32 [ %i_12, %while.body_3 ], [ %postfix_inc, %while.body ]
-	%a_2 = load i32*, i32** @a, align 4
-	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %i_11
-	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%slt = icmp slt i32 %arrayElement_2, %arrayElement
-	br i1 %slt, label %while.body, label %while.end
+define i32 @_add262144$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add131072$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add131072$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-while.body:
-	%postfix_inc = add i32 %i_11, 1
-	br label %while.cond_2
+define i32 @_add1$$YGHH$Z(i32 %x) {
+entry:
+	%add = add i32 %x, 1
+	ret i32 %add
+}
 
-while.end:
-	br label %while.cond_3
+define i32 @_add2$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add1$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add1$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-while.cond_3:
-	%j_11 = phi i32 [ %j_12, %while.end ], [ %postfix_dec, %while.body_2 ]
-	%a_3 = load i32*, i32** @a, align 4
-	%elementPtr_3 = getelementptr i32, i32* %a_3, i32 %j_11
-	%arrayElement_3 = load i32, i32* %elementPtr_3, align 4
-	%sgt = icmp sgt i32 %arrayElement_3, %arrayElement
-	br i1 %sgt, label %while.body_2, label %while.end_2
+define i32 @_sanity_check$$YGHXZ() {
+entry:
+	%funcCallRet = call i32 @_wP$$YGHXZ()
+	%add = add i32 %funcCallRet, 1
+	ret i32 %add
+}
 
-while.body_2:
-	%postfix_dec = sub i32 %j_11, 1
-	br label %while.cond_3
+define i32 @_add4$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add2$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add2$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-while.end_2:
-	%sle_2 = icmp sle i32 %i_11, %j_11
-	br i1 %sle_2, label %if.then, label %if.end
+define i32 @_add8192$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add4096$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add4096$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add32768$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add16384$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add16384$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_wP$$YGHXZ() {
+entry:
+	br label %for.body_2
+
+for.cond:
+	%j_6 = phi i32 [ 2, %for.body_2 ], [ %postfix_inc_2, %if.end ]
+	%slt = icmp slt i32 %j_6, %ashr
+	br i1 %slt, label %for.body, label %for.end
 
 if.then:
-	%a_4 = load i32*, i32** @a, align 4
-	%elementPtr_4 = getelementptr i32, i32* %a_4, i32 %i_11
-	%arrayElement_4 = load i32, i32* %elementPtr_4, align 4
-	%a_5 = load i32*, i32** @a, align 4
-	%elementPtr_5 = getelementptr i32, i32* %a_5, i32 %i_11
-	%a_6 = load i32*, i32** @a, align 4
-	%elementPtr_6 = getelementptr i32, i32* %a_6, i32 %j_11
-	%arrayElement_6 = load i32, i32* %elementPtr_6, align 4
-	store i32 %arrayElement_6, i32* %elementPtr_5, align 4
-	%a_7 = load i32*, i32** @a, align 4
-	%elementPtr_7 = getelementptr i32, i32* %a_7, i32 %j_11
-	store i32 %arrayElement_4, i32* %elementPtr_7, align 4
-	%postfix_inc_2 = add i32 %i_11, 1
-	%postfix_dec_2 = sub i32 %j_11, 1
-	br label %if.end
+	%postfix_inc = add i32 %i_10, 1
+	br label %for.end
 
 if.end:
-	%j_10 = phi i32 [ %postfix_dec_2, %if.then ], [ %j_11, %while.end_2 ]
-	%temp_2 = phi i32 [ %arrayElement_4, %if.then ], [ %temp_3, %while.end_2 ]
-	%i_10 = phi i32 [ %postfix_inc_2, %if.then ], [ %i_11, %while.end_2 ]
-	br label %while.cond
+	%postfix_inc_2 = add i32 %j_6, 1
+	br label %for.cond
 
-while.body_3:
-	br label %while.cond_2
+for.body:
+	%srem = srem i32 %i_10, %j_6
+	%eq = icmp eq i32 %srem, 0
+	br i1 %eq, label %if.then, label %if.end
 
-while.end_3:
-	%slt_2 = icmp slt i32 %l, %j_12
-	br i1 %slt_2, label %if.then_2, label %if.end_2
+for.end:
+	%i_11 = phi i32 [ %postfix_inc, %if.then ], [ %i_10, %for.cond ]
+	%isp_6 = phi i32 [ 0, %if.then ], [ 1, %for.cond ]
+	%sgt = icmp sgt i32 %i_11, 0
+	br i1 %sgt, label %logical_and_branch, label %logical_and_end
+
+logical_and_branch:
+	%add = add i32 %i_11, %isp_6
+	%srem_2 = srem i32 %add, 9
+	%eq_2 = icmp eq i32 %srem_2, 0
+	br label %logical_and_end
+
+logical_and_end:
+	%logicalAnd = phi i1 [ 0, %for.end ], [ %eq_2, %logical_and_branch ]
+	br i1 %logicalAnd, label %if.then_2, label %if.end_2
 
 if.then_2:
-	%funcCallRet = call i32 @_qsrt$$YGHHH$Z(i32 %l, i32 %j_12)
-	br label %if.end_2
+	%N_3 = load i32, i32* @N, align 4
+	%funcCallRet = call i32 @_wpppp$$YGHXZ()
+	%add_4 = add i32 %N_3, %funcCallRet
+	%srem_3 = srem i32 %add_4, 2
+	%eq_3 = icmp eq i32 %srem_3, 0
+	br i1 %eq_3, label %if.then_3, label %if.end_3
 
 if.end_2:
-	%slt_3 = icmp slt i32 %i_12, %r
-	br i1 %slt_3, label %if.then_3, label %if.end_3
+	%N_2 = load i32, i32* @N, align 4
+	%add_2 = add i32 %N_2, %isp_6
+	store i32 %add_2, i32* @N, align 4
+	%add_3 = add i32 %i_11, %isp_6
+	%postfix_inc_3 = add i32 %add_3, 1
+	br label %for.body_2
+
+for.body_2:
+	%j_5 = phi i32 [ 0, %entry ], [ %j_6, %if.end_2 ]
+	%ii_3 = phi i32 [ 0, %entry ], [ %ashr, %if.end_2 ]
+	%i_10 = phi i32 [ 3, %entry ], [ %postfix_inc_3, %if.end_2 ]
+	%isp_7 = phi i32 [ 0, %entry ], [ %isp_6, %if.end_2 ]
+	%ashr = ashr i32 %i_10, 1
+	br label %for.cond
 
 if.then_3:
-	%funcCallRet_2 = call i32 @_qsrt$$YGHHH$Z(i32 %i_12, i32 %r)
-	br label %if.end_3
+	%N_4 = load i32, i32* @N, align 4
+	%funcCallRet_2 = call i32 @_add524288$$YGHH$Z(i32 %N_4)
+	%sub = sub i32 %funcCallRet_2, 524288
+	%sub_2 = sub i32 %sub, 4
+	br label %return
 
 if.end_3:
-	ret i32 0
+	%funcCallRet_3 = call i32 @_block$$YGHXZ()
+	%funcCallRet_4 = call i32 @_block$$YGHXZ()
+	%funcCallRet_5 = call i32 @_block$$YGHXZ()
+	%funcCallRet_6 = call i32 @_block$$YGHXZ()
+	%funcCallRet_7 = call i32 @_bblock$$YGHXZ()
+	br label %return
+
+return:
+	%retval_2 = phi i32 [ %sub_2, %if.then_3 ], [ %funcCallRet_7, %if.end_3 ]
+	ret i32 %retval_2
+}
+
+define i32 @_add64$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add32$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add32$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_wppp$$YGHXZ() {
+entry:
+	%funcCallRet = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_2 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_3 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_4 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_5 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_6 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_7 = call i32 @_wpp$$YGHXZ()
+	%funcCallRet_8 = call i32 @_wpp$$YGHXZ()
+	ret i32 %funcCallRet_8
+}
+
+define i32 @_add16384$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add8192$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add8192$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add32$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add16$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add16$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_wpppp$$YGHXZ() {
+entry:
+	%funcCallRet = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_2 = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_3 = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_4 = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_5 = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_6 = call i32 @_wppp$$YGHXZ()
+	%funcCallRet_7 = call i32 @_wppp$$YGHXZ()
+	ret i32 %funcCallRet_7
+}
+
+define i32 @_add2048$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add1024$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add1024$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add16$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add8$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add8$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add1024$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add512$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add512$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
 }
 
 define i32 @main() {
 entry:
 	call void @___init__$$YGXXZ()
-	br label %for.cond
+	%funcCallRet = call i32 @_sanity_check$$YGHXZ()
+	%sub = sub i32 %funcCallRet, 3
+	ret i32 %sub
+}
 
-for.cond:
-	%i_10 = phi i32 [ 1, %entry ], [ %postfix_inc, %for.body ]
-	%n = load i32, i32* @n, align 4
-	%sle = icmp sle i32 %i_10, %n
-	br i1 %sle, label %for.body, label %for.end
+define i32 @_block$$YGHXZ() {
+entry:
+	%funcCallRet = call i32 @_block$$YGHXZ()
+	ret i32 %funcCallRet
+}
 
-for.body:
-	%a = load i32*, i32** @a, align 4
-	%elementPtr = getelementptr i32, i32* %a, i32 %i_10
-	%n_2 = load i32, i32* @n, align 4
-	%add = add i32 %n_2, 1
-	%sub = sub i32 %add, %i_10
-	store i32 %sub, i32* %elementPtr, align 4
-	%postfix_inc = add i32 %i_10, 1
-	br label %for.cond
+define i32 @_add524288$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add262144$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add262144$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-for.end:
-	%n_3 = load i32, i32* @n, align 4
-	%funcCallRet = call i32 @_qsrt$$YGHHH$Z(i32 1, i32 %n_3)
-	br label %for.cond_2
+define void @___init__$$YGXXZ() {
+entry:
+	ret void
+}
 
-for.cond_2:
-	%i_11 = phi i32 [ 1, %for.end ], [ %postfix_inc_2, %for.body_2 ]
-	%n_4 = load i32, i32* @n, align 4
-	%sle_2 = icmp sle i32 %i_11, %n_4
-	br i1 %sle_2, label %for.body_2, label %for.end_2
+define i32 @_add65536$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add32768$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add32768$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-for.body_2:
-	%a_2 = load i32*, i32** @a, align 4
-	%elementPtr_2 = getelementptr i32, i32* %a_2, i32 %i_11
-	%arrayElement_2 = load i32, i32* %elementPtr_2, align 4
-	%funcCallRet_2 = call i8* @_toString$$YGPADH$Z(i32 %arrayElement_2)
-	call void @_print$$YGXPAD$Z(i8* %funcCallRet_2)
-	%.const.main.str0 = getelementptr [2 x i8], [2 x i8]* @.const.main.str0, i32 0, i32 0
-	call void @_print$$YGXPAD$Z(i8* %.const.main.str0)
-	%postfix_inc_2 = add i32 %i_11, 1
-	br label %for.cond_2
+define i32 @_add4096$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add2048$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add2048$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
 
-for.end_2:
-	%.const.main.str1 = getelementptr [2 x i8], [2 x i8]* @.const.main.str1, i32 0, i32 0
-	call void @_print$$YGXPAD$Z(i8* %.const.main.str1)
-	ret i32 0
+define i32 @_add512$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add256$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add256$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add8$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add4$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add4$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add131072$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add65536$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add65536$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
+}
+
+define i32 @_add256$$YGHH$Z(i32 %x) {
+entry:
+	%funcCallRet_2 = call i32 @_add128$$YGHH$Z(i32 %x)
+	%funcCallRet = call i32 @_add128$$YGHH$Z(i32 %funcCallRet_2)
+	ret i32 %funcCallRet
 }
 
 declare i32 @_length$string$$QEAHXZ(i8* %str)

@@ -7,6 +7,7 @@ import Mx.IR.Instruction.*;
 import Mx.IR.Operand.*;
 import Mx.IR.TypeSystem.ArrayType;
 import Mx.IR.TypeSystem.BoolType;
+import Mx.IR.TypeSystem.IntegerType;
 import Mx.IR.TypeSystem.PointerType;
 
 import java.util.*;
@@ -64,6 +65,7 @@ public class AlgebraicSimplifier extends Pass {
     }
 
     private boolean checkBinary(BinaryOp i) {
+        aggregateBinaryInst(i);
         if (i.getOpName() == BinaryOp.BinaryOpName.add) {
             if (i.getOp1()==i.getOp2()) {
                 i.setOpName(BinaryOp.BinaryOpName.shl);
@@ -183,6 +185,53 @@ public class AlgebraicSimplifier extends Pass {
             return true;
         }
         return false;
+    }
+    private void aggregateBinaryInst(BinaryOp i) {
+        boolean cITypeLhs = i.getOp1().genByCommutativeIType(),
+                cITypeRhs = i.getOp2().genByCommutativeIType();
+        if (!cITypeLhs && !cITypeRhs) return;
+        if (cITypeLhs && cITypeRhs) {
+            BinaryOp lhsDef = (BinaryOp)((Register)i.getOp1()).getDef(),
+                     rhsDef = (BinaryOp)((Register)i.getOp2()).getDef();
+            if (lhsDef.getOpName()!=i.getOpName()
+                    || rhsDef.getOpName()!=i.getOpName() ) return;
+            lhsDef.skewToLeft();
+            rhsDef.skewToLeft();
+            Register tmp = new Register(new IntegerType(4), "tmp");
+            curFunc.addSymbol(tmp);
+            BinaryOp intermediate = new BinaryOp(i.getBlock(), tmp,
+                    i.getOpName(), lhsDef.getOp1(), rhsDef.getOp1());
+            i.getBlock().addPrevInst(i, intermediate);
+            i.rewrite(i.getOpName(), tmp, foldInt(i.getOpName(),
+                    (ConstInt) lhsDef.getOp2(), (ConstInt) rhsDef.getOp2()) );
+            exploit(i);
+        }
+        else if (cITypeLhs && i.getOp2() instanceof ConstInt) {
+            BinaryOp lhsDef = (BinaryOp)((Register)i.getOp1()).getDef();
+            if (lhsDef.getOpName()!=i.getOpName()) return;
+            lhsDef.skewToLeft();
+            i.rewrite(i.getOpName(), lhsDef.getOp1(), foldInt(i.getOpName(),
+                    (ConstInt) lhsDef.getOp2(), (ConstInt) i.getOp2()) );
+            exploit(i);
+        }
+        else if (cITypeRhs && i.getOp1() instanceof ConstInt) {
+            BinaryOp rhsDef = (BinaryOp)((Register)i.getOp2()).getDef();
+            if (rhsDef.getOpName()!=i.getOpName()) return;
+            rhsDef.skewToLeft();
+            i.rewrite(i.getOpName(), rhsDef.getOp1(), foldInt(i.getOpName(),
+                    (ConstInt) rhsDef.getOp2(), (ConstInt) i.getOp2()) );
+            exploit(i);
+        }
+    }
+    private ConstInt foldInt(BinaryOp.BinaryOpName opName, ConstInt c1, ConstInt c2) {
+        switch (opName) {
+            case add: return new ConstInt(c1.getValue()+c2.getValue(), 4);
+            case mul: return new ConstInt(c1.getValue()*c2.getValue(), 4);
+            case and: return new ConstInt(c1.getValue()&c2.getValue(), 4);
+            case or:  return new ConstInt(c1.getValue()|c2.getValue(), 4);
+            case xor: return new ConstInt(c1.getValue()^c2.getValue(), 4);
+            default: throw new RuntimeException();
+        }
     }
     private int mulToSllOrNot(int n) {
         if (n<=0) return -1;
