@@ -8,14 +8,21 @@ import Mx.IR.Operand.Constant;
 import Mx.IR.Operand.Operand;
 import Mx.IR.Operand.Register;
 import Mx.Optimize.FlowAnalysis.AliasAnalysis;
+import Mx.Optimize.FlowAnalysis.DominanceAnalysis;
 import Mx.Optimize.FlowAnalysis.LoopAnalysis;
 
 import java.util.*;
+
+//http://www.cs.toronto.edu/~pekhimenko/courses/cscd70-w18/docs/Lecture%205%20[LICM%20and%20Strength%20Reduction]%2002.08.2018.pdf
 
 // loop invariant code motion
 public class LICM extends Pass {
     private final AliasAnalysis alias;
     private final LoopAnalysis lpa;
+
+    private Map<IRLoop, Set<Store>> loopSTs;
+    private Set<IRLoop> hasSideEffect;
+    private Set<IRBlock> candidate;
     private Set<Register> loopInvariant;
 
     private boolean changed;
@@ -30,53 +37,67 @@ public class LICM extends Pass {
     public boolean run() {
         changed = false;
 
+        loopSTs = new HashMap<>();
+        hasSideEffect = new HashSet<>();
+        candidate = new HashSet<>();
         loopInvariant = new HashSet<>();
+        new DominanceAnalysis(module).run();
         lpa.getExteriorLoops().forEach(this::runForLoop);
 
         return changed;
     }
     private void runForLoop(IRLoop loop) {
+        Set<Store> lpST = new HashSet<>();
+        boolean sideEffect = false;
+
         if (!loop.getChildren().isEmpty()) {
-            loop.getChildren().forEach(this::runForLoop);
-        }
-
-        alias.buildST(loop);
-
-        Set<Register> loopDef = new HashSet<>();
-        for (var b: loop.getBlocks()) {
-            for (var i: b.getAllInst()) {
-                if (i.hasDst()) loopDef.add(i.getDst());
+            for (var c: loop.getChildren()) {
+                runForLoop(c);
+                lpST.addAll(loopSTs.get(c));
+                sideEffect |= hasSideEffect.contains(c);
             }
         }
-        Queue<IRInst> W = new LinkedList<>();
-        for (var b: loop.getBlocks()) {
-            for (var i: b.getAllInst()) checkHoist(i, loopDef, W);
-        }
-        changed |= !W.isEmpty();
 
+        candidate.clear();
+        for (var b: loop.getUniqueBlocks()) {
+            for (var i: b.getAllInst()) {
+                if (i instanceof Store) lpST.add((Store)i);
+                else if (i instanceof Call &&
+                        ((Call)i).getCallee().hasSideEffect() ) {
+                    sideEffect = true;
+                }
+            }
+
+            boolean isCandidate = true;
+            for (var t: loop.getTails()) {
+                if (!t.isDomed(b)) isCandidate = false;break;
+            }
+            if (isCandidate) candidate.add(b);
+        }
+        loopSTs.put(loop, lpST);
+        if (sideEffect) hasSideEffect.add(loop);
+
+        Queue<IRInst> W = new LinkedList<>();
+        while (true) {
+            boolean loopCond = false;
+            for (var b: loop.getUniqueBlocks()) {
+                for (var i: b.getAllInst()) {
+                    if (checkLPI(i, loop)) {
+                        W.offer(i);
+                        loopCond = true;
+                    }
+                }
+            }
+            if (loopCond) changed = true;
+            else break;
+        }
+
+        Set<IRInst> secondVisit = new HashSet<>();
         while (!W.isEmpty()) {
             IRInst inst = W.poll();
-            hoistInst(loop.getPreHeader(), inst);
-            for (var u: inst.getDst().getUses()) {
-                if (loopDef.contains(u.getDst())) checkHoist(u, loopDef, W);
-            }
-        }
-    }
-
-    private void checkHoist(IRInst inst, Set<Register> loopDef, Queue<IRInst> W) {
-        if (inst instanceof Load) {
-            Set<Operand> uses = inst.getUses();
-            uses.retainAll(loopDef);
-            if (uses.isEmpty() && !alias.useLoopST((Load) inst)) {
-                loopDef.remove(inst.getDst());
-                W.offer(inst);
-            }
-        }
-        else if (inst.hasNoSideEffect()) {
-            Set<Operand> uses = inst.getUses();
-            uses.retainAll(loopDef);
-            if (uses.isEmpty()) {
-                loopDef.remove(inst.getDst());
+            if (canHoist(inst, loop)) hoistInst(loop.getPreHeader(), inst);
+            else if (!secondVisit.contains(inst)) {
+                secondVisit.add(inst);
                 W.offer(inst);
             }
         }
@@ -87,7 +108,13 @@ public class LICM extends Pass {
         if (inst.hasNoSideEffect()
                 || inst instanceof Call
                 || inst instanceof Load) {
+            if (!candidate.contains(inst.getBlock())) return false;
             if (isLPI(inst.getDst(), loop)) return false;
+            for (var u: inst.getDst().getUses()) {
+                IRBlock block = u.getBlock();
+                if (!loop.getBlocks().contains(block)) continue;
+                if (!block.isDomed(inst.getBlock())) return false;
+            }
 
             if (inst instanceof Call) {
                 Call i = (Call) inst;
@@ -95,7 +122,11 @@ public class LICM extends Pass {
                 if (i.getCallee().hasSideEffect()) return false;
             }
             else if (inst instanceof Load) {
-                if (alias.useLoopST((Load) inst)) return false;
+                Set<Store> lpST = loopSTs.get(loop);
+                for (var i: lpST) {
+                    if (alias.mayAlias( ((Load)inst).getAddr(),
+                            i.getAddr() ) ) return false;
+                }
             }
             else if (inst instanceof BinaryOp) {
                 BinaryOp i = (BinaryOp) inst;

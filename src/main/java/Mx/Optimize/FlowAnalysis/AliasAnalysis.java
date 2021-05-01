@@ -1,8 +1,6 @@
 package Mx.Optimize.FlowAnalysis;
 
-import Mx.IR.Function;
 import Mx.IR.IRBlock;
-import Mx.IR.IRLoop;
 import Mx.IR.IRModule;
 import Mx.IR.Instruction.*;
 import Mx.IR.Operand.Null;
@@ -48,16 +46,8 @@ public class AliasAnalysis extends Pass {
     private Map<Operand, MemNode> ptrMap; // point to
     private Set<MemNode> nodes;
 
-    private final InterProceduralAnalysis interProc;
-    private final LoopAnalysis lpa;
-    private Map<Function, Set<MemNode>> funcSTs;
-    private Set<MemNode> loopSTs;
-    private Set<Operand> loopSAs; // addresses of stores
-
-    public AliasAnalysis(IRModule module, InterProceduralAnalysis interProc, LoopAnalysis lpa) {
+    public AliasAnalysis(IRModule module) {
         super(module);
-        this.interProc = interProc;
-        this.lpa = lpa;
     }
 
     public boolean mayAlias(Operand src1, Operand src2) {
@@ -75,14 +65,10 @@ public class AliasAnalysis extends Pass {
     public boolean run() {
         nodes = new HashSet<>();
         ptrMap = new HashMap<>();
-        funcSTs = new HashMap<>();
-        loopSTs = new HashSet<>();
-        loopSAs = new HashSet<>();
 
         init();
         solveConstraint();
         analyse();
-        collectSTs();
 
         return false;
     }
@@ -227,91 +213,5 @@ public class AliasAnalysis extends Pass {
                 }
             }
         }
-    }
-
-    private void collectSTs() {
-        ArrayList<Function> PO = interProc.getPO();
-        for (var f: PO) {
-            Set<MemNode> STs = new HashSet<>();
-            ArrayList<IRBlock> BPO = f.getPO();
-            for (var b: BPO) {
-                for (var i: b.getAllInst()) {
-                    if (i instanceof Store) {
-                        STs.addAll(ptrMap.get(((Store)i).getAddr()).basicConstrains);
-                    }
-                }
-            }
-            funcSTs.put(f, STs);
-        }
-        boolean loopCond = true;
-        while (loopCond) {
-            loopCond = false;
-            for (var f: PO) {
-                Set<MemNode> STs = funcSTs.get(f);
-                if (STs.isEmpty()) continue;
-                for (var caller: interProc.getDirectCallers(f)) {
-                    loopCond |= funcSTs.get(caller).addAll(STs);
-                }
-            }
-        }
-    }
-
-    private void stabilize(IRLoop loop) {
-        if (!loop.getChildren().isEmpty()) {
-            loop.getChildren().forEach(this::stabilize);
-        }
-        Set<MemNode> chord = new HashSet<>();
-        for (var inst: loop.getPreHeader().getAllInst()) {
-            if (inst.getDst().getType() instanceof PointerType) {
-                MemNode mem = ptrMap.get(inst.getDst());
-                if (!mem.simpleConstrains.isEmpty()) {
-                    chord.add(mem);
-                    chord.addAll(mem.simpleConstrains);
-                }
-            }
-        }
-        for (var b: loop.getBlocks()) {
-            for (var inst : b.getAllInst()) {
-                if (inst.getDst().getType() instanceof PointerType) {
-                    MemNode mem = ptrMap.get(inst.getDst());
-                    if (!mem.simpleConstrains.isEmpty()) {
-                        chord.add(mem);
-                        chord.addAll(mem.simpleConstrains);
-                    }
-                }
-            }
-        }
-        for (var c: chord) {
-            c.simpleConstrains.addAll(chord);
-        }
-    }
-
-    public void buildST(IRLoop loop) {
-        loopSTs.clear();
-        loopSAs.clear();
-        stabilize(loop);
-        for (var b: loop.getBlocks()) {
-            for (var inst: b.getAllInst()) {
-                if (inst instanceof Store) {
-                    loopSAs.add(((Store) inst).getAddr());
-                }
-                else if (inst instanceof Call) {
-                    Call i = (Call) inst;
-                    if (!module.hasNoFunction(i.getCallee().getName())) {
-                        loopSTs.addAll(funcSTs.get(i.getCallee()));
-                    }
-                }
-            }
-        }
-    }
-
-    public boolean useLoopST(Load i) {
-        Operand addr = i.getAddr();
-        Set<MemNode> pointTo = new HashSet<>(ptrMap.get(addr).basicConstrains);
-        if (!Collections.disjoint(pointTo, loopSTs)) return true;
-        for (var sa: loopSAs) {
-            if (mayAlias(sa, addr)) return true;
-        }
-        return false;
     }
 }
