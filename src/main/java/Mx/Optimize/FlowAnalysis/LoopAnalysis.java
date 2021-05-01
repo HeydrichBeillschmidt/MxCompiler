@@ -56,8 +56,6 @@ public class LoopAnalysis extends Pass {
         loopMap.forEach(this::addPreHeader);
 
         solveLoopDepth(f.getEntranceBlock(), new Stack<>(), new HashSet<>());
-
-        exteriorLoops.forEach(IRLoop::solveUniqueBlocks);
     }
 
     private void collectLoopBlocks(IRBlock head, IRBlock tail) {
