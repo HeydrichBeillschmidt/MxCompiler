@@ -239,22 +239,34 @@ public class OSR extends Pass {
         IRInst defInst = ((Register)iExpr.IV).getDef();
         IRInst newDef;
         Register result;
-        newDef = defInst.copyToBlock(defInst.getBlock());
-        result = newDef.getDst();
-        curFunc.addSymbol(result);
-        iExprMap.put(iExpr, result);
-        defInst.getBlock().addNextInst(defInst, newDef);
-        Set<Operand> uses = newDef.getUses();
-        for (var u: uses) {
-            if (u instanceof Register && header.get((Register) u)!=null &&
-                    header.get((Register) u)==header.get((Register) iExpr.IV) ) {
-                newDef.replaceUse(u, Reduce(new IExpr(u, iExpr.RC, iExpr.opName) ) );
+        if (defInst!=null) {
+            newDef = defInst.copyToBlock(defInst.getBlock());
+            result = newDef.getDst();
+            curFunc.addSymbol(result);
+            iExprMap.put(iExpr, result);
+            defInst.getBlock().addNextInst(defInst, newDef);
+            Set<Operand> uses = newDef.getUses();
+            for (var u: uses) {
+                if (u instanceof Register && header.get((Register) u)!=null &&
+                            header.get((Register) u)==header.get((Register) iExpr.IV) ) {
+                    newDef.replaceUse(u, Reduce(new IExpr(u, iExpr.RC, iExpr.opName) ) );
+                }
+                else if (iExpr.opName==BinaryOp.BinaryOpName.mul
+                        || newDef instanceof Phi) {
+                    if (!(u instanceof Parameter) && !(iExpr.RC instanceof Parameter))
+                        newDef.replaceUse(u, Apply(new IExpr(u, iExpr.RC, iExpr.opName) ) );
+                }
             }
-            else if (iExpr.opName==BinaryOp.BinaryOpName.mul
-                    || newDef instanceof Phi) {
-                if (!(u instanceof Parameter) && !(iExpr.RC instanceof Parameter))
-                    newDef.replaceUse(u, Apply(new IExpr(u, iExpr.RC, iExpr.opName) ) );
-            }
+        }
+        else {
+            result = new Register(iExpr.IV.getType(), "reduced");
+            curFunc.addSymbol(result);
+            iExprMap.put(iExpr, result);
+            newDef = new BinaryOp(curFunc.getEntranceBlock(),
+                    result, iExpr.opName, iExpr.IV, iExpr.RC);
+            ArrayList<Phi> phiList = curFunc.getEntranceBlock().getAllPhi();
+            Phi lastPhi = phiList.get(phiList.size()-1);
+            curFunc.getEntranceBlock().addNextInst(lastPhi, newDef);
         }
         header.put(result, header.get((Register)iExpr.IV));
         return result;
