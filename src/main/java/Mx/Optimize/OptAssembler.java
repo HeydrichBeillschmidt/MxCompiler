@@ -30,7 +30,7 @@ public class OptAssembler {
             changed |= new CSE(module).run();
             loop.run();
             changed |= new LICM(module, loop).run();
-            if (cnt>=8) changed |= new OSR(module).run();
+            if (cnt==9) changed |= new OSR(module).run();
             interProc.run();
             changed |= new Inliner(module, interProc).run();
             changed |= new AlgebraicSimplifier(module).run();
