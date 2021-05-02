@@ -23,9 +23,6 @@ public class Location {
         this(ctx.getStart());
     }
 
-    public int getRow() {return row;}
-    public int getCol() {return col;}
-
     public String toString() {
         return "(" + row + "," + col + ")";
     }

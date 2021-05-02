@@ -13,8 +13,6 @@ abstract public class Constant extends Operand {
     @Override
     public void addUse(IRInst inst) {}
     @Override
-    public void addUses(ArrayList<IRInst> insts) {}
-    @Override
     public void removeUse(IRInst inst) {}
 
     @Override

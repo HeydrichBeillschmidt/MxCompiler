@@ -2,7 +2,6 @@ package Mx.IR.Instruction;
 
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
-import Mx.IR.IRBuilder;
 import Mx.IR.IRVisitor;
 import Mx.IR.Operand.Null;
 import Mx.IR.Operand.Operand;
@@ -57,8 +56,8 @@ public class Call extends IRInst {
     public ArrayList<Operand> getParameterList() {
         return parameterList;
     }
-    public boolean isVoidCall() {
-        return voidCall;
+    public boolean isNotVoidCall() {
+        return !voidCall;
     }
 
     @Override

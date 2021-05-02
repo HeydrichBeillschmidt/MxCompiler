@@ -25,9 +25,6 @@ public class StructureType extends IRType {
     public ArrayList<IRType> getMemberTypes() {
         return memberTypes;
     }
-    public void addMemberTypes(ArrayList<IRType> mbTypes) {
-        memberTypes.addAll(mbTypes);
-    }
     public int calcOffset(int indexOfMember) {
         int ans = 0;
         for (int i = 0; i < indexOfMember; ++i)

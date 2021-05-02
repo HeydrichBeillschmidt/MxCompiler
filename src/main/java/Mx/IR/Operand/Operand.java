@@ -32,9 +32,6 @@ abstract public class Operand {
     public void addUse(IRInst inst) {
         if (inst!=null) uses.add(inst);
     }
-    public void addUses(ArrayList<IRInst> insts) {
-        uses.addAll(insts);
-    }
     public void removeUse(IRInst inst) {
         uses.remove(inst);
     }

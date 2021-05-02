@@ -3,7 +3,6 @@ package Mx.Optimize;
 import Mx.IR.Function;
 import Mx.IR.IRBlock;
 import Mx.IR.IRModule;
-import Mx.IR.IRPrinter;
 import Mx.IR.Instruction.Br;
 import Mx.IR.Instruction.Call;
 import Mx.IR.Instruction.Ret;
@@ -54,7 +53,7 @@ public class Inliner extends Pass {
         }
         assert inlineTail!=null;
         Ret instRet = (Ret) inlineTail.getTailInst();
-        if (!cs.isVoidCall()) cs.getDst().replaceUse(instRet.getRetValue());
+        if (cs.isNotVoidCall()) cs.getDst().replaceUse(instRet.getRetValue());
 
         IRBlock inlineEntrance = cs.getBlock();
         IRBlock inlineExit = inlineEntrance.split(caller, cs);

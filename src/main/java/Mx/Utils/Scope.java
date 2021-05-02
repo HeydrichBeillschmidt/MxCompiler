@@ -215,19 +215,6 @@ public class Scope {
         }
         return null;
     }
-    public FunctionEntity getFuncEntityAtCall(String pureName, ArrayList<ExprNode> parameters) {
-        if (funcEntities.containsKey(pureName)) {
-            String decoratedEnd = FuncNameDecorator.funcCallDecoratedEnd(parameters);
-            for (var p: funcEntities.get(pureName)) {
-                if (FuncNameDecorator.funcCallMatched(p.getName(), decoratedEnd))
-                    return p;
-            }
-        }
-        else if (parentScope!=null) {
-            return parentScope.getFuncEntityAtCall(pureName, parameters);
-        }
-        return null;
-    }
     public ArrayList<FunctionEntity> getOverloadedFuncEntities(String pureName) {
         if (funcEntities.containsKey(pureName))
             return funcEntities.get(pureName);

@@ -78,14 +78,6 @@ public class ASMBlock {
             tailInst = inst;
         }
     }
-    public void addInstAtHead(ASMInst inst) {
-        if (headInst==null) headInst = tailInst = inst;
-        else {
-            headInst.setPrevInst(inst);
-            inst.setNextInst(headInst);
-            headInst = inst;
-        }
-    }
     public void addPrevInst(ASMInst target, ASMInst instToAdd) {
         if (target.getPrevInst()==null) headInst = instToAdd;
         else {
@@ -115,14 +107,8 @@ public class ASMBlock {
     public ASMBlock getPrevBlock() {
         return prevBlock;
     }
-    public void setPrevBlock(ASMBlock prevBlock) {
-        this.prevBlock = prevBlock;
-    }
     public ASMBlock getNextBlock() {
         return nextBlock;
-    }
-    public void setNextBlock(ASMBlock nextBlock) {
-        this.nextBlock = nextBlock;
     }
     public void addBlock(ASMBlock block) {
         this.nextBlock = block;

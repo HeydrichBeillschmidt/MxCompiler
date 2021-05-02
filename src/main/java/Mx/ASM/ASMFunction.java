@@ -12,7 +12,6 @@ import java.util.*;
 
 public class ASMFunction {
     private final String name;
-    private final int funcID;
 
     private final ArrayList<VirtualReg> parameters;
     private int stackedParmsSize;
@@ -26,7 +25,6 @@ public class ASMFunction {
 
     public ASMFunction(String name, int funcID, Function irFunc) {
         this.name = name;
-        this.funcID = funcID;
         this.blocks = new HashMap<>();
         this.unresolvedGEP = new HashMap<>();
         this.symbolTable = new FuncSymbolTable();
@@ -75,9 +73,6 @@ public class ASMFunction {
             return "main";
         return name;
     }
-    public int getFuncID() {
-        return funcID;
-    }
 
     public ArrayList<VirtualReg> getParameters() {
         return parameters;
@@ -104,9 +99,6 @@ public class ASMFunction {
     }
     public Map<VirtualReg, Address> getUnresolvedGEP() {
         return unresolvedGEP;
-    }
-    public FuncSymbolTable getSymbolTable() {
-        return symbolTable;
     }
     public void addSymbolUnique(VirtualReg vr) {
         symbolTable.putASMUnique(vr);
@@ -137,20 +129,27 @@ public class ASMFunction {
         return ans;
     }
     public ArrayList<ASMBlock> getPostOrder() {
-        ArrayList<ASMBlock> order = new ArrayList<>();
         Set<ASMBlock> visited = new HashSet<>();
-        _dfsRecursive(entranceBlock, order, visited);
-        return order;
-    }
-    private void _dfsRecursive(ASMBlock block, ArrayList<ASMBlock> order,
-                               Set<ASMBlock> visited) {
-        visited.add(block);
-        for (var s: block.getSuccessors()) {
-            if (!visited.contains(s)) {
-                _dfsRecursive(s, order, visited);
+        ArrayList<ASMBlock> order = new ArrayList<>();
+        Stack<ASMBlock> stNode = new Stack<>();
+        Stack<Boolean> stStat = new Stack<>();
+        stNode.push(entranceBlock);
+        stStat.push(false);
+        while (!stNode.isEmpty()) {
+            ASMBlock block = stNode.pop();
+            boolean postVisit = stStat.pop();
+            if (postVisit) order.add(block);
+            else if (!visited.contains(block)) {
+                visited.add(block);
+                stNode.push(block);
+                stStat.push(true);
+                for (var s: block.getSuccessors()) {
+                    stNode.push(s);
+                    stStat.push(false);
+                }
             }
         }
-        order.add(block);
+        return order;
     }
 
     public void performLvnAnalysis() {
