@@ -101,15 +101,15 @@ if.else:
 	ret i32 %sub
 
 for.body:
-	%u_3 = phi i32 [ 0, %entry ], [ %funcCallRet, %if.then ]
-	%y_4 = phi i32 [ 0, %entry ], [ %funcCallRet_5, %if.then ]
 	%v_3 = phi i32 [ 0, %entry ], [ %funcCallRet_2, %if.then ]
-	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %if.then ]
-	%zz_4 = phi i32 [ 0, %entry ], [ %funcCallRet_7, %if.then ]
-	%w_4 = phi i32 [ 0, %entry ], [ %funcCallRet_3, %if.then ]
-	%z_4 = phi i32 [ 0, %entry ], [ %funcCallRet_6, %if.then ]
-	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %funcCallRet_7, %if.then ]
 	%x_4 = phi i32 [ 0, %entry ], [ %funcCallRet_4, %if.then ]
+	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %funcCallRet_7, %if.then ]
+	%z_4 = phi i32 [ 0, %entry ], [ %funcCallRet_6, %if.then ]
+	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %if.then ]
+	%y_4 = phi i32 [ 0, %entry ], [ %funcCallRet_5, %if.then ]
+	%w_4 = phi i32 [ 0, %entry ], [ %funcCallRet_3, %if.then ]
+	%zz_4 = phi i32 [ 0, %entry ], [ %funcCallRet_7, %if.then ]
+	%u_3 = phi i32 [ 0, %entry ], [ %funcCallRet, %if.then ]
 	%funcCallRet = call i32 @_rng$$YGHH$Z(i32 %rng_seed_5)
 	%funcCallRet_2 = call i32 @_rng$$YGHH$Z(i32 %funcCallRet)
 	%bitwise_and = and i32 %funcCallRet, 255

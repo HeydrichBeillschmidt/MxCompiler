@@ -20,7 +20,8 @@ public class OptAssembler {
             SideEffectAnalysis sideEffect = new SideEffectAnalysis(module, interProc);
             LoopAnalysis loop = new LoopAnalysis(module);
 
-            boolean changed = new SCCP(module).run();
+            boolean changed = new TailRecursionEliminator(module).run();
+            changed |= new SCCP(module).run();
             changed |= new CFGSimplifier(module).run();
             interProc.run();
             sideEffect.run();

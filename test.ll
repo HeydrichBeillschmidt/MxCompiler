@@ -1,273 +1,3 @@
-define i32 @_test$$YGHHHHHHHHHHH$Z(i32 %q, i32 %w, i32 %e, i32 %r, i32 %t, i32 %y, i32 %u, i32 %i, i32 %o, i32 %p) {
-entry:
-	%eq = icmp eq i32 %q, %w
-	br i1 %eq, label %if.then_2, label %if.else_2
-
-logical_or_branch:
-	%ne_2 = icmp ne i32 %e, %r
-	br label %logical_or_end
-
-logical_or_end:
-	%logicalOr = phi i1 [ 1, %if.then_2 ], [ %ne_2, %logical_or_branch ]
-	br i1 %logicalOr, label %if.then, label %if.else
-
-if.then:
-	%eq_2 = icmp eq i32 %w, %e
-	br i1 %eq_2, label %if.then_3, label %if.else_4
-
-if.then_3:
-	%ne_3 = icmp ne i32 %e, %r
-	br i1 %ne_3, label %logical_or_end_2, label %logical_or_branch_2
-
-logical_or_branch_2:
-	%ne_4 = icmp ne i32 %r, %t
-	br label %logical_or_end_2
-
-logical_or_end_2:
-	%logicalOr_2 = phi i1 [ 1, %if.then_3 ], [ %ne_4, %logical_or_branch_2 ]
-	br i1 %logicalOr_2, label %if.then_4, label %if.else_3
-
-if.then_4:
-	%eq_5 = icmp eq i32 %e, %r
-	br i1 %eq_5, label %if.then_9, label %if.else_16
-
-if.then_9:
-	%ne_9 = icmp ne i32 %r, %t
-	br i1 %ne_9, label %logical_or_end_5, label %logical_or_branch_5
-
-logical_or_branch_5:
-	%ne_10 = icmp ne i32 %t, %y
-	br label %logical_or_end_5
-
-logical_or_end_5:
-	%logicalOr_5 = phi i1 [ 1, %if.then_9 ], [ %ne_10, %logical_or_branch_5 ]
-	br i1 %logicalOr_5, label %if.then_10, label %if.else_11
-
-if.then_10:
-	%eq_6 = icmp eq i32 %r, %t
-	br i1 %eq_6, label %if.then_11, label %if.else_10
-
-if.then_11:
-	%ne_11 = icmp ne i32 %t, %y
-	br i1 %ne_11, label %logical_or_end_6, label %logical_or_branch_6
-
-logical_or_branch_6:
-	%ne_12 = icmp ne i32 %y, %u
-	br label %logical_or_end_6
-
-logical_or_end_6:
-	%logicalOr_6 = phi i1 [ 1, %if.then_11 ], [ %ne_12, %logical_or_branch_6 ]
-	br i1 %logicalOr_6, label %if.then_12, label %if.else_9
-
-if.then_12:
-	%funcCallRet_8 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %t, i32 %y, i32 %u, i32 %i, i32 %o, i32 %p, i32 %q, i32 %w, i32 %e, i32 %r)
-	%add_17 = add i32 %funcCallRet_8, 1
-	br label %return_5
-
-if.else_9:
-	%sub_9 = sub i32 %o, 1
-	%sub_10 = sub i32 %p, 2
-	%funcCallRet_9 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %t, i32 %y, i32 %u, i32 %i, i32 %sub_9, i32 %sub_10, i32 %q, i32 %w, i32 %e, i32 %r)
-	%add_18 = add i32 %funcCallRet_9, 2
-	br label %return_5
-
-if.else_10:
-	%add_19 = add i32 %r, %t
-	%add_20 = add i32 %add_19, %r
-	br label %return_5
-
-return_5:
-	%retval_6 = phi i32 [ %add_17, %if.then_12 ], [ %add_18, %if.else_9 ], [ %add_20, %if.else_10 ]
-	%add_21 = add i32 %retval_6, 1
-	br label %return_8
-
-if.else_11:
-	%sub_11 = sub i32 %i, 1
-	%sub_12 = sub i32 %o, 2
-	%eq_7 = icmp eq i32 %r, %t
-	br i1 %eq_7, label %if.then_13, label %if.else_15
-
-if.then_13:
-	%ne_13 = icmp ne i32 %t, %y
-	br i1 %ne_13, label %logical_or_end_7, label %logical_or_branch_7
-
-logical_or_branch_7:
-	%ne_14 = icmp ne i32 %y, %u
-	br label %logical_or_end_7
-
-logical_or_end_7:
-	%logicalOr_7 = phi i1 [ 1, %if.then_13 ], [ %ne_14, %logical_or_branch_7 ]
-	br i1 %logicalOr_7, label %if.then_14, label %if.else_14
-
-if.then_14:
-	%eq_8 = icmp eq i32 %t, %y
-	br i1 %eq_8, label %if.then_15, label %if.else_13
-
-if.then_15:
-	%ne_15 = icmp ne i32 %y, %u
-	br i1 %ne_15, label %logical_or_end_8, label %logical_or_branch_8
-
-logical_or_branch_8:
-	%ne_16 = icmp ne i32 %u, %sub_11
-	br label %logical_or_end_8
-
-logical_or_end_8:
-	%logicalOr_8 = phi i1 [ 1, %if.then_15 ], [ %ne_16, %logical_or_branch_8 ]
-	br i1 %logicalOr_8, label %if.then_16, label %if.else_12
-
-if.then_16:
-	%funcCallRet_10 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %y, i32 %u, i32 %sub_11, i32 %sub_12, i32 %p, i32 %q, i32 %w, i32 %e, i32 %r, i32 %t)
-	%add_22 = add i32 %funcCallRet_10, 1
-	br label %return_6
-
-if.else_12:
-	%sub_13 = sub i32 %p, 1
-	%sub_14 = sub i32 %q, 2
-	%funcCallRet_11 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %y, i32 %u, i32 %sub_11, i32 %sub_12, i32 %sub_13, i32 %sub_14, i32 %w, i32 %e, i32 %r, i32 %t)
-	%add_23 = add i32 %funcCallRet_11, 2
-	br label %return_6
-
-if.else_13:
-	%add_24 = add i32 %t, %y
-	%add_25 = add i32 %add_24, %t
-	br label %return_6
-
-return_6:
-	%retval_7 = phi i32 [ %add_22, %if.then_16 ], [ %add_23, %if.else_12 ], [ %add_25, %if.else_13 ]
-	%add_26 = add i32 %retval_7, 1
-	br label %return_7
-
-if.else_14:
-	%sub_15 = sub i32 %sub_12, 1
-	%sub_16 = sub i32 %p, 2
-	%funcCallRet_12 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %t, i32 %y, i32 %u, i32 %sub_11, i32 %sub_15, i32 %sub_16, i32 %q, i32 %w, i32 %e, i32 %r)
-	%add_27 = add i32 %funcCallRet_12, 2
-	br label %return_7
-
-if.else_15:
-	%add_28 = add i32 %r, %t
-	%add_29 = add i32 %add_28, %r
-	br label %return_7
-
-return_7:
-	%retval_8 = phi i32 [ %add_26, %return_6 ], [ %add_27, %if.else_14 ], [ %add_29, %if.else_15 ]
-	%add_30 = add i32 %retval_8, 2
-	br label %return_8
-
-if.else_16:
-	%add_31 = add i32 %e, %r
-	%add_32 = add i32 %add_31, %e
-	br label %return_8
-
-return_8:
-	%retval_9 = phi i32 [ %add_21, %return_5 ], [ %add_30, %return_7 ], [ %add_32, %if.else_16 ]
-	%add_5 = add i32 %retval_9, 1
-	br label %return_2
-
-if.else_3:
-	%sub_3 = sub i32 %u, 1
-	%sub_4 = sub i32 %i, 2
-	%funcCallRet_4 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %e, i32 %r, i32 %t, i32 %y, i32 %sub_3, i32 %sub_4, i32 %o, i32 %p, i32 %q, i32 %w)
-	%add_6 = add i32 %funcCallRet_4, 2
-	br label %return_2
-
-if.else_4:
-	%add_7 = add i32 %w, %e
-	%add_8 = add i32 %add_7, %w
-	br label %return_2
-
-return_2:
-	%retval_3 = phi i32 [ %add_5, %return_8 ], [ %add_6, %if.else_3 ], [ %add_8, %if.else_4 ]
-	%add = add i32 %retval_3, 1
-	br label %return
-
-if.else:
-	%sub = sub i32 %y, 1
-	%sub_2 = sub i32 %u, 2
-	%eq_3 = icmp eq i32 %w, %e
-	br i1 %eq_3, label %if.then_5, label %if.else_8
-
-if.then_5:
-	%ne_5 = icmp ne i32 %e, %r
-	br i1 %ne_5, label %logical_or_end_3, label %logical_or_branch_3
-
-logical_or_branch_3:
-	%ne_6 = icmp ne i32 %r, %t
-	br label %logical_or_end_3
-
-logical_or_end_3:
-	%logicalOr_3 = phi i1 [ 1, %if.then_5 ], [ %ne_6, %logical_or_branch_3 ]
-	br i1 %logicalOr_3, label %if.then_6, label %if.else_7
-
-if.then_6:
-	%eq_4 = icmp eq i32 %e, %r
-	br i1 %eq_4, label %if.then_7, label %if.else_6
-
-if.then_7:
-	%ne_7 = icmp ne i32 %r, %t
-	br i1 %ne_7, label %logical_or_end_4, label %logical_or_branch_4
-
-logical_or_branch_4:
-	%ne_8 = icmp ne i32 %t, %sub
-	br label %logical_or_end_4
-
-logical_or_end_4:
-	%logicalOr_4 = phi i1 [ 1, %if.then_7 ], [ %ne_8, %logical_or_branch_4 ]
-	br i1 %logicalOr_4, label %if.then_8, label %if.else_5
-
-if.then_8:
-	%funcCallRet_5 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %r, i32 %t, i32 %sub, i32 %sub_2, i32 %i, i32 %o, i32 %p, i32 %q, i32 %w, i32 %e)
-	%add_9 = add i32 %funcCallRet_5, 1
-	br label %return_3
-
-if.else_5:
-	%sub_5 = sub i32 %i, 1
-	%sub_6 = sub i32 %o, 2
-	%funcCallRet_6 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %r, i32 %t, i32 %sub, i32 %sub_2, i32 %sub_5, i32 %sub_6, i32 %p, i32 %q, i32 %w, i32 %e)
-	%add_10 = add i32 %funcCallRet_6, 2
-	br label %return_3
-
-if.else_6:
-	%add_11 = add i32 %e, %r
-	%add_12 = add i32 %add_11, %e
-	br label %return_3
-
-return_3:
-	%retval_4 = phi i32 [ %add_9, %if.then_8 ], [ %add_10, %if.else_5 ], [ %add_12, %if.else_6 ]
-	%add_13 = add i32 %retval_4, 1
-	br label %return_4
-
-if.else_7:
-	%sub_7 = sub i32 %sub_2, 1
-	%sub_8 = sub i32 %i, 2
-	%funcCallRet_7 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %e, i32 %r, i32 %t, i32 %sub, i32 %sub_7, i32 %sub_8, i32 %o, i32 %p, i32 %q, i32 %w)
-	%add_14 = add i32 %funcCallRet_7, 2
-	br label %return_4
-
-if.else_8:
-	%add_15 = add i32 %w, %e
-	%add_16 = add i32 %add_15, %w
-	br label %return_4
-
-return_4:
-	%retval_5 = phi i32 [ %add_13, %return_3 ], [ %add_14, %if.else_7 ], [ %add_16, %if.else_8 ]
-	%add_2 = add i32 %retval_5, 2
-	br label %return
-
-if.then_2:
-	%ne = icmp ne i32 %w, %e
-	br i1 %ne, label %logical_or_end, label %logical_or_branch
-
-if.else_2:
-	%add_3 = add i32 %q, %w
-	%add_4 = add i32 %add_3, %q
-	br label %return
-
-return:
-	%retval_2 = phi i32 [ %add, %return_2 ], [ %add_2, %return_4 ], [ %add_4, %if.else_2 ]
-	ret i32 %retval_2
-}
-
 define i32 @main() {
 entry:
 	br label %for.body
@@ -388,8 +118,50 @@ return_8:
 	%bitwise_and_6 = and i32 %xor_25, 32767
 	%ashr_5 = ashr i32 %bitwise_and_14, 15
 	%bitwise_and_7 = and i32 %xor_29, 32767
-	%funcCallRet_8 = call i32 @_test$$YGHHHHHHHHHHH$Z(i32 %bitwise_and_3, i32 %ashr, i32 %bitwise_and_4, i32 %ashr_2, i32 %ashr_3, i32 %bitwise_and_5, i32 %ashr_4, i32 %bitwise_and_6, i32 %ashr_5, i32 %bitwise_and_7)
-	%xor = xor i32 %sum_4, %funcCallRet_8
+	br label %entry_30
+
+entry_30:
+	%w_5 = phi i32 [ %ashr, %return_8 ], [ %e, %if.then_10 ], [ %e, %if.else_9 ]
+	%o = phi i32 [ %ashr_5, %return_8 ], [ %p, %if.then_10 ], [ %p, %if.else_9 ]
+	%i = phi i32 [ %bitwise_and_6, %return_8 ], [ %o, %if.then_10 ], [ %o, %if.else_9 ]
+	%u_4 = phi i32 [ %ashr_4, %return_8 ], [ %i, %if.then_10 ], [ %i, %if.else_9 ]
+	%r = phi i32 [ %ashr_2, %return_8 ], [ %t, %if.then_10 ], [ %t, %if.else_9 ]
+	%p = phi i32 [ %bitwise_and_7, %return_8 ], [ %q, %if.then_10 ], [ %q, %if.else_9 ]
+	%y_5 = phi i32 [ %bitwise_and_5, %return_8 ], [ %u_4, %if.then_10 ], [ %sub_10, %if.else_9 ]
+	%e = phi i32 [ %bitwise_and_4, %return_8 ], [ %r, %if.then_10 ], [ %r, %if.else_9 ]
+	%t = phi i32 [ %ashr_3, %return_8 ], [ %y_5, %if.then_10 ], [ %sub_9, %if.else_9 ]
+	%q = phi i32 [ %bitwise_and_3, %return_8 ], [ %w_5, %if.then_10 ], [ %w_5, %if.else_9 ]
+	%recursiveInc = phi i32 [ 0, %return_8 ], [ 1, %if.then_10 ], [ 2, %if.else_9 ]
+	%recursiveIncCnt = phi i32 [ 0, %return_8 ], [ %incCntTmp, %if.then_10 ], [ %incCntTmp, %if.else_9 ]
+	%incCntTmp = add i32 %recursiveIncCnt, %recursiveInc
+	%eq = icmp eq i32 %q, %w_5
+	br i1 %eq, label %if.then_9, label %if.else_10
+
+if.then_9:
+	%ne_2 = icmp ne i32 %w_5, %e
+	br i1 %ne_2, label %logical_or_end, label %logical_or_branch
+
+logical_or_branch:
+	%ne_3 = icmp ne i32 %e, %r
+	br label %logical_or_end
+
+logical_or_end:
+	%logicalOr = phi i1 [ 1, %if.then_9 ], [ %ne_3, %logical_or_branch ]
+	br i1 %logicalOr, label %if.then_10, label %if.else_9
+
+if.then_10:
+	br label %entry_30
+
+if.else_9:
+	%sub_9 = sub i32 %y_5, 1
+	%sub_10 = sub i32 %u_4, 2
+	br label %entry_30
+
+if.else_10:
+	%add = add i32 %q, %w_5
+	%add_2 = add i32 %add, %q
+	%recursiveIncOverall = add i32 %add_2, %incCntTmp
+	%xor = xor i32 %sum_4, %recursiveIncOverall
 	br label %for.body
 
 if.else:
@@ -397,8 +169,8 @@ if.else:
 	ret i32 %sub
 
 for.body:
-	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %return_8 ]
-	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %bitwise_and_14, %return_8 ]
+	%rng_seed_5 = phi i32 [ 19260817, %entry ], [ %bitwise_and_14, %if.else_10 ]
+	%sum_4 = phi i32 [ 0, %entry ], [ %xor, %if.else_10 ]
 	%shl = shl i32 %rng_seed_5, 13
 	%xor_2 = xor i32 %rng_seed_5, %shl
 	%sge = icmp sge i32 %xor_2, 0
