@@ -50,8 +50,8 @@ abstract public class Operand {
         if (!(defInst instanceof BinaryOp)) return false;
         BinaryOp bi = (BinaryOp) defInst;
         if (!bi.isCommutable()) return false;
-        return (bi.getOp1() instanceof ConstInt && !(bi.getOp2() instanceof ConstInt))
-                || (bi.getOp2() instanceof ConstInt && !(bi.getOp1() instanceof ConstInt));
+        return (bi.getOp1() instanceof ConstInt && bi.getOp2() instanceof Register)
+                || (bi.getOp2() instanceof ConstInt && bi.getOp1() instanceof Register);
     }
 
     abstract public boolean isConstant();
