@@ -114,7 +114,7 @@ public class Inliner extends Pass {
     private void removeRedundantFunc() {
         interProc.run();
         Set<Function> unusedFunc = new HashSet<>(module.getFunctions().values());
-        unusedFunc.removeAll(interProc.getPO());
+        interProc.getPO().forEach(unusedFunc::remove);
         unusedFunc.forEach(f -> module.getFunctions().remove(f.getName()));
         new DominanceAnalysis(module).run();
     }

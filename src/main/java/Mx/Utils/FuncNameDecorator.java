@@ -126,7 +126,7 @@ public class FuncNameDecorator {
             return decoratedName.substring(1, last);
         }
     }
-    public static String extractDecoratedEnd(String decoratedName) {
+    private static String extractDecoratedEnd(String decoratedName) {
         int begin;
         if (decoratedName.charAt(1)=='_') { // constructor
             begin = decoratedName.indexOf("$$QEA") + 5;

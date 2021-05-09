@@ -178,7 +178,7 @@ public class TailRecursionEliminator extends Pass {
         }
     }
 
-    private boolean TREWithOffset(ArrayList<IRInst> instList, Function callee, Operand retVal) {
+    private boolean TREWithOffset(ArrayList<IRInst> instList, Function caller, Operand retVal) {
         int sz = instList.size();
         if (sz<3 || !(instList.get(sz-2) instanceof BinaryOp)) return false;
         BinaryOp incInst = (BinaryOp) instList.get(sz-2);
@@ -188,7 +188,7 @@ public class TailRecursionEliminator extends Pass {
         if (!(instList.get(sz-3) instanceof Call)) return false;
         Call tailCS = (Call) instList.get(sz-3);
         incInst.skewToLeft();
-        return tailCS.getCallee()==callee && tailCS.hasDst()
+        return tailCS.getCallee()==caller && tailCS.hasDst()
                 && tailCS.getDst().getUses().size()==1 && incInst.isCommutable()
                 && incInst.getOp1().equals(tailCS.getDst());
     }
